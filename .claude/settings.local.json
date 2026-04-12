@@ -78,7 +78,9 @@
       "Bash(python -c \"from pathlib import Path; p = Path\\('E:/claude_money/backend'\\).parent / 'frontend'; print\\(p\\); print\\(p.exists\\(\\)\\); print\\(list\\(p.glob\\('app.js'\\)\\)\\)\")",
       "Bash(curl -s \"http://localhost:8765/static/app.js\")",
       "Bash(curl -s -I \"http://localhost:8765/static/app.js?v=3\")",
-      "Bash(python -c \"import json; d=json.load\\(open\\('E:/claude_money/backend/data/alm_config.json','r',encoding='utf-8'\\)\\); invs=d.get\\('investments',[]\\); [print\\(g['group'], json.dumps\\(g['items'][:2], ensure_ascii=False\\)\\) for g in invs]\")"
+      "Bash(python -c \"import json; d=json.load\\(open\\('E:/claude_money/backend/data/alm_config.json','r',encoding='utf-8'\\)\\); invs=d.get\\('investments',[]\\); [print\\(g['group'], json.dumps\\(g['items'][:2], ensure_ascii=False\\)\\) for g in invs]\")",
+      "Bash(pip show:*)",
+      "Bash(python -c \"import main; print\\('OK'\\)\")"
     ]
   }
 }

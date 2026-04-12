@@ -1,5 +1,6 @@
 """HC Finance Web — FastAPI backend"""
 import json
+import logging
 import time
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("hc_finance")
 
 app = FastAPI(title="HC Finance")
 app.add_middleware(
@@ -519,6 +526,143 @@ def get_market_history(start: str = "", end: str = "", indices: str = ""):
         return closes
     except Exception as e:
         return {"error": str(e)}
+
+
+# ── Auto snapshot (scheduled) ────────────────────────────────────────────────
+def compute_and_save_snapshot() -> dict:
+    """
+    Server-side equivalent of JS calcTotals() + saveSnapshot().
+    Fetches live prices, computes totals, writes to history.json.
+    """
+    portfolio = load_json(CONFIG_FILE, {"assets": [], "liabilities": [], "investments": []})
+
+    # Exchange rates
+    idx = fetch_indices()
+    usd_twd = idx.get("usd_twd") or 31.77
+    jpy_twd = idx.get("jpy_twd") or 0.21
+
+    def to_twd(amount: float, currency: str) -> float:
+        if currency == "USD": return amount * usd_twd
+        if currency == "JPY": return amount * jpy_twd
+        return amount
+
+    # Collect tickers to refresh
+    stock_keys, cb_syms, us_keys = [], [], []
+    for g in portfolio.get("investments", []):
+        grp = g.get("group", "")
+        for item in g.get("items", []):
+            sym = (item.get("symbol") or "").strip()
+            if not sym:
+                continue
+            if grp == "美國股市":
+                us_keys.append(sym)
+            elif grp == "可轉債":
+                cb_syms.append(sym)
+            elif grp == "股票":
+                stock_keys.append(sym + ".TW")
+
+    tw_prices = fetch_prices(stock_keys) if stock_keys else {}
+    us_prices = fetch_prices(us_keys)    if us_keys    else {}
+    cb_data   = fetch_cb_prices(cb_syms) if cb_syms    else {}
+
+    total_assets = 0.0
+    group_totals: dict = {}
+
+    # Assets (cash, real estate, etc.)
+    for g in portfolio.get("assets", []):
+        gs = sum(to_twd(float(it.get("amount") or 0), it.get("currency", "TWD"))
+                 for it in g.get("items", []))
+        group_totals[g["group"]] = round(gs)
+        total_assets += gs
+
+    # Investments
+    for g in portfolio.get("investments", []):
+        grp = g.get("group", "")
+        is_cb = grp == "可轉債"
+        is_us = grp == "美國股市"
+        gs = 0.0
+        for item in g.get("items", []):
+            sym    = (item.get("symbol") or "").strip()
+            cost   = float(item.get("cost")        or 0)
+            shares = float(item.get("shares")      or 0)
+            entry  = float(item.get("entry_price") or 0)
+            # Resolve live price, fall back to stored current_price
+            if is_us:
+                price = float((us_prices.get(sym) or {}).get("price") or item.get("current_price") or 0)
+            elif is_cb:
+                price = float((cb_data.get(sym)   or {}).get("price") or item.get("current_price") or 0)
+            else:
+                price = float((tw_prices.get(sym + ".TW") or {}).get("price") or item.get("current_price") or 0)
+
+            mv = (cost + (price - entry) * shares) if is_cb else (shares * price)
+            gs += mv * usd_twd if is_us else mv
+
+        group_totals[grp] = round(gs)
+        total_assets += gs
+
+    # Liabilities
+    total_debts = sum(
+        to_twd(float(it.get("amount") or 0), it.get("currency", "TWD"))
+        for g in portfolio.get("liabilities", [])
+        for it in g.get("items", [])
+    )
+
+    net_worth = total_assets - total_debts
+    snapshot = {
+        "net_worth":        round(net_worth),
+        "total_assets":     round(total_assets),
+        "total_liabilities": round(total_debts),
+        "asset_groups":     group_totals,
+    }
+
+    date_key = datetime.now().strftime("%Y-%m-%d")
+    history = load_json(HISTORY_FILE, {})
+    history[date_key] = snapshot
+    save_json(HISTORY_FILE, history)
+    logger.info(f"[auto-snapshot] {date_key} saved — net_worth={net_worth:,.0f}")
+    return {"date": date_key, **snapshot}
+
+
+def _run_daily_snapshot():
+    try:
+        compute_and_save_snapshot()
+    except Exception as e:
+        logger.error(f"[auto-snapshot] failed: {e}")
+
+
+# Scheduler: fire every day at 15:00 Taiwan time (UTC+8)
+_scheduler = BackgroundScheduler(timezone="Asia/Taipei")
+_scheduler.add_job(
+    _run_daily_snapshot,
+    CronTrigger(hour=15, minute=0, timezone="Asia/Taipei"),
+    id="daily_snapshot",
+    replace_existing=True,
+)
+_scheduler.start()
+logger.info("[scheduler] daily auto-snapshot scheduled at 15:00 Asia/Taipei")
+
+
+@app.get("/api/auto-snapshot/run")
+def trigger_auto_snapshot():
+    """Manually trigger the auto-snapshot (for testing)."""
+    try:
+        result = compute_and_save_snapshot()
+        return {"ok": True, **result}
+    except Exception as e:
+        return {"ok": False, "error": str(e)}
+
+
+@app.get("/api/auto-snapshot/status")
+def auto_snapshot_status():
+    job = _scheduler.get_job("daily_snapshot")
+    if not job:
+        return {"scheduled": False}
+    return {
+        "scheduled": True,
+        "next_run": str(job.next_run_time),
+        "timezone": "Asia/Taipei",
+        "trigger": "每日 15:00",
+    }
 
 
 # ── Serve frontend ───────────────────────────────────────────────────────────
