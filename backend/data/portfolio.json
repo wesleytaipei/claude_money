@@ -1,0 +1,10 @@
+{
+  "cash": [
+    {"id": "cash-1", "currency": "TWD", "amount": 0, "label": "現金/活存"}
+  ],
+  "positions": [],
+  "debts": [],
+  "other_assets": [],
+  "usd_twd_rate": 32.0,
+  "last_updated": null
+}

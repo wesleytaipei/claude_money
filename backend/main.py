@@ -1,0 +1,454 @@
+"""HC Finance Web — FastAPI backend"""
+import json
+import time
+from datetime import datetime
+from pathlib import Path
+
+import urllib3
+import requests as http_requests
+
+import yfinance as yf
+from fastapi import FastAPI, Request
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI(title="HC Finance")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / "data"
+FRONTEND_DIR = BASE_DIR.parent / "frontend"
+
+CONFIG_FILE = DATA_DIR / "alm_config.json"
+HISTORY_FILE = DATA_DIR / "history.json"
+MANUAL_HISTORY_FILE = DATA_DIR / "manual_history.json"
+
+_price_cache: dict = {}
+_indices_cache: dict = {"ts": 0, "data": {}}
+CACHE_TTL = 300  # 5 minutes
+
+
+# ── IO helpers ───────────────────────────────────────────────────────────────
+def load_json(path: Path, default):
+    if not path.exists():
+        return default
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return default
+
+
+def save_json(path: Path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+# ── Price fetching ───────────────────────────────────────────────────────────
+def _resolve_ticker(symbol: str, market: str) -> str:
+    """Convert a raw symbol to a yfinance ticker."""
+    s = symbol.strip().upper()
+    if market == "tw":
+        if not (s.endswith(".TW") or s.endswith(".TWO")):
+            # Taiwan stocks use .TW; fallback to .TWO (OTC) handled separately
+            return f"{s}.TW"
+    return s
+
+
+def fetch_prices(tickers: list[str]) -> dict:
+    now = time.time()
+    result = {}
+    to_fetch = []
+
+    for t in tickers:
+        cached = _price_cache.get(t)
+        if cached and (now - cached["ts"]) < CACHE_TTL:
+            result[t] = cached
+        else:
+            to_fetch.append(t)
+
+    if to_fetch:
+        try:
+            tkrs = yf.Tickers(" ".join(to_fetch))
+            for t in to_fetch:
+                try:
+                    fi = tkrs.tickers[t].fast_info
+                    price = fi.last_price
+                    currency = getattr(fi, "currency", None) or "TWD"
+                    entry = {
+                        "price": round(float(price), 4) if price else None,
+                        "currency": currency,
+                        "ts": now,
+                    }
+                    _price_cache[t] = entry
+                    result[t] = entry
+                except Exception as e:
+                    err = {"price": None, "currency": "N/A", "error": str(e), "ts": now}
+                    _price_cache[t] = err
+                    result[t] = err
+        except Exception as e:
+            for t in to_fetch:
+                result[t] = {"price": None, "currency": "N/A", "error": str(e), "ts": now}
+
+    return result
+
+
+def fetch_indices() -> dict:
+    now = time.time()
+    if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
+        return _indices_cache["data"]
+
+    index_tickers = {
+        "taiex": "^TWII",
+        "otc": "^TWOII",
+        "dji": "^DJI",
+        "nasdaq": "^IXIC",
+        "sox": "^SOX",
+    }
+    fx_tickers = {"usd_twd": "USDTWD=X", "jpy_twd": "JPYTWD=X"}
+
+    result = {}
+    all_tickers = list(index_tickers.values()) + list(fx_tickers.values())
+
+    try:
+        tkrs = yf.Tickers(" ".join(all_tickers))
+
+        for key, sym in index_tickers.items():
+            try:
+                fi = tkrs.tickers[sym].fast_info
+                price = float(fi.last_price or 0)
+                prev = float(getattr(fi, "previous_close", None) or 0)
+                change = price - prev if prev else 0
+                pct = (change / prev * 100) if prev else 0
+                result[key] = {
+                    "price": round(price, 2),
+                    "change": round(change, 2),
+                    "change_pct": round(pct, 2),
+                }
+            except Exception:
+                result[key] = None
+
+        for key, sym in fx_tickers.items():
+            try:
+                fi = tkrs.tickers[sym].fast_info
+                result[key] = round(float(fi.last_price), 4)
+            except Exception:
+                result[key] = None
+    except Exception as e:
+        result["error"] = str(e)
+
+    _indices_cache["data"] = result
+    _indices_cache["ts"] = now
+    return result
+
+
+_cb_cache: dict = {"ts": 0, "data": {}}
+
+
+CBAS_CACHE_TTL = 300  # 5 min
+_cbas_cache: dict = {"ts": 0, "data": {}}  # bond_code -> full CB info
+
+
+def load_cbas_data() -> dict:
+    """Load all CB data from CBAS API (cached). Returns dict keyed by bond_code."""
+    now = time.time()
+    if _cbas_cache["ts"] and (now - _cbas_cache["ts"]) < CBAS_CACHE_TTL:
+        return _cbas_cache["data"]
+
+    url = "https://cbas16889.pscnet.com.tw/api/CbasQuote/GetIssuedCBSchedule"
+    try:
+        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False)
+        raw = r.json()
+        cb_list = raw.get("result", raw) if isinstance(raw, dict) else raw
+        result = {}
+        for item in cb_list:
+            code = str(item.get("bond_code", "")).strip()
+            if not code:
+                continue
+
+            def _f(k):
+                v = item.get(k)
+                try:
+                    return float(v) if v not in (None, "", "-") else None
+                except (ValueError, TypeError):
+                    return None
+
+            # CB market price from CBAS (more reliable than mis API in some cases)
+            cb_price = _f("convertible_bond_market_price")
+
+            result[code] = {
+                "name":              item.get("underlying_bond", ""),
+                "price":             cb_price,
+                "cb_due_date":       item.get("expiry_date", ""),
+                "issued_shares":     (_f("circulation") or 0) * 1000,
+                "remain_shares":     _f("circulating_balance"),
+                "balance_ratio":     _f("balance_ratio"),
+                "conversion_price":  _f("conversion_price"),
+                "premium_rate":      _f("premium_rate"),
+                "stock_price":       _f("underlying_stock_market_price"),
+                "conversion_value":  _f("conversion_value"),
+                "convert_target":    item.get("convert_target_code", ""),
+                "ts": now,
+            }
+        _cbas_cache["data"] = result
+        _cbas_cache["ts"] = now
+        return result
+    except Exception as e:
+        return _cbas_cache.get("data", {})
+
+
+def fetch_cb_prices(symbols: list[str]) -> dict:
+    """Fetch CB data. Primary: CBAS API (full data). Fallback: TWSE mis API (price only)."""
+    cbas = load_cbas_data()
+    now = time.time()
+    result = {}
+
+    # Symbols not found in CBAS — try mis API for price
+    missing = [s for s in symbols if s not in cbas]
+
+    if missing:
+        ex_ch = "|".join(f"otc_{s}.tw" for s in missing)
+        url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}"
+        try:
+            r = http_requests.get(url, timeout=10, verify=False)
+            for item in r.json().get("msgArray", []):
+                code = item.get("c", "")
+                price = None
+                for field in ["z", None, "y"]:
+                    if field is None:
+                        b = item.get("b", "")
+                        if b and b != "-":
+                            try: price = float(b.split("_")[0])
+                            except: pass
+                        if price: break
+                        continue
+                    val = item.get(field, "-")
+                    if val and val != "-":
+                        try: price = float(val)
+                        except: pass
+                    if price: break
+                cbas[code] = {
+                    "name": item.get("n", ""),
+                    "price": round(price, 4) if price else None,
+                    "ts": now,
+                }
+        except Exception:
+            pass
+
+    for s in symbols:
+        result[s] = cbas.get(s, {"price": None, "name": "", "ts": now})
+
+    return result
+
+
+# ── API routes ───────────────────────────────────────────────────────────────
+@app.get("/api/health")
+def health():
+    return {"ok": True}
+
+
+@app.get("/api/portfolio")
+def get_portfolio():
+    return load_json(CONFIG_FILE, {"assets": [], "liabilities": [], "investments": []})
+
+
+@app.post("/api/portfolio")
+async def post_portfolio(request: Request):
+    data = await request.json()
+    save_json(CONFIG_FILE, data)
+    return {"ok": True}
+
+
+@app.get("/api/prices")
+def get_prices(tickers: str = ""):
+    if not tickers.strip():
+        return {}
+    tks = [t.strip() for t in tickers.split(",") if t.strip()]
+    return fetch_prices(tks)
+
+
+@app.get("/api/cb-prices")
+def get_cb_prices(symbols: str = ""):
+    if not symbols.strip():
+        return {}
+    syms = [s.strip() for s in symbols.split(",") if s.strip()]
+    return fetch_cb_prices(syms)
+
+
+def _entry_to_lookup(symbol: str, entry: dict) -> dict:
+    return {
+        "symbol":           symbol,
+        "name":             entry.get("name", ""),
+        "price":            entry.get("price"),
+        "cb_due_date":      entry.get("cb_due_date", ""),
+        "issued_shares":    entry.get("issued_shares"),
+        "remain_shares":    entry.get("remain_shares"),
+        "balance_ratio":    entry.get("balance_ratio"),
+        "conversion_price": entry.get("conversion_price"),
+        "premium_rate":     entry.get("premium_rate"),
+        "stock_price":      entry.get("stock_price"),
+        "conversion_value": entry.get("conversion_value"),
+        "convert_target":   entry.get("convert_target", ""),
+    }
+
+
+@app.get("/api/cb-lookup")
+def cb_lookup(symbol: str = "", name: str = ""):
+    symbol = symbol.strip()
+    name = name.strip()
+
+    cbas = load_cbas_data()
+
+    if symbol:
+        if symbol in cbas:
+            return _entry_to_lookup(symbol, cbas[symbol])
+        # fallback: fetch price from mis API
+        data = fetch_cb_prices([symbol])
+        return _entry_to_lookup(symbol, data.get(symbol, {}))
+
+    if name:
+        # Search CBAS by name
+        for sym, entry in cbas.items():
+            if entry.get("name") == name:
+                return _entry_to_lookup(sym, entry)
+        # Search portfolio
+        portfolio = load_json(CONFIG_FILE, {"assets": [], "liabilities": [], "investments": []})
+        for g in portfolio.get("investments", []):
+            if g.get("group") != "可轉債":
+                continue
+            for item in g.get("items", []):
+                if item.get("name") == name:
+                    sym = item.get("symbol", "")
+                    if sym and sym in cbas:
+                        return _entry_to_lookup(sym, cbas[sym])
+        return {"symbol": "", "name": name, "error": "not_found"}
+
+    return {}
+
+
+@app.get("/api/indices")
+def get_indices():
+    return fetch_indices()
+
+
+@app.post("/api/snapshot")
+async def save_snapshot(request: Request):
+    body = await request.json()
+    history = load_json(HISTORY_FILE, {})
+    date_key = body.get("date") or datetime.now().strftime("%Y-%m-%d")
+    history[date_key] = {k: v for k, v in body.items() if k != "date"}
+    save_json(HISTORY_FILE, history)
+    return {"ok": True, "date": date_key}
+
+
+@app.get("/api/history")
+def get_history():
+    return load_json(HISTORY_FILE, {})
+
+
+@app.get("/api/manual-history")
+def get_manual_history():
+    return load_json(MANUAL_HISTORY_FILE, [])
+
+
+@app.post("/api/manual-history")
+async def add_manual_history(request: Request):
+    body = await request.json()
+    history = load_json(MANUAL_HISTORY_FILE, [])
+    date = body.get("date")
+    if not date:
+        return {"error": "date required"}
+    history = [h for h in history if h.get("date") != date]
+    history.append(body)
+    history.sort(key=lambda x: x.get("date", ""))
+    save_json(MANUAL_HISTORY_FILE, history)
+    return {"ok": True}
+
+
+@app.delete("/api/manual-history/{date}")
+def delete_manual_history(date: str):
+    history = load_json(MANUAL_HISTORY_FILE, [])
+    history = [h for h in history if h.get("date") != date]
+    save_json(MANUAL_HISTORY_FILE, history)
+    return {"ok": True}
+
+
+@app.get("/api/market-history")
+def get_market_history(start: str = "", end: str = "", indices: str = ""):
+    """Fetch historical index closing prices from yfinance."""
+    if not start or not indices:
+        return {}
+    index_map = {
+        "TAIEX": "^TWII",
+        "OTC": "^TWOII",
+        "DJI": "^DJI",
+        "NASDAQ": "^IXIC",
+        "SOX": "^SOX",
+    }
+    wanted = [i.strip() for i in indices.split(",") if i.strip() in index_map]
+    if not wanted:
+        return {}
+
+    try:
+        tickers = [index_map[i] for i in wanted]
+        end_date = end or datetime.now().strftime("%Y-%m-%d")
+        df = yf.download(
+            tickers, start=start, end=end_date,
+            auto_adjust=True, progress=False, group_by="ticker",
+        )
+        if df is None or df.empty:
+            return {}
+
+        closes = {}
+        if len(tickers) == 1:
+            t = tickers[0]
+            name = wanted[0]
+            if "Close" in df.columns:
+                series = df["Close"]
+            else:
+                series = df[(t, "Close")]
+            closes[name] = {str(idx.date()): round(float(v), 2)
+                            for idx, v in series.dropna().items()}
+        else:
+            for name, t in zip(wanted, tickers):
+                try:
+                    series = df[(t, "Close")]
+                    closes[name] = {str(idx.date()): round(float(v), 2)
+                                    for idx, v in series.dropna().items()}
+                except Exception:
+                    closes[name] = {}
+        return closes
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# ── Serve frontend ───────────────────────────────────────────────────────────
+from fastapi import Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class NoCacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+app.add_middleware(NoCacheMiddleware)
+app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
+
+
+@app.get("/")
+def serve_index():
+    return FileResponse(
+        str(FRONTEND_DIR / "index.html"),
+        headers={"Cache-Control": "no-store"},
+    )

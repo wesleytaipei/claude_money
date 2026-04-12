@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HC 財務管理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=8" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── SIDEBAR ──────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">💎</div>
+        <div>
+          <div class="brand-title">HC Finance</div>
+          <div class="brand-sub">Wesley Chen</div>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-page="dashboard">
+          <span class="nav-ico">📊</span><span>資產總覽</span>
+        </button>
+        <button class="nav-item" data-page="assets">
+          <span class="nav-ico">💼</span><span>資產與負債</span>
+        </button>
+        <button class="nav-item" data-page="investments">
+          <span class="nav-ico">📈</span><span>投資部位</span>
+        </button>
+        <button class="nav-item" data-page="growth">
+          <span class="nav-ico">📊</span><span>資產成長圖</span>
+        </button>
+        <button class="nav-item" data-page="trend">
+          <span class="nav-ico">📉</span><span>資產趨勢圖</span>
+        </button>
+        <button class="nav-item" data-page="history">
+          <span class="nav-ico">📅</span><span>歷史紀錄</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="datetime" id="datetime">—</div>
+        <button class="btn-action btn-save" onclick="saveSnapshot()">💾 儲存資料</button>
+        <button class="btn-action btn-refresh" onclick="refreshAll()">
+          <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新數據</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ─────────────────────────────────────── -->
+    <main class="main-content">
+
+      <!-- ══ DASHBOARD ══ -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>資產總覽</h1>
+            <p class="page-sub" id="dash-time">—</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-ghost" onclick="openSettingsModal()">⚙️ 設定統計</button>
+            <button class="btn-ghost" onclick="togglePrivacy()">
+              <span id="privacy-ico">👁</span> <span id="privacy-txt">顯示中</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-net">
+            <div class="kpi-label">淨資產</div>
+            <div class="kpi-value" id="kpi-net-worth">—</div>
+            <div class="kpi-sub" id="kpi-net-worth-usd">—</div>
+          </div>
+          <div class="kpi-card kpi-assets">
+            <div class="kpi-label">總資產</div>
+            <div class="kpi-value" id="kpi-total-assets">—</div>
+            <div class="kpi-sub" id="kpi-total-assets-usd">—</div>
+          </div>
+          <div class="kpi-card kpi-debts">
+            <div class="kpi-label">總負債</div>
+            <div class="kpi-value" id="kpi-total-debts">—</div>
+            <div class="kpi-sub" id="kpi-debt-ratio">—</div>
+          </div>
+          <div class="kpi-card kpi-leverage">
+            <div class="kpi-label">資產槓桿</div>
+            <div class="kpi-value" id="kpi-leverage">—</div>
+            <div class="kpi-sub">總資產 / 淨資產</div>
+          </div>
+          <div class="kpi-card kpi-exposure">
+            <div class="kpi-label">投資曝險</div>
+            <div class="kpi-value" id="kpi-exposure">—</div>
+            <div class="kpi-sub">投資 / 淨資產</div>
+          </div>
+        </div>
+
+        <!-- Chart + Indices row -->
+        <div class="dash-grid">
+          <div class="panel panel-lg">
+            <div class="panel-head">
+              <h3>資產配置</h3>
+              <span class="panel-sub" id="alloc-total">—</span>
+            </div>
+            <div class="alloc-container">
+              <div class="alloc-chart-wrap">
+                <canvas id="alloc-chart"></canvas>
+              </div>
+              <div class="alloc-legend" id="alloc-legend"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>市場指數</h3>
+              <span class="panel-sub" id="fx-info">—</span>
+            </div>
+            <div class="indices-list" id="indices-list">
+              <div class="muted small">載入中…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- P&L Summary -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>投資損益總覽</h3>
+          </div>
+          <div class="pnl-grid" id="pnl-grid"></div>
+        </div>
+      </section>
+
+      <!-- ══ ASSETS & LIABILITIES ══ -->
+      <section class="page" id="page-assets">
+        <div class="page-header">
+          <div>
+            <h1>資產與負債管理</h1>
+            <p class="page-sub">編輯現金、不動產、貸款項目</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>📗 資產項目</h3>
+            <button class="btn-primary" onclick="openAddGroup('assets')">＋ 新增群組</button>
+          </div>
+          <div id="assets-groups"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>📕 負債項目</h3>
+            <button class="btn-primary" onclick="openAddGroup('liabilities')">＋ 新增群組</button>
+          </div>
+          <div id="liabilities-groups"></div>
+        </div>
+      </section>
+
+      <!-- ══ INVESTMENTS ══ -->
+      <section class="page" id="page-investments">
+        <div class="page-header">
+          <div>
+            <h1>投資部位</h1>
+            <p class="page-sub">台股 · 可轉債 · 美股</p>
+          </div>
+        </div>
+
+        <div class="inv-tabs">
+          <button class="inv-tab active" data-inv="stock">🇹🇼 股票</button>
+          <button class="inv-tab" data-inv="cb">💠 可轉債</button>
+          <button class="inv-tab" data-inv="us">🇺🇸 美股</button>
+        </div>
+
+        <div class="inv-summary" id="inv-summary"></div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3 id="inv-title">股票</h3>
+            <button class="btn-primary" onclick="openAddPosition()">＋ 新增部位</button>
+          </div>
+          <div class="table-wrap">
+            <table id="inv-table">
+              <thead id="inv-thead"></thead>
+              <tbody id="inv-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ GROWTH CHART ══ -->
+      <section class="page" id="page-growth">
+        <div class="page-header">
+          <div>
+            <h1>資產成長圖</h1>
+            <p class="page-sub">每日資料堆疊圖 + 淨資產走勢</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>資產組成堆疊圖</h3>
+            <div class="trend-controls">
+              <label>起始：</label>
+              <input type="date" id="growth-start" />
+              <label>結束：</label>
+              <input type="date" id="growth-end" />
+              <button class="btn-primary" onclick="renderGrowthChart()">更新圖表</button>
+            </div>
+          </div>
+          <div class="chart-container" style="height:480px">
+            <canvas id="growth-chart"></canvas>
+          </div>
+          <div id="growth-summary" class="pnl-grid" style="margin-top:20px"></div>
+        </div>
+      </section>
+
+      <!-- ══ TREND CHART ══ -->
+      <section class="page" id="page-trend">
+        <div class="page-header">
+          <div>
+            <h1>資產趨勢圖</h1>
+            <p class="page-sub">個人報酬率 vs 市場指數</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>報酬率比較</h3>
+            <div class="trend-controls">
+              <label>起始：</label>
+              <input type="date" id="trend-start" />
+              <label>結束：</label>
+              <input type="date" id="trend-end" />
+              <button class="btn-primary" onclick="renderTrendChart()">分析趨勢</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ HISTORY ══ -->
+      <section class="page" id="page-history">
+        <div class="page-header">
+          <div>
+            <h1>歷史紀錄</h1>
+            <p class="page-sub">手動輸入歷史淨資產，並與指數做比較</p>
+          </div>
+        </div>
+
+        <div class="history-grid">
+          <div class="panel">
+            <div class="panel-head"><h3>新增歷史紀錄</h3></div>
+            <div class="form-group">
+              <label>日期</label>
+              <input type="date" id="hist-date" />
+            </div>
+            <div class="form-group">
+              <label>淨資產 (TWD)</label>
+              <input type="number" id="hist-nw" placeholder="1500000" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>加權指數</label>
+                <input type="number" id="hist-taiex" placeholder="19000" />
+              </div>
+              <div class="form-group">
+                <label>櫃買指數</label>
+                <input type="number" id="hist-otc" placeholder="200" />
+              </div>
+            </div>
+            <button class="btn-primary full" onclick="addManualHistory()">➕ 新增</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>歷史清單</h3>
+              <span class="panel-sub" id="hist-count">—</span>
+            </div>
+            <div class="hist-list-wrap">
+              <div id="hist-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>歷史淨資產趨勢</h3></div>
+          <div class="chart-container">
+            <canvas id="hist-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-overlay" class="hidden" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="modal-title">—</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/app.js?v=8"></script>
+</body>
+</html>
