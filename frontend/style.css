@@ -959,6 +959,7 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .privacy input.priv-num,
 .privacy #kpi-net-worth-usd,
 .privacy #kpi-total-assets-usd,
+.privacy #alloc-total,
 .privacy .priv-amt {
   filter: blur(8px);
   transition: filter .2s;

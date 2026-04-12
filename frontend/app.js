@@ -523,8 +523,8 @@ async function renderPnLGrid(year) {
         </div>
         <div class="pnl-card">
           <div class="pnl-card-label">總投資標的數</div>
-          <div class="pnl-card-value">${totalItems}</div>
-          <div class="pnl-card-sub">${breakdown}</div>
+          <div class="pnl-card-value priv-amt">${totalItems}</div>
+          <div class="pnl-card-sub priv-amt">${breakdown}</div>
         </div>
         ${pnlCard('未實現損益', unrealized,
             fmtPct(unrealizedPct),
