@@ -335,6 +335,56 @@ def cb_lookup(symbol: str = "", name: str = ""):
     return {}
 
 
+@app.get("/api/stock-lookup")
+def stock_lookup(symbol: str = "", market: str = "tw"):
+    symbol = symbol.strip().upper()
+    if not symbol:
+        return {}
+
+    if market == "tw":
+        for ex in ["tse", "otc"]:
+            try:
+                url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex}_{symbol.lower()}.tw"
+                r = http_requests.get(url, timeout=5, verify=False)
+                items = r.json().get("msgArray", [])
+                if items:
+                    item = items[0]
+                    name = item.get("n", "")
+                    z = item.get("z", "-")
+                    b = item.get("b", "")
+                    y = item.get("y", "")
+                    price = None
+                    for raw in [z, b.split("_")[0] if b else "", y]:
+                        try:
+                            v = float(raw)
+                            if v > 0:
+                                price = v
+                                break
+                        except Exception:
+                            pass
+                    if name:
+                        return {"symbol": symbol, "name": name, "price": price}
+            except Exception:
+                pass
+        return {"symbol": symbol, "name": "", "price": None}
+
+    elif market == "us":
+        try:
+            ticker = yf.Ticker(symbol)
+            fi = ticker.fast_info
+            price = round(float(fi.last_price), 4) if getattr(fi, "last_price", None) else None
+            try:
+                info = ticker.info
+                name = info.get("shortName") or info.get("longName") or symbol
+            except Exception:
+                name = symbol
+            return {"symbol": symbol, "name": name, "price": price}
+        except Exception:
+            return {"symbol": symbol, "name": "", "price": None}
+
+    return {}
+
+
 @app.get("/api/indices")
 def get_indices():
     return fetch_indices()

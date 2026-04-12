@@ -7,11 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=8" />
+  <link rel="stylesheet" href="/static/style.css?v=9" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div id="app">
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
     <!-- ── SIDEBAR ──────────────────────────────────────────── -->
     <aside class="sidebar">
@@ -55,6 +56,16 @@
 
     <!-- ── MAIN CONTENT ─────────────────────────────────────── -->
     <main class="main-content">
+
+      <!-- ── MOBILE HEADER ─────────────────────────────────── -->
+      <div class="mobile-header" id="mobile-header">
+        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="選單">☰</button>
+        <span class="mobile-title" id="mobile-page-title">資產總覽</span>
+        <div style="flex:1"></div>
+        <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="togglePrivacy()">
+          <span id="mobile-privacy-ico">👁</span>
+        </button>
+      </div>
 
       <!-- ══ DASHBOARD ══ -->
       <section class="page active" id="page-dashboard">
@@ -314,6 +325,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=8"></script>
+  <script src="/static/app.js?v=9"></script>
 </body>
 </html>

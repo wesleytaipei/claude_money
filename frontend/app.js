@@ -893,7 +893,7 @@ function showPositionModal(idx, item = null) {
 
   document.getElementById('modal-body').innerHTML = `
     <div class="form-row">
-      <div class="form-group"><label>代號${isCB ? ' *（輸入代號自動帶入名稱）' : ' *'}</label>
+      <div class="form-group"><label>代號 *（輸入後自動帶入名稱）</label>
         <input id="f-sym" value="${v('symbol')}" placeholder="${isCB ? '35871' : isUS ? 'NVDA' : '2316'}" /></div>
       <div class="form-group"><label>名稱</label>
         <input id="f-name" value="${v('name')}" placeholder="${isCB ? '或輸入名稱自動帶入代號' : isUS ? 'NVIDIA' : '楠梓電'}" /></div>
@@ -903,7 +903,7 @@ function showPositionModal(idx, item = null) {
       <div class="form-group"><label>買入均價 *</label><input id="f-entry" type="number" step="0.1" value="${v('entry_price')}" /></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>目前價格${isCB ? '（自動抓取）' : ''}</label>
+      <div class="form-group"><label>目前價格（存檔後自動更新）</label>
         <input id="f-cur" type="number" step="0.1" value="${v('current_price')}" ${isCB ? 'placeholder="存檔後自動更新"' : ''} /></div>
       <div class="form-group"><label>投入成本 *</label><input id="f-cost" type="number" step="any" value="${v('cost')}" /></div>
     </div>
@@ -926,6 +926,22 @@ function showPositionModal(idx, item = null) {
     nameEl.addEventListener('blur', () => {
       const nm = nameEl.value.trim();
       if (nm) window._cbLookup('name', nm);
+    });
+  }
+
+  if (!isCB) {
+    const symEl = document.getElementById('f-sym');
+    const market = isUS ? 'us' : 'tw';
+    symEl.addEventListener('blur', async () => {
+      const sym = symEl.value.trim();
+      if (!sym) return;
+      try {
+        const data = await api('/api/stock-lookup?symbol=' + encodeURIComponent(sym) + '&market=' + market);
+        const nameEl = document.getElementById('f-name');
+        const curEl  = document.getElementById('f-cur');
+        if (nameEl && data.name && !nameEl.value) nameEl.value = data.name;
+        if (curEl  && data.price != null && !curEl.value) curEl.value = data.price;
+      } catch (e) { console.warn('stock lookup failed:', e); }
     });
   }
 }
@@ -1073,6 +1089,15 @@ function togglePrivacy() {
   document.body.classList.toggle('privacy', state.privacy);
   document.getElementById('privacy-ico').textContent = state.privacy ? '🔒' : '👁';
   document.getElementById('privacy-txt').textContent = state.privacy ? '隱藏中' : '顯示中';
+  const mobileIco = document.getElementById('mobile-privacy-ico');
+  if (mobileIco) mobileIco.textContent = state.privacy ? '🙈' : '👁';
+}
+
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const isOpen = sidebar.classList.toggle('mobile-open');
+  backdrop.classList.toggle('visible', isOpen);
 }
 
 // ══ Router ══════════════════════════════════════════════════════════════
@@ -1097,6 +1122,18 @@ function goPage(name) {
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+
+  // Update mobile title and close sidebar
+  const titles = {
+    dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
+    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄'
+  };
+  const titleEl = document.getElementById('mobile-page-title');
+  if (titleEl) titleEl.textContent = titles[name] || name;
+  // Close sidebar on mobile after navigation
+  document.querySelector('.sidebar').classList.remove('mobile-open');
+  const bd = document.getElementById('sidebar-backdrop');
+  if (bd) bd.classList.remove('visible');
 }
 
 // ══ Growth Chart ════════════════════════════════════════════════════════
