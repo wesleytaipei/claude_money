@@ -1006,7 +1006,13 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 /* ══ Responsive — covers portrait + landscape iPhone (≤ 900px) ══════════════ */
 @media (max-width: 900px) {
   body { overflow-x: hidden; }
-  #app { flex-direction: column; overflow-x: hidden; }
+  /* Reset grid to single column so main-content fills full width */
+  #app {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    overflow-x: hidden;
+  }
 
   /* Sidebar → hidden drawer; kill backdrop-filter to prevent iOS Safari bleed */
   .sidebar {
