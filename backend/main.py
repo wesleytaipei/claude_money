@@ -30,14 +30,40 @@ FRONTEND_DIR = BASE_DIR.parent / "frontend"
 
 # ── Seed data logic ──────────────────────────────────────────────────────────
 def ensure_data_seeded():
-    """If DATA_DIR is empty (new volume), seed it from INITIAL_DATA_DIR."""
+    """Merge INITIAL_DATA_DIR into DATA_DIR if the latter is missing history."""
+    import shutil
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    config_file = DATA_DIR / "alm_config.json"
-    if not config_file.exists() and INITIAL_DATA_DIR.exists():
-        import shutil
-        print(f"Seeding data from {INITIAL_DATA_DIR} to {DATA_DIR}...")
-        for f in INITIAL_DATA_DIR.glob("*.json"):
-            shutil.copy(f, DATA_DIR / f.name)
+    if not INITIAL_DATA_DIR.exists():
+        return
+
+    for f in INITIAL_DATA_DIR.glob("*.json"):
+        target = DATA_DIR / f.name
+        if not target.exists():
+            shutil.copy(f, target)
+        else:
+            # Merge logic for JSON files (especially history)
+            try:
+                with open(f, "r", encoding="utf-8") as source_f:
+                    source_data = json.load(source_f)
+                with open(target, "r", encoding="utf-8") as target_f:
+                    curr_data = json.load(target_f)
+                
+                if isinstance(source_data, dict) and isinstance(curr_data, dict):
+                    # Merge dictionaries (priority to current but keep source keys)
+                    merged = {**source_data, **curr_data}
+                    with open(target, "w", encoding="utf-8") as target_f:
+                        json.dump(merged, target_f, ensure_ascii=False, indent=2)
+                elif isinstance(source_data, list) and isinstance(curr_data, list):
+                    # Merge lists (unique by 'date' if applicable)
+                    dates_in_curr = {it.get("date") for it in curr_data if isinstance(it, dict)}
+                    for it in source_data:
+                        if isinstance(it, dict) and it.get("date") not in dates_in_curr:
+                            curr_data.append(it)
+                    curr_data.sort(key=lambda x: str(x.get("date", "")))
+                    with open(target, "w", encoding="utf-8") as target_f:
+                        json.dump(curr_data, target_f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print(f"Error merging {f.name}: {e}")
 
 ensure_data_seeded()
 
