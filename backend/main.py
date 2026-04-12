@@ -25,7 +25,21 @@ app.add_middleware(
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
+INITIAL_DATA_DIR = BASE_DIR / "initial_data"
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
+
+# ── Seed data logic ──────────────────────────────────────────────────────────
+def ensure_data_seeded():
+    """If DATA_DIR is empty (new volume), seed it from INITIAL_DATA_DIR."""
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    config_file = DATA_DIR / "alm_config.json"
+    if not config_file.exists() and INITIAL_DATA_DIR.exists():
+        import shutil
+        print(f"Seeding data from {INITIAL_DATA_DIR} to {DATA_DIR}...")
+        for f in INITIAL_DATA_DIR.glob("*.json"):
+            shutil.copy(f, DATA_DIR / f.name)
+
+ensure_data_seeded()
 
 CONFIG_FILE = DATA_DIR / "alm_config.json"
 HISTORY_FILE = DATA_DIR / "history.json"
