@@ -80,7 +80,11 @@
       "Bash(curl -s -I \"http://localhost:8765/static/app.js?v=3\")",
       "Bash(python -c \"import json; d=json.load\\(open\\('E:/claude_money/backend/data/alm_config.json','r',encoding='utf-8'\\)\\); invs=d.get\\('investments',[]\\); [print\\(g['group'], json.dumps\\(g['items'][:2], ensure_ascii=False\\)\\) for g in invs]\")",
       "Bash(pip show:*)",
-      "Bash(python -c \"import main; print\\('OK'\\)\")"
+      "Bash(python -c \"import main; print\\('OK'\\)\")",
+      "WebFetch(domain:www.tpex.org.tw)",
+      "Bash(curl -s \"https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202604/RSdrs002.20260413-C.csv\" --insecure)",
+      "Bash(python3 -c \"import sys; data=sys.stdin.buffer.read\\(\\); print\\(repr\\(data[:800]\\)\\)\")",
+      "Bash(curl -s \"http://localhost:8765/api/cb-suspension/reload\")"
     ]
   }
 }

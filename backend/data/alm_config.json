@@ -17,7 +17,7 @@
           "currency": "USD",
           "amount": 103.19,
           "rate": 31.77,
-          "_twd": 3273.70275
+          "_twd": 3269.98791
         },
         {
           "name": "台北富邦",
@@ -25,7 +25,7 @@
           "currency": "JPY",
           "rate": 0.19949764521193092,
           "value": 33.11660910518053,
-          "_twd": 33.0174
+          "_twd": 33.034
         },
         {
           "name": "國泰世華",
@@ -113,7 +113,7 @@
           "currency": "USD",
           "rate": 31.77,
           "value": 64251.648,
-          "_twd": 64160.64000000001
+          "_twd": 64087.833600000005
         }
       ]
     },
@@ -304,7 +304,7 @@
           "_pnl": -162959.9999999998,
           "_pnl_twd": -162959.9999999998,
           "_pnl_pct": -4.616091907137686,
-          "_change_pct": -5.71
+          "_change_pct": -6.1
         },
         {
           "name": "金居",
@@ -364,7 +364,9 @@
           "_pnl": -96000.00000000009,
           "_pnl_twd": -96000.00000000009,
           "_pnl_pct": -12.726188108967998,
-          "_stock_change_pct": 1.91
+          "_stock_change_pct": 1.91,
+          "_suspended": true,
+          "_suspension_dates": "2026/04/13 - 2026/06/11"
         },
         {
           "name": "和大四",
@@ -388,7 +390,9 @@
           "_pnl": -141030.00000000003,
           "_pnl_twd": -141030.00000000003,
           "_pnl_pct": -85.4882705946536,
-          "_stock_change_pct": 2.27
+          "_stock_change_pct": 2.27,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/31 - 2026/05/29"
         },
         {
           "name": "中砂一",
@@ -413,7 +417,9 @@
           "_pnl": 1744800,
           "_pnl_twd": 1744800,
           "_pnl_pct": 194.0391459074733,
-          "_stock_change_pct": 0.58
+          "_stock_change_pct": 0.58,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "順德一",
@@ -438,7 +444,9 @@
           "_pnl": 474500,
           "_pnl_twd": 474500,
           "_pnl_pct": 155.5737704918033,
-          "_stock_change_pct": 0
+          "_stock_change_pct": 0,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "偉詮電一",
@@ -461,7 +469,9 @@
           "_pnl": 9750.000000000015,
           "_pnl_twd": 9750.000000000015,
           "_pnl_pct": 9.784244856999514,
-          "_stock_change_pct": 0
+          "_stock_change_pct": 0,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/31 - 2026/05/29"
         },
         {
           "name": "盟立二",
@@ -486,7 +496,9 @@
           "_pnl": -150799.99999999985,
           "_pnl_twd": -150799.99999999985,
           "_pnl_pct": -30.147940823670506,
-          "_stock_change_pct": 1.74
+          "_stock_change_pct": 1.74,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "志聖二",
@@ -508,7 +520,9 @@
           "_pnl": 911250,
           "_pnl_twd": 911250,
           "_pnl_pct": 98.51351351351352,
-          "_stock_change_pct": 1.29
+          "_stock_change_pct": 1.29,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "弘塑二",
@@ -530,7 +544,9 @@
           "_pnl": 1496440.0000000002,
           "_pnl_twd": 1496440.0000000002,
           "_pnl_pct": 141.27754385302393,
-          "_stock_change_pct": 9.94
+          "_stock_change_pct": 9.94,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "晶宏三",
@@ -554,7 +570,9 @@
           "_pnl": -103549.99999999997,
           "_pnl_twd": -103549.99999999997,
           "_pnl_pct": -79.4704528012279,
-          "_stock_change_pct": -0.35
+          "_stock_change_pct": -0.35,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/24 - 2026/05/22"
         },
         {
           "name": "大量二",
@@ -578,7 +596,9 @@
           "_pnl": 2737600,
           "_pnl_twd": 2737600,
           "_pnl_pct": 584.4577284372331,
-          "_stock_change_pct": -3
+          "_stock_change_pct": -3,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "凡甲六",
@@ -596,14 +616,16 @@
           "premium_rate": -0.37,
           "stock_price": 291.5,
           "cbas_due_date": "2027/01/15",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 494700,
           "_mv_twd": 494700,
           "_cost_twd": 354700,
           "_pnl": 140000,
           "_pnl_twd": 140000,
           "_pnl_pct": 39.46997462644488,
-          "_stock_change_pct": 0.34
+          "_stock_change_pct": 0.34,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/26 - 2026/04/23"
         },
         {
           "name": "凡甲七",
@@ -621,14 +643,16 @@
           "premium_rate": 17.92,
           "stock_price": 291.5,
           "cbas_due_date": "2026/10/16",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 758600,
           "_mv_twd": 758600,
           "_cost_twd": 491400,
           "_pnl": 267200,
           "_pnl_twd": 267200,
           "_pnl_pct": 54.37525437525438,
-          "_stock_change_pct": 0.34
+          "_stock_change_pct": 0.34,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/26 - 2026/04/23"
         },
         {
           "name": "辛耘一",
@@ -646,14 +670,16 @@
           "premium_rate": -0.98,
           "stock_price": 702,
           "cbas_due_date": "2026/05/23",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 3147300,
           "_mv_twd": 3147300,
           "_cost_twd": 936300,
           "_pnl": 2211000,
           "_pnl_twd": 2211000,
           "_pnl_pct": 236.14226209548224,
-          "_stock_change_pct": 4.31
+          "_stock_change_pct": 4.31,
+          "_suspended": true,
+          "_suspension_dates": "2026/04/07 - 2026/06/05"
         },
         {
           "name": "辛耘二",
@@ -671,14 +697,16 @@
           "premium_rate": -1.47,
           "stock_price": 702,
           "cbas_due_date": "2026/06/04",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 553250,
           "_mv_twd": 553250,
           "_cost_twd": 194000,
           "_pnl": 359250,
           "_pnl_twd": 359250,
           "_pnl_pct": 185.18041237113403,
-          "_stock_change_pct": 4.31
+          "_stock_change_pct": 4.31,
+          "_suspended": true,
+          "_suspension_dates": "2026/04/07 - 2026/06/05"
         },
         {
           "name": "閎康二",
@@ -703,7 +731,9 @@
           "_pnl": 576000.0000000001,
           "_pnl_twd": 576000.0000000001,
           "_pnl_pct": 80.97849008857024,
-          "_stock_change_pct": 9.86
+          "_stock_change_pct": 9.86,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "家登四",
@@ -727,7 +757,9 @@
           "_pnl": -125070.0000000002,
           "_pnl_twd": -125070.0000000002,
           "_pnl_pct": -17.302344884830905,
-          "_stock_change_pct": -2.3
+          "_stock_change_pct": -2.3,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "聯嘉投控一",
@@ -749,7 +781,9 @@
           "_pnl": -7000.000000000171,
           "_pnl_twd": -7000.000000000171,
           "_pnl_pct": -2.101471029720856,
-          "_stock_change_pct": 0.9
+          "_stock_change_pct": 0.9,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "國精化三",
@@ -771,7 +805,9 @@
           "_pnl": 999.9999999999432,
           "_pnl_twd": 999.9999999999432,
           "_pnl_pct": 0.45341192473359476,
-          "_stock_change_pct": 0
+          "_stock_change_pct": 0,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "台特化一",
@@ -793,7 +829,9 @@
           "_pnl": 10000,
           "_pnl_twd": 10000,
           "_pnl_pct": 2.5853154084798344,
-          "_stock_change_pct": -0.51
+          "_stock_change_pct": -0.51,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "正文六",
@@ -817,7 +855,9 @@
           "_pnl": 180000,
           "_pnl_twd": 180000,
           "_pnl_pct": 138.37638376383762,
-          "_stock_change_pct": 1
+          "_stock_change_pct": 1,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "佳必琪三",
@@ -841,7 +881,9 @@
           "_pnl": 361210.0000000001,
           "_pnl_twd": 361210.0000000001,
           "_pnl_pct": 28.743425083753106,
-          "_stock_change_pct": 0.28
+          "_stock_change_pct": 0.28,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/28 - 2026/05/26"
         },
         {
           "name": "台燿五",
@@ -859,14 +901,16 @@
           "premium_rate": -1.21,
           "stock_price": 801,
           "cbas_due_date": "2028/10/29",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 7819550.000000001,
           "_mv_twd": 7819550.000000001,
           "_cost_twd": 3296850,
           "_pnl": 4522700.000000001,
           "_pnl_twd": 4522700.000000001,
           "_pnl_pct": 137.18246204710562,
-          "_stock_change_pct": -0.87
+          "_stock_change_pct": -0.87,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/26 - 2026/04/23"
         },
         {
           "name": "佳邦三",
@@ -882,14 +926,16 @@
           "conversion_price": 86.6,
           "premium_rate": 21.32,
           "stock_price": 85.3,
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 176170.00000000006,
           "_mv_twd": 176170.00000000006,
           "_cost_twd": 236090,
           "_pnl": -59919.999999999956,
           "_pnl_twd": -59919.999999999956,
           "_pnl_pct": -25.380151637087533,
-          "_stock_change_pct": -0.35
+          "_stock_change_pct": -0.35,
+          "_suspended": true,
+          "_suspension_dates": "2026/04/14 - 2026/06/12"
         },
         {
           "name": "樺漢五",
@@ -913,7 +959,9 @@
           "_pnl": -168000.00000000012,
           "_pnl_twd": -168000.00000000012,
           "_pnl_pct": -39.79156797726199,
-          "_stock_change_pct": 1.59
+          "_stock_change_pct": 1.59,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "南俊國際一",
@@ -938,7 +986,9 @@
           "_pnl": 175000,
           "_pnl_twd": 175000,
           "_pnl_pct": 202.94561057636554,
-          "_stock_change_pct": 3.34
+          "_stock_change_pct": 3.34,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "森崴能源一",
@@ -962,7 +1012,9 @@
           "_pnl": -339300.00000000006,
           "_pnl_twd": -339300.00000000006,
           "_pnl_pct": -93.31683168316833,
-          "_stock_change_pct": -9.83
+          "_stock_change_pct": -9.83,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "翔名四",
@@ -986,7 +1038,9 @@
           "_pnl": 124480.00000000001,
           "_pnl_twd": 124480.00000000001,
           "_pnl_pct": 42.41082075568124,
-          "_stock_change_pct": -1.09
+          "_stock_change_pct": -1.09,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "博智一",
@@ -1011,7 +1065,9 @@
           "_pnl": 662500,
           "_pnl_twd": 662500,
           "_pnl_pct": 588.6377367878594,
-          "_stock_change_pct": -2.33
+          "_stock_change_pct": -2.33,
+          "_suspended": false,
+          "_suspension_dates": null
         },
         {
           "name": "朋程一",
@@ -1029,14 +1085,16 @@
           "premium_rate": 64.26,
           "stock_price": 121,
           "cbas_due_date": "2026/07/25",
-          "highlighted": true,
+          "highlighted": false,
           "_mv": 80000,
           "_mv_twd": 80000,
           "_cost_twd": 332900,
           "_pnl": -252900,
           "_pnl_twd": -252900,
           "_pnl_pct": -75.96875938720336,
-          "_stock_change_pct": -1.22
+          "_stock_change_pct": -1.22,
+          "_suspended": true,
+          "_suspension_dates": "2026/03/29 - 2026/05/27"
         },
         {
           "name": "波力二KY",
@@ -1060,7 +1118,9 @@
           "_pnl": -285000,
           "_pnl_twd": -285000,
           "_pnl_pct": -57.90917403230722,
-          "_stock_change_pct": 0
+          "_stock_change_pct": 0,
+          "_suspended": false,
+          "_suspension_dates": null
         }
       ]
     },
@@ -1071,76 +1131,76 @@
           "name": "NVDA",
           "shares": 300,
           "entry_price": 111.5,
-          "current_price": 188.44,
+          "current_price": 188.1699,
           "symbol": "NVDA",
           "cost": 33450,
-          "_mv": 56532,
-          "_mv_twd": 1793477.7000000002,
-          "_cost_twd": 1061201.25,
-          "_pnl": 23082,
-          "_pnl_twd": 732276.4500000001,
-          "_pnl_pct": 69.00448430493273,
-          "_change_pct": 0.01
+          "_mv": 56450.97,
+          "_mv_twd": 1788874.7883300001,
+          "_cost_twd": 1059997.05,
+          "_pnl": 23000.970000000005,
+          "_pnl_twd": 728877.7383300002,
+          "_pnl_pct": 68.76224215246638,
+          "_change_pct": -0.13
         },
         {
           "name": "TSLA",
           "shares": 157,
           "entry_price": 329.21,
-          "current_price": 350.0001,
+          "current_price": 352.73,
           "symbol": "TSLA",
           "cost": 51686.75,
-          "_mv": 54950.015699999996,
-          "_mv_twd": 1743289.2480825,
-          "_cost_twd": 1639762.14375,
-          "_pnl": 3264.045699999999,
-          "_pnl_twd": 103551.84983249998,
-          "_pnl_pct": 6.315053084204364,
-          "_change_pct": -0.36
+          "_mv": 55378.61,
+          "_mv_twd": 1754892.77229,
+          "_cost_twd": 1637901.42075,
+          "_pnl": 3692.6400000000062,
+          "_pnl_twd": 117016.0689600002,
+          "_pnl_pct": 7.144268115135903,
+          "_change_pct": 0.41
         },
         {
           "name": "ONDS",
           "shares": 1730,
           "entry_price": 12.02,
-          "current_price": 9.24,
+          "current_price": 9.4,
           "symbol": "ONDS",
           "cost": 20794.55,
-          "_mv": 15985.2,
-          "_mv_twd": 507130.47000000003,
-          "_cost_twd": 659707.09875,
-          "_pnl": -4809.399999999999,
-          "_pnl_twd": -152578.21499999997,
-          "_pnl_pct": -23.128175411345754,
-          "_change_pct": 2.33
+          "_mv": 16262,
+          "_mv_twd": 515326.518,
+          "_cost_twd": 658958.49495,
+          "_pnl": -4532.5999999999985,
+          "_pnl_twd": -143633.56139999995,
+          "_pnl_pct": -21.797057402059668,
+          "_change_pct": 4.1
         },
         {
           "name": "COHR",
           "symbol": "COHR",
           "shares": 100,
           "entry_price": 287.58,
-          "current_price": 307.62,
+          "current_price": 304.5167,
           "cost": 28758,
-          "_mv": 30762,
-          "_mv_twd": 975924.4500000001,
-          "_cost_twd": 912347.55,
-          "_pnl": 2004.000000000002,
-          "_pnl_twd": 63576.90000000007,
-          "_pnl_pct": 6.968495722929278,
-          "_change_pct": -0.4
+          "_mv": 30451.670000000002,
+          "_mv_twd": 964982.9706300001,
+          "_cost_twd": 911312.262,
+          "_pnl": 1693.670000000003,
+          "_pnl_twd": 53670.708630000096,
+          "_pnl_pct": 5.88938730092497,
+          "_change_pct": -1.41
         },
         {
           "name": "COHX",
           "symbol": "COHX",
           "shares": 300,
           "entry_price": 40.17,
-          "current_price": 41,
+          "current_price": 40.54,
           "cost": 12050,
-          "_mv": 12300,
-          "_mv_twd": 390217.5,
-          "_cost_twd": 382286.25,
-          "_pnl": 248.9999999999995,
-          "_pnl_twd": 7899.524999999984,
-          "_pnl_pct": 2.0663900414937717,
-          "_change_pct": -0.75
+          "_mv": 12162,
+          "_mv_twd": 385401.618,
+          "_cost_twd": 381852.45,
+          "_pnl": 110.99999999999923,
+          "_pnl_twd": 3517.4789999999757,
+          "_pnl_pct": 0.9211618257261347,
+          "_change_pct": -1.86
         }
       ]
     }

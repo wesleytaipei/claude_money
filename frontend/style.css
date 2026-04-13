@@ -171,6 +171,14 @@ input, select { font-family: inherit; outline: none; }
   font-family: var(--mono);
   padding: 6px 0 10px;
 }
+.last-save {
+  text-align: center;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-family: var(--mono);
+  padding: 0 0 4px;
+  line-height: 1.5;
+}
 .btn-action {
   padding: 10px;
   border-radius: 8px;

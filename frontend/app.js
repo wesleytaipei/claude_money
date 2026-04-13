@@ -304,7 +304,34 @@ async function loadManualHistory() {
 async function loadHistory() {
   try {
     state.history = await api('/api/history');
+    updateLastSaveDisplay();
   } catch (e) { console.error(e); }
+}
+
+function updateLastSaveDisplay() {
+  const el = document.getElementById('last-save');
+  if (!el) return;
+  const dates = Object.keys(state.history || {}).sort();
+  if (!dates.length) { el.textContent = ''; return; }
+  const last = dates[dates.length - 1];  // "2026-04-13"
+  const [y, m, d] = last.split('-');
+  el.innerHTML = `上次儲存<br>${y}/${m}/${d}`;
+}
+
+async function refreshCbSuspensions() {
+  try {
+    const data = await api('/api/cb-suspension/status');
+    const suspended = data.suspended || {};
+    const cbGroup = state.portfolio.investments.find(g => g.group === '可轉債');
+    if (cbGroup) {
+      for (const item of cbGroup.items) {
+        const dateRange = suspended[item.symbol];
+        item._suspended        = dateRange !== undefined;
+        item._suspension_dates = dateRange || null;
+      }
+    }
+    state._cbSuspensionLoaded = true;
+  } catch (e) { console.warn('cb-suspension fetch failed:', e); }
 }
 
 async function refreshPrices() {
