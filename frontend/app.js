@@ -88,6 +88,36 @@ async function api(path, opts = {}) {
   return res.json();
 }
 
+// ══ Expression evaluator ═════════════════════════════════════════════════
+function evalExpr(str) {
+  const s = String(str).trim();
+  if (!s) return '';
+  // Only allow: digits, operators +−*/%, dot, parentheses, spaces
+  if (!/^[\d\s+\-*/.()%]+$/.test(s)) return s;
+  // Skip if it's already a plain number
+  if (/^-?\d+(\.\d+)?$/.test(s)) return s;
+  try {
+    // eslint-disable-next-line no-new-func
+    const result = Function('"use strict"; return (' + s + ')')();
+    if (typeof result === 'number' && isFinite(result)) {
+      return (+result.toFixed(10)).toString();
+    }
+  } catch (e) { /* leave as-is */ }
+  return s;
+}
+
+// Global blur handler — evaluate arithmetic in any decimal input
+document.addEventListener('blur', (e) => {
+  const el = e.target;
+  if (el.tagName !== 'INPUT') return;
+  if (el.getAttribute('inputmode') !== 'decimal') return;
+  const evaluated = evalExpr(el.value);
+  if (evaluated !== el.value) {
+    el.value = evaluated;
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+}, true);
+
 // ══ Utils ═══════════════════════════════════════════════════════════════
 function fmt(n, currency = 'TWD') {
   if (n == null || isNaN(n)) return '—';
@@ -117,10 +147,10 @@ function toTWD(amount, currency) {
   return amount;
 }
 
-// Format price with 1 decimal place (for CB prices)
+// Format price with 2 decimal places
 function fmtPrice(n) {
-  if (n == null || isNaN(n) || n === 0) return '—';
-  return Number(n).toFixed(1);
+  if (n == null || isNaN(n) || Number(n) === 0) return '—';
+  return Number(n).toFixed(2);
 }
 
 function pnlClass(v) {
@@ -278,43 +308,62 @@ async function loadHistory() {
 }
 
 async function refreshPrices() {
-  const tickers = [];
-  const cbSymbols = [];
+  const twStocks  = [];   // TW stock symbols (no suffix)
+  const usTickers = [];   // US stock symbols
+  const cbSymbols = [];   // CB symbols
+
   for (const g of state.portfolio.investments) {
-    const isUS = g.group === '美國股市';
-    const isCB = g.group === '可轉債';
+    const isUS    = g.group === '美國股市';
+    const isCB    = g.group === '可轉債';
     const isStock = g.group === '股票';
     for (const item of g.items) {
       if (!item.symbol) continue;
-      if (isUS) tickers.push(item.symbol);
-      else if (isCB) cbSymbols.push(item.symbol);
-      else if (isStock) tickers.push(item.symbol + '.TW');
+      if (isUS)    usTickers.push(item.symbol);
+      else if (isCB)    cbSymbols.push(item.symbol);
+      else if (isStock) twStocks.push(item.symbol);
     }
   }
 
-  // Fetch stock/US prices via yfinance
   const promises = [];
-  if (tickers.length > 0) {
-    const q = [...new Set(tickers)].join(',');
+
+  // TW stocks → MIS API (handles both TSE 上市 and OTC 上櫃, returns change_pct)
+  if (twStocks.length > 0) {
+    const q = [...new Set(twStocks)].join(',');
+    promises.push(
+      api('/api/tw-prices?symbols=' + encodeURIComponent(q))
+        .then(data => {
+          for (const g of state.portfolio.investments) {
+            if (g.group !== '股票') continue;
+            for (const item of g.items) {
+              if (!item.symbol) continue;
+              const d = data[item.symbol];
+              if (d && d.price != null) item.current_price = d.price;
+              if (d && d.change_pct != null) item._change_pct = d.change_pct;
+            }
+          }
+        })
+        .catch(e => console.error('tw-prices error:', e))
+    );
+  }
+
+  // US stocks → yfinance (change_pct from previous_close)
+  if (usTickers.length > 0) {
+    const q = [...new Set(usTickers)].join(',');
     promises.push(
       api('/api/prices?tickers=' + encodeURIComponent(q))
         .then(data => {
           Object.assign(state.prices, data);
           for (const g of state.portfolio.investments) {
-            const isUS = g.group === '美國股市';
-            const isStock = g.group === '股票';
+            if (g.group !== '美國股市') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
-              let key;
-              if (isUS) key = item.symbol;
-              else if (isStock) key = item.symbol + '.TW';
-              else continue;
-              const d = data[key];
-              if (d && d.price) item.current_price = d.price;
+              const d = data[item.symbol];
+              if (d && d.price != null) item.current_price = d.price;
+              if (d && d.change_pct != null) item._change_pct = d.change_pct;
             }
           }
         })
-        .catch(e => console.error('prices error:', e))
+        .catch(e => console.error('us-prices error:', e))
     );
   }
 
@@ -330,8 +379,10 @@ async function refreshPrices() {
               if (!item.symbol) continue;
               const d = data[item.symbol];
               if (!d) continue;
-              if (d.price)            item.current_price  = d.price;
-              if (d.name && !item.name) item.name         = d.name;   // fill missing name
+              if (d.price)                    item.current_price    = d.price;
+              if (d.change_pct != null)       item._change_pct      = d.change_pct;
+              if (d.stock_change_pct != null) item._stock_change_pct = d.stock_change_pct;
+              if (d.name && !item.name)       item.name             = d.name;
               if (d.cb_due_date)      item.cb_due_date    = d.cb_due_date;
               if (d.issued_shares)    item.issued_shares  = d.issued_shares;
               if (d.remain_shares != null) item.remain_shares = d.remain_shares;
@@ -647,12 +698,12 @@ function renderItemRow(section, gi, ii, item, isLiab) {
   if (isLiab) {
     return `<div class="${rowCls}">
       <input value="${escapeAttr(item.name || '')}" placeholder="名稱" onchange="updateItem('${section}',${gi},${ii},'name',this.value)" />
-      <input class="num-input priv-num" type="number" step="any" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
+      <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
       <select onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
-      <input class="num-input priv-num" type="number" step="0.0001" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
-      <input class="num-input" type="number" step="0.01" value="${item.rate_pct ?? ''}" placeholder="利率%" onchange="updateItem('${section}',${gi},${ii},'rate_pct',parseFloat(this.value)||0)" />
+      <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
+      <input class="num-input" type="text" inputmode="decimal" value="${item.rate_pct ?? ''}" placeholder="利率%" onchange="updateItem('${section}',${gi},${ii},'rate_pct',parseFloat(this.value)||0)" />
       <input value="${escapeAttr(item.start_date || '')}" placeholder="YYYY/MM" onchange="updateItem('${section}',${gi},${ii},'start_date',this.value)" />
-      <input class="num-input" type="number" value="${item.years ?? ''}" placeholder="期數" onchange="updateItem('${section}',${gi},${ii},'years',parseFloat(this.value)||0)" />
+      <input class="num-input" type="text" inputmode="decimal" value="${item.years ?? ''}" placeholder="期數" onchange="updateItem('${section}',${gi},${ii},'years',parseFloat(this.value)||0)" />
       <div class="calc-value red">${fmtFull(twd)}</div>
       <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
     </div>`;
@@ -660,9 +711,9 @@ function renderItemRow(section, gi, ii, item, isLiab) {
 
   return `<div class="${rowCls}">
     <input value="${escapeAttr(item.name || '')}" placeholder="名稱" onchange="updateItem('${section}',${gi},${ii},'name',this.value)" />
-    <input class="num-input priv-num" type="number" step="any" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
+    <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
     <select onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
-    <input class="num-input priv-num" type="number" step="0.0001" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
+    <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
     <div class="calc-value">${fmtFull(twd)}</div>
     <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
   </div>`;
@@ -767,12 +818,18 @@ function renderInvestmentsPage() {
   const isUS = state.currentInv === 'us';
   const cur = isUS ? 'USD' : 'TWD';
 
-  const baseHeaders = ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '發行張數', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格'];
+  // CB: 今日漲幅% moves to end of cbHeaders (shows underlying stock's change%)
+  // Non-CB: 今日漲幅% stays after 目前價格
+  const baseHeaders = isCB
+    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估市值', '預估損益', '損益%']
+    : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '發行張數', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : baseHeaders;
 
+  // '代號' & '名稱' are non-numeric; everything else is right-aligned
+  const numFromIdx = isCB ? 3 : 2;   // ★ shifts the threshold by 1 for CB
   document.getElementById('inv-thead').innerHTML =
-    '<tr>' + headers.map((h, i) => `<th class="${i >= 2 ? 'num' : ''}">${h}</th>`).join('') + '<th></th></tr>';
+    '<tr>' + headers.map((h, i) => `<th class="${i >= numFromIdx ? 'num' : ''}">${h}</th>`).join('') + '<th></th></tr>';
 
   const tbody = document.getElementById('inv-tbody');
   if (items.length === 0) {
@@ -780,19 +837,43 @@ function renderInvestmentsPage() {
     return;
   }
 
-  tbody.innerHTML = items.map((item, idx) => {
+  const sortedItems = [...items].sort((a, b) => {
+    const sa = (a.symbol || a.name || '').toUpperCase();
+    const sb = (b.symbol || b.name || '').toUpperCase();
+    const aNum = /^\d/.test(sa), bNum = /^\d/.test(sb);
+    if (aNum && !bNum) return -1;
+    if (!aNum && bNum) return 1;
+    if (aNum && bNum) return sa.localeCompare(sb, undefined, { numeric: true });
+    return sa.localeCompare(sb);
+  });
+  // Map sorted index back to original index for edit/delete ops
+  const origIdx = sortedItems.map(item => items.indexOf(item));
+
+  tbody.innerHTML = sortedItems.map((item, si) => {
+    const idx = origIdx[si];
     const mv = item._mv || 0;
     const pnl = item._pnl || 0;
     const pnlPct = item._pnl_pct || 0;
     const rowCls = item.highlighted ? 'highlighted' : '';
 
-    const priceCell = (v) => isCB ? fmtPrice(v) : fmtFull(v).replace('NT$ ', '');
+    const priceCell = (v) => fmtPrice(v);
+
+    // Build a change% cell with optional limit-up/down highlight
+    const makeChgCell = (pct) => {
+      if (pct == null) return `<td class="num muted">—</td>`;
+      const isLimitUp   = pct >=  9.8;
+      const isLimitDown = pct <= -9.8;
+      const cls = isLimitUp ? 'cell-limit-up' : isLimitDown ? 'cell-limit-down' : pnlClass(pct);
+      return `<td class="num ${cls}">${fmtPct(pct)}</td>`;
+    };
+
     const baseCells = `
       <td><span class="symbol-badge">${item.symbol || '—'}</span></td>
       <td>${item.name || '—'}</td>
       <td class="num">${(Number(item.shares) || 0).toLocaleString()}</td>
       <td class="num">${priceCell(item.entry_price)}</td>
       <td class="num">${priceCell(item.current_price)}</td>
+      ${isCB ? '' : makeChgCell(item._change_pct)}
       <td class="num">${fmtFull(item.cost).replace('NT$ ', '')}</td>
       <td class="num">${fmtFull(mv).replace('NT$ ', '')}</td>
       <td class="num ${pnlClass(pnl)}">${pnl >= 0 ? '+' : ''}${fmtFull(pnl).replace('NT$ ', '')}</td>
@@ -809,9 +890,10 @@ function renderInvestmentsPage() {
         <td class="num">${item.issued_shares || '—'}</td>
         <td class="num ${percentWarnClass(remainPct, 50, 80)}">${item.remain_shares || '—'}</td>
         <td class="num ${percentWarnClass(remainPct, 50, 80)}">${remainPct != null ? remainPct.toFixed(1) + '%' : '—'}</td>
-        <td class="num">${item.conversion_price ? Number(item.conversion_price).toFixed(1) : '—'}</td>
+        <td class="num">${item.conversion_price ? Number(item.conversion_price).toFixed(2) : '—'}</td>
         <td class="num ${percentWarnClass(item.premium_rate, 5, 20)}">${item.premium_rate != null && item.premium_rate !== 0 ? Number(item.premium_rate).toFixed(2) + '%' : '—'}</td>
-        <td class="num">${item.stock_price ? Number(item.stock_price).toFixed(1) : '—'}</td>
+        <td class="num">${item.stock_price ? Number(item.stock_price).toFixed(2) : '—'}</td>
+        ${makeChgCell(item._stock_change_pct)}
       `;
     }
 
@@ -881,14 +963,14 @@ function showPositionModal(idx, item = null) {
         <div class="form-group"><label>CBAS 到期日 *</label><input id="f-cbas-due" value="${v('cbas_due_date')}" placeholder="2026/07/28" /></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>發行張數</label><input id="f-issued" type="number" value="${v('issued_shares')}" ${autoAttr}/></div>
-        <div class="form-group"><label>剩餘張數</label><input id="f-remain" type="number" value="${v('remain_shares')}" ${autoAttr}/></div>
+        <div class="form-group"><label>發行張數</label><input id="f-issued" type="text" inputmode="decimal" value="${v('issued_shares')}" ${autoAttr}/></div>
+        <div class="form-group"><label>剩餘張數</label><input id="f-remain" type="text" inputmode="decimal" value="${v('remain_shares')}" ${autoAttr}/></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>轉換價</label><input id="f-conv" type="number" step="any" value="${v('conversion_price')}" ${autoAttr}/></div>
-        <div class="form-group"><label>溢價率 %</label><input id="f-prem" type="number" step="any" value="${v('premium_rate')}" ${autoAttr}/></div>
+        <div class="form-group"><label>轉換價</label><input id="f-conv" type="text" inputmode="decimal" value="${v('conversion_price')}" ${autoAttr}/></div>
+        <div class="form-group"><label>溢價率 %</label><input id="f-prem" type="text" inputmode="decimal" value="${v('premium_rate')}" ${autoAttr}/></div>
       </div>
-      <div class="form-group"><label>現股價格</label><input id="f-stk" type="number" step="any" value="${v('stock_price')}" ${autoAttr}/></div>`;
+      <div class="form-group"><label>現股價格</label><input id="f-stk" type="text" inputmode="decimal" value="${v('stock_price')}" ${autoAttr}/></div>`;
   }
 
   document.getElementById('modal-body').innerHTML = `
@@ -899,13 +981,13 @@ function showPositionModal(idx, item = null) {
         <input id="f-name" value="${v('name')}" placeholder="${isCB ? '或輸入名稱自動帶入代號' : isUS ? 'NVIDIA' : '楠梓電'}" /></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>持有股數 *</label><input id="f-shares" type="number" step="any" value="${v('shares')}" /></div>
-      <div class="form-group"><label>買入均價 *</label><input id="f-entry" type="number" step="0.1" value="${v('entry_price')}" /></div>
+      <div class="form-group"><label>持有股數 *</label><input id="f-shares" type="text" inputmode="decimal" value="${v('shares')}" /></div>
+      <div class="form-group"><label>買入均價 *</label><input id="f-entry" type="text" inputmode="decimal" value="${v('entry_price')}" /></div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>目前價格（存檔後自動更新）</label>
-        <input id="f-cur" type="number" step="0.1" value="${v('current_price')}" ${isCB ? 'placeholder="存檔後自動更新"' : ''} /></div>
-      <div class="form-group"><label>投入成本 *</label><input id="f-cost" type="number" step="any" value="${v('cost')}" /></div>
+        <input id="f-cur" type="text" inputmode="decimal" value="${v('current_price')}" ${isCB ? 'placeholder="存檔後自動更新"' : ''} /></div>
+      <div class="form-group"><label>投入成本 *</label><input id="f-cost" type="text" inputmode="decimal" value="${v('cost')}" /></div>
     </div>
     ${cbFields}
     <div class="modal-footer">
@@ -930,19 +1012,33 @@ function showPositionModal(idx, item = null) {
   }
 
   if (!isCB) {
-    const symEl = document.getElementById('f-sym');
+    const symEl  = document.getElementById('f-sym');
+    const nameEl = document.getElementById('f-name');
+    const curEl  = document.getElementById('f-cur');
     const market = isUS ? 'us' : 'tw';
+
     symEl.addEventListener('blur', async () => {
       const sym = symEl.value.trim();
       if (!sym) return;
       try {
         const data = await api('/api/stock-lookup?symbol=' + encodeURIComponent(sym) + '&market=' + market);
-        const nameEl = document.getElementById('f-name');
-        const curEl  = document.getElementById('f-cur');
-        if (nameEl && data.name && !nameEl.value) nameEl.value = data.name;
-        if (curEl  && data.price != null && !curEl.value) curEl.value = data.price;
+        if (data.name  && !nameEl.value) nameEl.value = data.name;
+        if (data.price != null && !curEl.value) curEl.value = data.price;
       } catch (e) { console.warn('stock lookup failed:', e); }
     });
+
+    // TW stocks: also support name → symbol (same logic as CB)
+    if (!isUS) {
+      nameEl.addEventListener('blur', async () => {
+        const nm = nameEl.value.trim();
+        if (!nm || symEl.value.trim()) return;
+        try {
+          const data = await api('/api/stock-lookup?name=' + encodeURIComponent(nm) + '&market=tw');
+          if (data.symbol) symEl.value = data.symbol;
+          if (data.price != null && !curEl.value) curEl.value = data.price;
+        } catch (e) { console.warn('stock name lookup failed:', e); }
+      });
+    }
   }
 }
 
@@ -1057,6 +1153,12 @@ async function saveSnapshot() {
   };
   try {
     await api('/api/snapshot', { method: 'POST', body: JSON.stringify(body) });
+    // Reload history so charts & PnL grid reflect the new snapshot immediately
+    await loadHistory();
+    const page = currentPage();
+    if (page === 'growth') renderGrowthChart();
+    else if (page === 'trend') renderTrendChart();
+    else if (page === 'dashboard') renderPnLGrid(state.pnlYear);
     toast('✅ 資料已儲存');
   } catch (e) { toast('資料儲存失敗', 'error'); }
 }

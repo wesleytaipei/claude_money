@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=12" />
+  <link rel="stylesheet" href="/static/style.css?v=18" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -274,16 +274,16 @@
             </div>
             <div class="form-group">
               <label>淨資產 (TWD)</label>
-              <input type="number" id="hist-nw" placeholder="1500000" />
+              <input type="text" inputmode="decimal" id="hist-nw" placeholder="1500000" />
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>加權指數</label>
-                <input type="number" id="hist-taiex" placeholder="19000" />
+                <input type="text" inputmode="decimal" id="hist-taiex" placeholder="19000" />
               </div>
               <div class="form-group">
                 <label>櫃買指數</label>
-                <input type="number" id="hist-otc" placeholder="200" />
+                <input type="text" inputmode="decimal" id="hist-otc" placeholder="200" />
               </div>
             </div>
             <button class="btn-primary full" onclick="addManualHistory()">➕ 新增</button>
@@ -325,6 +325,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=12"></script>
+  <script src="/static/app.js?v=18"></script>
 </body>
 </html>

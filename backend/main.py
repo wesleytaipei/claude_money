@@ -79,6 +79,7 @@ HISTORY_FILE = DATA_DIR / "history.json"
 MANUAL_HISTORY_FILE = DATA_DIR / "manual_history.json"
 
 _price_cache: dict = {}
+_tw_mis_cache: dict = {}   # symbol → {price, change_pct, name, ts}
 _indices_cache: dict = {"ts": 0, "data": {}}
 CACHE_TTL = 300  # 5 minutes
 
@@ -130,22 +131,157 @@ def fetch_prices(tickers: list[str]) -> dict:
                 try:
                     fi = tkrs.tickers[t].fast_info
                     price = fi.last_price
+                    prev_close = getattr(fi, "previous_close", None)
+                    change_pct = None
+                    if price and prev_close and float(prev_close) > 0:
+                        change_pct = round((float(price) - float(prev_close)) / float(prev_close) * 100, 2)
                     currency = getattr(fi, "currency", None) or "TWD"
                     entry = {
-                        "price": round(float(price), 4) if price else None,
-                        "currency": currency,
-                        "ts": now,
+                        "price":      round(float(price), 4) if price else None,
+                        "change_pct": change_pct,
+                        "currency":   currency,
+                        "ts":         now,
                     }
                     _price_cache[t] = entry
                     result[t] = entry
                 except Exception as e:
-                    err = {"price": None, "currency": "N/A", "error": str(e), "ts": now}
+                    err = {"price": None, "change_pct": None, "currency": "N/A", "error": str(e), "ts": now}
                     _price_cache[t] = err
                     result[t] = err
         except Exception as e:
             for t in to_fetch:
-                result[t] = {"price": None, "currency": "N/A", "error": str(e), "ts": now}
+                result[t] = {"price": None, "change_pct": None, "currency": "N/A", "error": str(e), "ts": now}
 
+    return result
+
+
+def _mis_parse_price(item: dict) -> tuple[float | None, float | None]:
+    """Extract (price, change_pct) from a single MIS msgArray item."""
+    z_raw = item.get("z", "-") or "-"
+    y_raw = item.get("y", "-") or "-"
+    b_raw = item.get("b", "") or ""
+
+    price = None
+    for raw in [z_raw, b_raw.split("_")[0], y_raw]:
+        try:
+            v = float(raw)
+            if v > 0:
+                price = round(v, 2)
+                break
+        except (ValueError, TypeError):
+            pass
+
+    change_pct = None
+    try:
+        z = float(z_raw)
+        y = float(y_raw)
+        if z > 0 and y > 0:
+            change_pct = round((z - y) / y * 100, 2)
+    except (ValueError, TypeError):
+        pass
+
+    return price, change_pct
+
+
+def fetch_tw_prices_mis(symbols: list[str]) -> dict:
+    """Batch-fetch TW stock prices + day-change% from TWSE MIS API.
+
+    Works for both TSE (上市) and OTC (上櫃) stocks — the market exchange
+    is resolved via _tw_table; unknown symbols are tried as TSE first.
+    """
+    now = time.time()
+    result: dict = {}
+    to_fetch: list[str] = []
+
+    for sym in symbols:
+        cached = _tw_mis_cache.get(sym)
+        if cached and (now - cached["ts"]) < CACHE_TTL:
+            result[sym] = cached
+        else:
+            to_fetch.append(sym)
+
+    if not to_fetch:
+        return result
+
+    by_sym = _tw_table.get("by_symbol", {})
+    parts = []
+    for sym in to_fetch:
+        entry = by_sym.get(sym)
+        if entry:
+            # Known symbol — use exact market
+            parts.append(f"{entry['market']}_{sym.lower()}.tw")
+        else:
+            # Unknown symbol — try all three exchanges; MIS returns whichever exists
+            parts += [f"tse_{sym.lower()}.tw", f"otc_{sym.lower()}.tw", f"emg_{sym.lower()}.tw"]
+
+    ex_ch = "|".join(parts)
+    url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    try:
+        r = http_requests.get(url, headers=headers, timeout=10, verify=False)
+        found: set[str] = set()
+        for item in r.json().get("msgArray", []):
+            code = (item.get("c") or "").strip().upper()
+            if not code:
+                continue
+            price, change_pct = _mis_parse_price(item)
+            entry = {
+                "price":      price,
+                "change_pct": change_pct,
+                "name":       item.get("n", ""),
+                "ts":         now,
+            }
+            _tw_mis_cache[code] = entry
+            result[code] = entry
+            found.add(code)
+
+        # Symbols not returned by MIS (holiday / invalid) → cache a miss
+        for sym in to_fetch:
+            if sym not in found:
+                miss = {"price": None, "change_pct": None, "name": "", "ts": now}
+                _tw_mis_cache[sym] = miss
+                result[sym] = miss
+
+    except Exception as e:
+        logger.error(f"[tw-prices] MIS fetch failed: {e}")
+        for sym in to_fetch:
+            if sym not in result:
+                result[sym] = {"price": None, "change_pct": None, "name": "", "ts": now}
+
+    return result
+
+
+def _fetch_tw_indices_mis() -> dict:
+    """Fetch TAIEX and OTC index from TWSE MIS API (real-time, reliable)."""
+    url = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw|otc_o00.tw"
+    key_map = {"t00": "taiex", "o00": "otc"}
+    result = {}
+    try:
+        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8, verify=False)
+        for item in r.json().get("msgArray", []):
+            code = (item.get("c") or "").strip()
+            key = key_map.get(code)
+            if not key:
+                continue
+            # Index: 'i' = current value; 'y' = previous close
+            i_raw = item.get("i") or item.get("z") or "-"
+            y_raw = item.get("y") or "-"
+            current, prev = None, None
+            try:
+                current = round(float(i_raw), 2)
+            except (ValueError, TypeError):
+                pass
+            try:
+                prev = float(y_raw)
+            except (ValueError, TypeError):
+                pass
+            if current:
+                change = round(current - prev, 2) if prev else 0
+                pct    = round((current - prev) / prev * 100, 2) if prev and prev > 0 else 0
+                result[key] = {"price": current, "change": change, "change_pct": pct}
+    except Exception as e:
+        logger.warning(f"[indices] MIS TW fetch failed: {e}")
     return result
 
 
@@ -154,28 +290,30 @@ def fetch_indices() -> dict:
     if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
         return _indices_cache["data"]
 
-    index_tickers = {
-        "taiex": "^TWII",
-        "otc": "^TWOII",
-        "dji": "^DJI",
+    # US indices + FX via yfinance
+    us_index_tickers = {
+        "dji":    "^DJI",
         "nasdaq": "^IXIC",
-        "sox": "^SOX",
+        "sox":    "^SOX",
     }
     fx_tickers = {"usd_twd": "USDTWD=X", "jpy_twd": "JPYTWD=X"}
 
     result = {}
-    all_tickers = list(index_tickers.values()) + list(fx_tickers.values())
+
+    # TW indices via MIS (more accurate than yfinance for TAIEX/OTC)
+    result.update(_fetch_tw_indices_mis())
 
     try:
-        tkrs = yf.Tickers(" ".join(all_tickers))
+        all_yf = list(us_index_tickers.values()) + list(fx_tickers.values())
+        tkrs = yf.Tickers(" ".join(all_yf))
 
-        for key, sym in index_tickers.items():
+        for key, sym in us_index_tickers.items():
             try:
                 fi = tkrs.tickers[sym].fast_info
                 price = float(fi.last_price or 0)
-                prev = float(getattr(fi, "previous_close", None) or 0)
+                prev  = float(getattr(fi, "previous_close", None) or 0)
                 change = price - prev if prev else 0
-                pct = (change / prev * 100) if prev else 0
+                pct    = (change / prev * 100) if prev else 0
                 result[key] = {
                     "price": round(price, 2),
                     "change": round(change, 2),
@@ -283,16 +421,66 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
                         try: price = float(val)
                         except: pass
                     if price: break
+                # Compute day change % from z (current) vs y (prev close)
+                change_pct = None
+                try:
+                    z = float(item.get("z", "-") or "-")
+                    y = float(item.get("y", "-") or "-")
+                    if z and y and y > 0:
+                        change_pct = round((z - y) / y * 100, 2)
+                except (ValueError, TypeError):
+                    pass
                 cbas[code] = {
-                    "name": item.get("n", ""),
-                    "price": round(price, 4) if price else None,
-                    "ts": now,
+                    "name":       item.get("n", ""),
+                    "price":      round(price, 4) if price else None,
+                    "change_pct": change_pct,
+                    "ts":         now,
                 }
         except Exception:
             pass
 
     for s in symbols:
         result[s] = cbas.get(s, {"price": None, "name": "", "ts": now})
+
+    # ── Collect underlying stock codes from CBAS (convert_target) ──────────
+    target_map: dict[str, str] = {}   # cb_code → underlying_stock_code
+    for s in symbols:
+        target = (result[s].get("convert_target") or "").strip().upper()
+        if target:
+            target_map[s] = target
+
+    # ── Supplement change_pct from MIS for ALL CB symbols ─────────────────
+    # CBAS doesn't include yesterday's close, so we always query MIS.
+    by_sym = _tw_table.get("by_symbol", {})
+    cb_parts = []
+    for s in symbols:
+        entry = by_sym.get(s)
+        if entry:
+            cb_parts.append(f"{entry['market']}_{s.lower()}.tw")
+        else:
+            # CBs are mostly OTC; also try TSE for listed CBs
+            cb_parts += [f"otc_{s.lower()}.tw", f"tse_{s.lower()}.tw"]
+    try:
+        mis_url = ("https://mis.twse.com.tw/stock/api/getStockInfo.jsp"
+                   f"?ex_ch={'|'.join(cb_parts)}")
+        mis_r = http_requests.get(mis_url, headers={"User-Agent": "Mozilla/5.0"},
+                                  timeout=10, verify=False)
+        for item in mis_r.json().get("msgArray", []):
+            code = (item.get("c") or "").strip()
+            if code in result:
+                _, change_pct = _mis_parse_price(item)
+                if change_pct is not None:
+                    result[code]["change_pct"] = change_pct
+    except Exception:
+        pass
+
+    # ── Fetch underlying stock change_pct (for CB table display) ───────────
+    if target_map:
+        unique_targets = list(set(target_map.values()))
+        stock_data = fetch_tw_prices_mis(unique_targets)
+        for cb_code, stock_code in target_map.items():
+            sp = stock_data.get(stock_code, {})
+            result[cb_code]["stock_change_pct"] = sp.get("change_pct")
 
     return result
 
@@ -321,6 +509,15 @@ def get_prices(tickers: str = ""):
         return {}
     tks = [t.strip() for t in tickers.split(",") if t.strip()]
     return fetch_prices(tks)
+
+
+@app.get("/api/tw-prices")
+def get_tw_prices(symbols: str = ""):
+    """MIS-based TW stock prices (TSE + OTC) with day-change%."""
+    if not symbols.strip():
+        return {}
+    syms = [s.strip().upper() for s in symbols.split(",") if s.strip()]
+    return fetch_tw_prices_mis(syms)
 
 
 @app.get("/api/cb-prices")
@@ -382,52 +579,185 @@ def cb_lookup(symbol: str = "", name: str = ""):
     return {}
 
 
+# Cache for TWSE + OTC full stock list (name → symbol)
+# ── TW Stock Table (ISIN-based, weekly rebuild) ──────────────────────────────
+TW_TABLE_FILE = DATA_DIR / "tw_stock_table.json"
+
+# in-memory: {by_symbol: {sym: {name, market}}, by_name: {name: sym}, updated, count}
+_tw_table: dict = {"by_symbol": {}, "by_name": {}, "updated": None, "count": 0}
+
+_ISIN_SOURCES = [
+    ("https://isin.twse.com.tw/isin/C_public.jsp?strMode=2", "tse"),  # 上市股票
+    ("https://isin.twse.com.tw/isin/C_public.jsp?strMode=3", "tse"),  # 上市 ETF/受益憑證
+    ("https://isin.twse.com.tw/isin/C_public.jsp?strMode=4", "otc"),  # 上櫃股票
+    ("https://isin.twse.com.tw/isin/C_public.jsp?strMode=5", "otc"),  # 上櫃 ETF/受益憑證
+    ("https://isin.twse.com.tw/isin/C_public.jsp?strMode=7", "emg"),  # 興櫃股票
+]
+
+_ISIN_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8",
+    "Referer": "https://isin.twse.com.tw/",
+}
+
+
+def _parse_isin_page(raw: bytes) -> list[tuple[str, str]]:
+    """Parse one TWSE ISIN page, return list of (symbol, name)."""
+    import re
+    # Try UTF-8 first, fall back to Big5
+    try:
+        html = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        html = raw.decode("big5", errors="replace")
+    # Each data row first <td> looks like: "2330　台積電" (U+3000 full-width space)
+    results = []
+    for m in re.finditer(
+        r'<td[^>]*>\s*([A-Z0-9]{2,8})\u3000([^\s<][^<]*?)\s*</td>',
+        html,
+        re.IGNORECASE,
+    ):
+        sym  = m.group(1).strip().upper()
+        name = m.group(2).strip()
+        if sym and name:
+            results.append((sym, name))
+    return results
+
+
+def _build_tw_stock_table() -> dict:
+    """Fetch all 4 ISIN pages, build lookup table, persist to disk."""
+    global _tw_table
+    by_symbol: dict = {}
+    by_name:   dict = {}
+
+    for url, market in _ISIN_SOURCES:
+        try:
+            r = http_requests.get(url, headers=_ISIN_HEADERS, timeout=30, verify=False)
+            pairs = _parse_isin_page(r.content)
+            for sym, name in pairs:
+                if sym not in by_symbol:
+                    by_symbol[sym] = {"name": name, "market": market}
+                if name not in by_name:
+                    by_name[name] = sym
+            logger.info(f"[tw-table] {url.split('=')[-1]} ({market}) → {len(pairs)} rows")
+        except Exception as e:
+            logger.error(f"[tw-table] fetch failed {url}: {e}")
+
+    updated = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    table = {
+        "by_symbol": by_symbol,
+        "by_name":   by_name,
+        "updated":   updated,
+        "count":     len(by_symbol),
+    }
+    save_json(TW_TABLE_FILE, table)
+    _tw_table = table
+    logger.info(f"[tw-table] done — {len(by_symbol)} symbols, saved to {TW_TABLE_FILE}")
+    return table
+
+
+def _load_tw_table():
+    """Load stock table from disk; if missing, build it now."""
+    global _tw_table
+    if TW_TABLE_FILE.exists():
+        try:
+            data = load_json(TW_TABLE_FILE, {})
+            if data.get("by_symbol"):
+                _tw_table = data
+                logger.info(
+                    f"[tw-table] loaded {data.get('count', len(data['by_symbol']))} symbols "
+                    f"(updated: {data.get('updated')})"
+                )
+                return
+        except Exception as e:
+            logger.warning(f"[tw-table] cache load failed: {e}")
+    logger.info("[tw-table] no cache — building initial table (this may take ~30 s)…")
+    _build_tw_stock_table()
+
+
+# Load on startup; auto-rebuild if emg data is absent (table predates emg support)
+_load_tw_table()
+if not any(v.get("market") == "emg" for v in _tw_table.get("by_symbol", {}).values()):
+    import threading as _threading
+    logger.info("[tw-table] emg data missing — triggering background rebuild now")
+    _threading.Thread(target=_build_tw_stock_table, daemon=True).start()
+
+
+def _tw_price_for_symbol(symbol: str) -> tuple[str, float | None]:
+    """Fetch name + price for a TW stock symbol via TWSE mis API."""
+    for ex in ["tse", "otc"]:
+        try:
+            url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex}_{symbol.lower()}.tw"
+            r = http_requests.get(url, timeout=5, verify=False)
+            items = r.json().get("msgArray", [])
+            if items:
+                item = items[0]
+                name = item.get("n", "")
+                price = None
+                for raw in [item.get("z", "-"), (item.get("b") or "").split("_")[0], item.get("y", "")]:
+                    try:
+                        v = float(raw)
+                        if v > 0:
+                            price = v
+                            break
+                    except Exception:
+                        pass
+                if name:
+                    return name, price
+        except Exception:
+            pass
+    return "", None
+
+
 @app.get("/api/stock-lookup")
-def stock_lookup(symbol: str = "", market: str = "tw"):
+def stock_lookup(symbol: str = "", name: str = "", market: str = "tw"):
     symbol = symbol.strip().upper()
-    if not symbol:
-        return {}
+    name   = name.strip()
 
     if market == "tw":
-        for ex in ["tse", "otc"]:
-            try:
-                url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex}_{symbol.lower()}.tw"
-                r = http_requests.get(url, timeout=5, verify=False)
-                items = r.json().get("msgArray", [])
-                if items:
-                    item = items[0]
-                    name = item.get("n", "")
-                    z = item.get("z", "-")
-                    b = item.get("b", "")
-                    y = item.get("y", "")
-                    price = None
-                    for raw in [z, b.split("_")[0] if b else "", y]:
-                        try:
-                            v = float(raw)
-                            if v > 0:
-                                price = v
-                                break
-                        except Exception:
-                            pass
-                    if name:
-                        return {"symbol": symbol, "name": name, "price": price}
-            except Exception:
-                pass
-        return {"symbol": symbol, "name": "", "price": None}
+        # ── symbol → name + price ─────────────────────────────────────────
+        if symbol:
+            # Name from in-memory table (instant); price from live MIS API
+            entry = _tw_table.get("by_symbol", {}).get(symbol, {})
+            table_name = entry.get("name", "")
+            mis_name, price = _tw_price_for_symbol(symbol)
+            return {"symbol": symbol, "name": table_name or mis_name, "price": price}
+
+        # ── name → symbol + price ─────────────────────────────────────────
+        if name:
+            # 1. In-memory table lookup (instant)
+            sym = _tw_table.get("by_name", {}).get(name, "")
+            # 2. Fallback: search portfolio
+            if not sym:
+                portfolio = load_json(CONFIG_FILE, {"assets": [], "liabilities": [], "investments": []})
+                for g in portfolio.get("investments", []):
+                    if g.get("group") != "股票":
+                        continue
+                    for item in g.get("items", []):
+                        if item.get("name") == name:
+                            sym = item.get("symbol", "")
+                            break
+                    if sym:
+                        break
+            if sym:
+                _, price = _tw_price_for_symbol(sym)
+                return {"symbol": sym, "name": name, "price": price}
+            return {"symbol": "", "name": name, "price": None}
 
     elif market == "us":
-        try:
-            ticker = yf.Ticker(symbol)
-            fi = ticker.fast_info
-            price = round(float(fi.last_price), 4) if getattr(fi, "last_price", None) else None
+        if symbol:
             try:
-                info = ticker.info
-                name = info.get("shortName") or info.get("longName") or symbol
+                ticker = yf.Ticker(symbol)
+                fi = ticker.fast_info
+                price = round(float(fi.last_price), 4) if getattr(fi, "last_price", None) else None
+                try:
+                    info = ticker.info
+                    us_name = info.get("shortName") or info.get("longName") or symbol
+                except Exception:
+                    us_name = symbol
+                return {"symbol": symbol, "name": us_name, "price": price}
             except Exception:
-                name = symbol
-            return {"symbol": symbol, "name": name, "price": price}
-        except Exception:
-            return {"symbol": symbol, "name": "", "price": None}
+                return {"symbol": symbol, "name": "", "price": None}
 
     return {}
 
@@ -638,8 +968,15 @@ _scheduler.add_job(
     id="daily_snapshot",
     replace_existing=True,
 )
+# Rebuild TW stock table every Sunday at 15:00 Taiwan time
+_scheduler.add_job(
+    _build_tw_stock_table,
+    CronTrigger(day_of_week="sun", hour=15, minute=0, timezone="Asia/Taipei"),
+    id="tw_table_rebuild",
+    replace_existing=True,
+)
 _scheduler.start()
-logger.info("[scheduler] daily auto-snapshot scheduled at 15:00 Asia/Taipei")
+logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ Sun 15:00")
 
 
 @app.get("/api/auto-snapshot/run")
@@ -663,6 +1000,44 @@ def auto_snapshot_status():
         "timezone": "Asia/Taipei",
         "trigger": "每日 15:00",
     }
+
+
+@app.get("/api/stock-table/status")
+def stock_table_status():
+    """Return metadata about the in-memory TW stock table."""
+    job = _scheduler.get_job("tw_table_rebuild")
+    return {
+        "count":      _tw_table.get("count", len(_tw_table.get("by_symbol", {}))),
+        "updated":    _tw_table.get("updated"),
+        "next_rebuild": str(job.next_run_time) if job else None,
+        "trigger":    "每週日 15:00",
+        "file":       str(TW_TABLE_FILE),
+    }
+
+
+@app.get("/api/stock-table/rebuild")
+def stock_table_rebuild():
+    """Manually trigger a full rebuild of the TW stock table."""
+    import threading
+    threading.Thread(target=_build_tw_stock_table, daemon=True).start()
+    return {"ok": True, "message": "Rebuild started in background"}
+
+
+@app.get("/api/stock-table/lookup")
+def stock_table_lookup(q: str = ""):
+    """Quick fuzzy search in the table — returns up to 10 matches by symbol or name prefix."""
+    q = q.strip().upper()
+    if not q:
+        return []
+    results = []
+    by_symbol = _tw_table.get("by_symbol", {})
+    for sym, entry in by_symbol.items():
+        name = entry.get("name", "")
+        if sym.startswith(q) or name.upper().startswith(q) or q in name.upper():
+            results.append({"symbol": sym, "name": name, "market": entry.get("market", "")})
+            if len(results) >= 10:
+                break
+    return results
 
 
 # ── Serve frontend ───────────────────────────────────────────────────────────
