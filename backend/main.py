@@ -3,7 +3,7 @@ import json
 import logging
 import time
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import urllib3
@@ -258,7 +258,8 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
 
     for sym in symbols:
         cached = _tw_mis_cache.get(sym)
-        if cached and (now - cached["ts"]) < CACHE_TTL:
+        # Only use cache if it has both price AND change_pct; otherwise retry fallbacks
+        if cached and (now - cached["ts"]) < CACHE_TTL and cached.get("change_pct") is not None:
             result[sym] = cached
         else:
             to_fetch.append(sym)
@@ -472,6 +473,130 @@ _cb_cache: dict = {"ts": 0, "data": {}}
 CBAS_CACHE_TTL = 300  # 5 min
 _cbas_cache: dict = {"ts": 0, "data": {}}  # bond_code -> full CB info
 
+# ── CB Suspension (停止轉換) ──────────────────────────────────────────────────
+# data: {code: "2026/04/13 - 2026/06/11"} for currently suspended CBs
+_cb_suspension_cache: dict = {"ts": 0, "data": {}}
+CB_SUSPENSION_TTL = 3600  # 1 hour
+
+
+def load_cb_suspensions() -> dict:
+    """Fetch TPEX 停止轉換 CSV via JSON index; return dict {code: "start - end"} for suspended CBs.
+
+    CSV format (Big5 encoded):
+        TITLE,...
+        DATADATE,...
+        ALIGN,...
+        HEADER,債券代碼,債券簡稱,停止開始日,停止結束日,停止事由
+        BODY,"15142 ","亞力二    ","2026/04/13","2026/06/11","股東常會  "
+    """
+    import csv, io
+    now = time.time()
+    if _cb_suspension_cache["ts"] and (now - _cb_suspension_cache["ts"]) < CB_SUSPENSION_TTL:
+        return _cb_suspension_cache["data"]
+
+    today = datetime.now().date()
+    suspended: dict = {}  # code → "YYYY/MM/DD - YYYY/MM/DD"
+
+    # Step 1: Get latest CSV URL from TPEX JSON API
+    # Response: {"tables":[{"data":[["115/04/13", "/path/xls", "/path/csv"], ...]}], "stat":"ok"}
+    csv_url = None
+    try:
+        api_r = http_requests.get(
+            "https://www.tpex.org.tw/www/zh-tw/bond/cbSuspend?response=json&limit=100&offset=0",
+            timeout=10, verify=False,
+            headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
+        )
+        data = api_r.json()
+        tables = data.get("tables", [])
+        if tables:
+            rows = tables[0].get("data", [])
+            if rows:
+                path = rows[0][2]  # index 2 = CSV path
+                if path and not path.startswith("http"):
+                    path = "https://www.tpex.org.tw" + path
+                csv_url = path
+                logger.info(f"[cb-suspension] latest CSV from JSON API: {csv_url}")
+    except Exception as e:
+        logger.warning(f"[cb-suspension] JSON index failed: {e}")
+
+    # Step 2: Fallback — try today and recent trading days directly
+    if not csv_url:
+        for days_back in range(7):
+            d = today - timedelta(days=days_back)
+            yyyy     = d.strftime("%Y")
+            yyyymm   = d.strftime("%Y%m")
+            yyyymmdd = d.strftime("%Y%m%d")
+            url = (f"https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/"
+                   f"{yyyy}/{yyyymm}/RSdrs002.{yyyymmdd}-C.csv")
+            try:
+                r = http_requests.head(url, timeout=5, verify=False,
+                                       headers={"User-Agent": "Mozilla/5.0"})
+                if r.status_code == 200:
+                    csv_url = url
+                    logger.info(f"[cb-suspension] found via HEAD: {csv_url}")
+                    break
+            except Exception:
+                continue
+
+    if not csv_url:
+        logger.warning("[cb-suspension] could not locate any CSV file")
+        _cb_suspension_cache["ts"] = now
+        return suspended
+
+    # Step 3: Fetch and parse
+    try:
+        r = http_requests.get(csv_url, timeout=15, verify=False,
+                              headers={"User-Agent": "Mozilla/5.0"})
+        r.raise_for_status()
+
+        # File is Big5 / CP950 encoded
+        text = None
+        for enc in ("big5", "cp950", "utf-8-sig", "utf-8"):
+            try:
+                text = r.content.decode(enc)
+                break
+            except (UnicodeDecodeError, LookupError):
+                continue
+        if text is None:
+            text = r.content.decode("big5", errors="replace")
+
+        # Each data row: BODY,"15142 ","亞力二","2026/04/13","2026/06/11","..."
+        reader = csv.reader(io.StringIO(text))
+        for row in reader:
+            if not row or row[0].strip().upper() != "BODY":
+                continue
+            if len(row) < 5:
+                continue
+            code = row[1].strip().strip('"').strip()
+            if not re.match(r'^\d{5}$', code):
+                continue
+
+            # Dates are AD (西元) format: 2026/04/13
+            def _parse_ad(s: str):
+                s = s.strip().strip('"').strip()
+                try:
+                    return datetime.strptime(s, "%Y/%m/%d").date()
+                except Exception:
+                    return None
+
+            start_d = _parse_ad(row[3])
+            end_d   = _parse_ad(row[4])
+
+            if start_d and end_d:
+                if start_d <= today <= end_d:
+                    suspended[code] = f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
+                    logger.info(f"[cb-suspension] {code} suspended {start_d}~{end_d}")
+            elif start_d and start_d <= today:
+                suspended[code] = start_d.strftime('%Y/%m/%d')
+
+        logger.info(f"[cb-suspension] total {len(suspended)} suspended CBs from {csv_url}")
+    except Exception as e:
+        logger.error(f"[cb-suspension] parse failed {csv_url}: {e}")
+
+    _cb_suspension_cache["data"] = suspended
+    _cb_suspension_cache["ts"] = now
+    return suspended
+
 
 def load_cbas_data() -> dict:
     """Load all CB data from CBAS API (cached). Returns dict keyed by bond_code."""
@@ -572,10 +697,20 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
     for s in symbols:
         result[s] = cbas.get(s, {"price": None, "name": "", "ts": now})
 
+    # ── Mark suspended CBs ─────────────────────────────────────────────────
+    suspensions = load_cb_suspensions()  # {code: "start - end"}
+    for s in symbols:
+        date_range = suspensions.get(s)
+        result[s]["suspended"]       = date_range is not None
+        result[s]["suspension_dates"] = date_range  # e.g. "2026/04/13 - 2026/06/11" or None
+
     # ── Collect underlying stock codes from CBAS (convert_target) ──────────
     target_map: dict[str, str] = {}   # cb_code → underlying_stock_code
     for s in symbols:
         target = (result[s].get("convert_target") or "").strip().upper()
+        if not target and len(s) == 5 and s.isdigit():
+            # Fallback: derive underlying code from CB code (drop last digit)
+            target = s[:4]
         if target:
             target_map[s] = target
 
@@ -1130,6 +1265,25 @@ def auto_snapshot_status():
         "timezone": "Asia/Taipei",
         "trigger": "每日 15:00",
     }
+
+
+@app.get("/api/cb-suspension/status")
+def cb_suspension_status():
+    """Return currently suspended CBs with date ranges."""
+    suspended = load_cb_suspensions()  # {code: "start - end"}
+    return {
+        "count": len(suspended),
+        "suspended": suspended,  # dict so frontend gets date ranges too
+        "cache_age_s": round(time.time() - _cb_suspension_cache["ts"]),
+    }
+
+
+@app.get("/api/cb-suspension/reload")
+def cb_suspension_reload():
+    """Force clear suspension cache and reload."""
+    _cb_suspension_cache["ts"] = 0
+    suspended = load_cb_suspensions()
+    return {"ok": True, "count": len(suspended), "suspended": suspended}
 
 
 @app.get("/api/stock-table/status")

@@ -379,10 +379,12 @@ async function refreshPrices() {
               if (!item.symbol) continue;
               const d = data[item.symbol];
               if (!d) continue;
-              if (d.price)                    item.current_price    = d.price;
-              if (d.change_pct != null)       item._change_pct      = d.change_pct;
+              if (d.price)                    item.current_price     = d.price;
+              if (d.change_pct != null)       item._change_pct       = d.change_pct;
               if (d.stock_change_pct != null) item._stock_change_pct = d.stock_change_pct;
-              if (d.name && !item.name)       item.name             = d.name;
+              if (d.suspended != null)         item._suspended         = d.suspended;
+              if (d.suspension_dates !== undefined) item._suspension_dates = d.suspension_dates;
+              if (d.name && !item.name)       item.name              = d.name;
               if (d.cb_due_date)      item.cb_due_date    = d.cb_due_date;
               if (d.issued_shares)    item.issued_shares  = d.issued_shares;
               if (d.remain_shares != null) item.remain_shares = d.remain_shares;
@@ -787,6 +789,23 @@ function renderInvestmentsPage() {
   const group = state.portfolio.investments.find(g => g.group === groupName);
   const items = group ? group.items : [];
 
+  // Auto-load CB suspension status when viewing CB tab and not yet fetched
+  if (state.currentInv === 'cb' && !state._cbSuspensionLoaded) {
+    state._cbSuspensionLoaded = true;
+    api('/api/cb-suspension/status').then(data => {
+      const suspended = data.suspended || {};  // {code: "start - end"}
+      const cbGroup = state.portfolio.investments.find(g => g.group === '可轉債');
+      if (cbGroup) {
+        for (const item of cbGroup.items) {
+          const dateRange = suspended[item.symbol];
+          item._suspended        = dateRange !== undefined;
+          item._suspension_dates = dateRange || null;
+        }
+      }
+      renderInvestmentsPage();
+    }).catch(() => {});
+  }
+
   document.getElementById('inv-title').textContent = groupName;
 
   // Summary
@@ -818,12 +837,12 @@ function renderInvestmentsPage() {
   const isUS = state.currentInv === 'us';
   const cur = isUS ? 'USD' : 'TWD';
 
-  // CB: 今日漲幅% moves to end of cbHeaders (shows underlying stock's change%)
+  // CB: hide 預估市值; 今日漲幅% at end of cbHeaders shows underlying stock's change%
   // Non-CB: 今日漲幅% stays after 目前價格
   const baseHeaders = isCB
-    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估市值', '預估損益', '損益%']
+    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
     : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : baseHeaders;
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
@@ -875,7 +894,7 @@ function renderInvestmentsPage() {
       <td class="num">${priceCell(item.current_price)}</td>
       ${isCB ? '' : makeChgCell(item._change_pct)}
       <td class="num">${fmtFull(item.cost).replace('NT$ ', '')}</td>
-      <td class="num">${fmtFull(mv).replace('NT$ ', '')}</td>
+      ${isCB ? '' : `<td class="num">${fmtFull(mv).replace('NT$ ', '')}</td>`}
       <td class="num ${pnlClass(pnl)}">${pnl >= 0 ? '+' : ''}${fmtFull(pnl).replace('NT$ ', '')}</td>
       <td class="num ${pnlClass(pnlPct)}">${fmtPct(pnlPct)}</td>
     `;
@@ -893,6 +912,13 @@ function renderInvestmentsPage() {
         <td class="num ${percentWarnClass(item.premium_rate, 5, 20)}">${item.premium_rate != null && item.premium_rate !== 0 ? Number(item.premium_rate).toFixed(2) + '%' : '—'}</td>
         <td class="num">${item.stock_price ? Number(item.stock_price).toFixed(2) : '—'}</td>
         ${makeChgCell(item._stock_change_pct)}
+        <td style="text-align:center">${
+          item._suspended === true
+            ? `<span class="status-dot red" title="停止轉換中&#10;${item._suspension_dates || ''}"></span>`
+            : item._suspended === false
+              ? '<span class="status-dot green" title="可轉換"></span>'
+              : '—'
+        }</td>
       `;
     }
 
@@ -1169,6 +1195,7 @@ async function refreshAll() {
   icoEl.innerHTML = '<span class="spinner"></span>';
   txtEl.textContent = '更新中...';
 
+  state._cbSuspensionLoaded = false;  // force re-fetch on next CB render
   await loadIndices();
   await refreshPrices();
   await savePortfolio();

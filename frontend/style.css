@@ -577,6 +577,10 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 /* Limit-up / limit-down circuit breaker highlight */
 .cell-limit-up   { background: rgba(16,185,129,.15) !important; color: var(--green-2) !important; font-weight: 700; border-radius: 4px; }
 .cell-limit-down { background: rgba(220,38,38,.20) !important; color: var(--red-2)   !important; font-weight: 700; border-radius: 4px; }
+/* CB suspension status dot */
+.status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
+.status-dot.red   { background: var(--red-2); box-shadow: 0 0 5px rgba(251,113,133,.7); }
+.status-dot.green { background: var(--green); box-shadow: 0 0 5px rgba(16,185,129,.5); }
 
 /* ══ Assets groups ═════════════════════════════════════════════════════════ */
 .group-block {
