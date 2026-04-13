@@ -823,7 +823,7 @@ function renderInvestmentsPage() {
   const baseHeaders = isCB
     ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估市值', '預估損益', '損益%']
     : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '發行張數', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : baseHeaders;
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
@@ -887,7 +887,6 @@ function renderInvestmentsPage() {
       cbCells = `
         <td class="num ${dateWarnClass(item.cb_due_date)}">${item.cb_due_date || '—'}</td>
         <td class="num ${dateWarnClass(item.cbas_due_date)}">${item.cbas_due_date || '—'}</td>
-        <td class="num">${item.issued_shares || '—'}</td>
         <td class="num ${percentWarnClass(remainPct, 50, 80)}">${item.remain_shares || '—'}</td>
         <td class="num ${percentWarnClass(remainPct, 50, 80)}">${remainPct != null ? remainPct.toFixed(1) + '%' : '—'}</td>
         <td class="num">${item.conversion_price ? Number(item.conversion_price).toFixed(2) : '—'}</td>

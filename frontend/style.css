@@ -418,8 +418,8 @@ input, select { font-family: inherit; outline: none; }
   font-weight: 600;
   text-align: right;
 }
-.index-up   { color: var(--red); }      /* TW convention: 紅漲 */
-.index-down { color: var(--green); }    /* 綠跌 */
+.index-up   { color: var(--green); }    /* 漲: 綠 (依照使用者要求) */
+.index-down { color: var(--red); }      /* 跌: 紅 */
 
 /* P&L Grid */
 .pnl-grid {
@@ -575,8 +575,8 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .cell-warn-red    { color: var(--red-2) !important; font-weight: 600; }
 .cell-warn-orange { color: var(--orange) !important; font-weight: 600; }
 /* Limit-up / limit-down circuit breaker highlight */
-.cell-limit-up   { background: rgba(220,38,38,.20) !important; color: var(--red-2)  !important; font-weight: 700; border-radius: 4px; }
-.cell-limit-down { background: rgba(16,185,129,.15) !important; color: var(--green) !important; font-weight: 700; border-radius: 4px; }
+.cell-limit-up   { background: rgba(16,185,129,.15) !important; color: var(--green-2) !important; font-weight: 700; border-radius: 4px; }
+.cell-limit-down { background: rgba(220,38,38,.20) !important; color: var(--red-2)   !important; font-weight: 700; border-radius: 4px; }
 
 /* ══ Assets groups ═════════════════════════════════════════════════════════ */
 .group-block {

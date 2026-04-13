@@ -180,7 +180,69 @@ def _mis_parse_price(item: dict) -> tuple[float | None, float | None]:
     except (ValueError, TypeError):
         pass
 
+    # Fallback: if z was unavailable but we resolved a price from b/y, use that
+    if change_pct is None and price is not None:
+        try:
+            y = float(y_raw)
+            if y > 0:
+                change_pct = round((price - y) / y * 100, 2)
+        except (ValueError, TypeError):
+            pass
+
     return price, change_pct
+
+
+def _fetch_yahoo_tw_scrape(symbol: str, market: str = "tse") -> dict:
+    """Scrape Yahoo Finance Taiwan for price + change_pct (reliable for TW stocks/indices)."""
+    if symbol.startswith('^'):
+        url = f"https://tw.stock.yahoo.com/quote/{symbol}"
+    else:
+        suffix = ".TWO" if market == "otc" else ".TW"
+        url = f"https://tw.stock.yahoo.com/quote/{symbol}{suffix}"
+        
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = http_requests.get(url, headers=headers, timeout=10)
+        html = r.text
+        
+        # 1. Capture Price
+        price_m = re.search(r'"regularMarketPrice":([0-9]+\.?[0-9]*)', html)
+        if not price_m:
+            price_m = re.search(r'"regularMarketPrice":\{"raw":([0-9]+\.?[0-9]*)', html)
+        
+        price = float(price_m.group(1)) if price_m else None
+        
+        # 2. Capture Percentage and Sign
+        # Taiwan convention: c-trend-up = Red (+), c-trend-down = Green (-)
+        pct = 0.0
+        # Improved regex to handle (0.78%) or 6.10% formats
+        pct_matches = re.findall(r'>\s*\(?([-+0-9.]+%)\)?\s*<', html)
+        if not pct_matches:
+            # Fallback: catch any text string ending with % inside a tag
+            pct_matches = re.findall(r'>([^<]*?[\d.]+%)<', html)
+
+        if pct_matches:
+            # The first one is usually the day change percentage
+            pct_str = pct_matches[0].replace('%', '').replace('(', '').replace(')', '').replace('+', '').strip()
+            try:
+                pct = float(pct_str)
+                # Sign detection: look for the color classes c-trend-up/down in the HTML
+                # These classes are applied to the parent or nearby span of the price/change info
+                # We'll look at the block of HTML around the first price/percentage occurrence
+                idx = html.find(pct_matches[0])
+                search_area = html[max(0, idx-1000) : idx+200]
+                
+                if 'c-trend-down' in search_area:
+                    pct = -abs(pct)
+                elif 'c-trend-up' in search_area:
+                    pct = abs(pct)
+            except: pass
+            
+        if price:
+            return {"price": price, "change_pct": pct}
+    except Exception as e:
+        logger.warning(f"[yahoo-scrape] {symbol} failed: {e}")
+    return {}
 
 
 def fetch_tw_prices_mis(symbols: list[str]) -> dict:
@@ -203,6 +265,9 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
     if not to_fetch:
         return result
 
+    # FORCE CLEAR CACHE for this request to ensure scraper logic takes effect
+    # _tw_mis_cache.clear() 
+    # v2: ensuring correct fallback for missing percentages (e.g. 6826)
     by_sym = _tw_table.get("by_symbol", {})
     parts = []
     for sym in to_fetch:
@@ -236,12 +301,49 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
             result[code] = entry
             found.add(code)
 
-        # Symbols not returned by MIS (holiday / invalid) → cache a miss
+        # Symbols with null data or not found or missing change_pct → try Yahoo Scrape / yfinance
         for sym in to_fetch:
-            if sym not in found:
-                miss = {"price": None, "change_pct": None, "name": "", "ts": now}
-                _tw_mis_cache[sym] = miss
-                result[sym] = miss
+            # Even if found in MIS, if price was Null or change_pct was Null, we want fallback
+            # (MIS often reports price but '-' for z during off-hours, missing the % change)
+            if sym not in found or result[sym].get("price") is None or result[sym].get("change_pct") is None:
+                entry = by_sym.get(sym, {})
+                market = entry.get("market", "tse")
+                
+                # 1. Try Yahoo Scrape (Best for TW stocks accurate change%)
+                yahoo = _fetch_yahoo_tw_scrape(sym, market)
+                if yahoo.get("price"):
+                    hit = {
+                        "price":      yahoo["price"],
+                        "change_pct": yahoo["change_pct"],
+                        "name":       yahoo.get("name", entry.get("name", "")),
+                        "ts":         now,
+                    }
+                    _tw_mis_cache[sym] = hit
+                    result[sym] = hit
+                    found.add(sym)
+                    continue
+
+                # 2. Try yfinance fallback (standard)
+                suffix = ".TWO" if market == "otc" else ".TW"
+                yf_sym = f"{sym}{suffix}"
+                try:
+                    fi = yf.Ticker(yf_sym).fast_info
+                    price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
+                    prev = float(getattr(fi, "previous_close", None) or 0)
+                    change_pct = None
+                    if price and prev > 0:
+                        change_pct = round((price - prev) / prev * 100, 2)
+                    name = entry.get("name", "")
+                    hit = {"price": price, "change_pct": change_pct, "name": name, "ts": now}
+                    _tw_mis_cache[sym] = hit
+                    result[sym] = hit
+                    found.add(sym)
+                except Exception:
+                    # Final miss
+                    if sym not in result:
+                        miss = {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
+                        _tw_mis_cache[sym] = miss
+                        result[sym] = miss
 
     except Exception as e:
         logger.error(f"[tw-prices] MIS fetch failed: {e}")
@@ -264,12 +366,12 @@ def _fetch_tw_indices_mis() -> dict:
             key = key_map.get(code)
             if not key:
                 continue
-            # Index: 'i' = current value; 'y' = previous close
-            i_raw = item.get("i") or item.get("z") or "-"
+            # Index: 'z' = current value; 'y' = previous close
+            z_raw = item.get("z") or item.get("i") or "-"
             y_raw = item.get("y") or "-"
             current, prev = None, None
             try:
-                current = round(float(i_raw), 2)
+                current = round(float(z_raw), 2)
             except (ValueError, TypeError):
                 pass
             try:
@@ -287,8 +389,9 @@ def _fetch_tw_indices_mis() -> dict:
 
 def fetch_indices() -> dict:
     now = time.time()
-    if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
-        return _indices_cache["data"]
+    # Cache temporarily disabled to force refresh with corrected MIS logic
+    # if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
+    #     return _indices_cache["data"]
 
     # US indices + FX via yfinance
     us_index_tickers = {
@@ -302,6 +405,32 @@ def fetch_indices() -> dict:
 
     # TW indices via MIS (more accurate than yfinance for TAIEX/OTC)
     result.update(_fetch_tw_indices_mis())
+
+    # Fallback for TW indices if MIS is blank (weekends/holidays)
+    tw_fallback = {"taiex": "^TWII", "otc": "^TWOII"}
+    for key, sym in tw_fallback.items():
+        if not result.get(key) or result[key].get("price") is None:
+             # Try Yahoo Scrape for indices first (consistent with E:\money)
+             yahoo = _fetch_yahoo_tw_scrape(sym, "tse" if key == "taiex" else "otc")
+             if yahoo.get("price"):
+                  p = yahoo["price"]
+                  pct = yahoo["change_pct"]
+                  # Calculate absolute change back from percentage
+                  prev = p / (1 + pct/100) if (1 + pct/100) != 0 else p
+                  change = round(p - prev, 2)
+                  result[key] = {"price": p, "change": change, "change_pct": pct}
+             else:
+                 # Standard yfinance fallback
+                 try:
+                     fi = yf.Ticker(sym).fast_info
+                     price = float(fi.last_price or 0)
+                     prev  = float(getattr(fi, "previous_close", None) or 0)
+                     if price > 0:
+                         change = price - prev if prev else 0
+                         pct    = (change / prev * 100) if prev else 0
+                         result[key] = {"price": round(price, 2), "change": round(change, 2), "change_pct": round(pct, 2)}
+                 except Exception:
+                     pass
 
     try:
         all_yf = list(us_index_tickers.values()) + list(fx_tickers.values())
