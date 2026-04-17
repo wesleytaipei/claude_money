@@ -57,19 +57,22 @@ def ensure_data_seeded():
                     curr_data = json.load(target_f)
                 
                 if isinstance(source_data, dict) and isinstance(curr_data, dict):
-                    # Merge dictionaries (priority to current but keep source keys)
-                    merged = {**source_data, **curr_data}
+                    # For dicts, let Git (source) override existing keys to allow "Push to Update"
+                    # but keep keys that only exist in Production (e.g. dynamic state)
+                    merged = {**curr_data, **source_data}
                     with open(target, "w", encoding="utf-8") as target_f:
                         json.dump(merged, target_f, ensure_ascii=False, indent=2)
                 elif isinstance(source_data, list) and isinstance(curr_data, list):
-                    # Merge lists (unique by 'date' if applicable)
-                    dates_in_curr = {it.get("date") for it in curr_data if isinstance(it, dict)}
-                    for it in source_data:
-                        if isinstance(it, dict) and it.get("date") not in dates_in_curr:
-                            curr_data.append(it)
-                    curr_data.sort(key=lambda x: str(x.get("date", "")))
+                    # Update/Merge lists (unique by 'date', source overrides if date mismatch)
+                    new_data_map = {it.get("date"): it for it in source_data if isinstance(it, dict) and it.get("date")}
+                    
+                    # Filter out Production entries being updated by Git
+                    merged_list = [it for it in curr_data if not (isinstance(it, dict) and it.get("date") in new_data_map)]
+                    merged_list.extend(source_data)
+                    merged_list.sort(key=lambda x: str(x.get("date", "")))
+                    
                     with open(target, "w", encoding="utf-8") as target_f:
-                        json.dump(curr_data, target_f, ensure_ascii=False, indent=2)
+                        json.dump(merged_list, target_f, ensure_ascii=False, indent=2)
             except Exception as e:
                 print(f"Error merging {f.name}: {e}")
 

@@ -1,6 +1,11 @@
 {
   "cash": [
-    {"id": "cash-1", "currency": "TWD", "amount": 0, "label": "現金/活存"}
+    {
+      "id": "cash-1",
+      "currency": "TWD",
+      "amount": 0,
+      "label": "現金/活存"
+    }
   ],
   "positions": [],
   "debts": [],
