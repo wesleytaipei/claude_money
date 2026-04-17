@@ -478,6 +478,49 @@ _cbas_cache: dict = {"ts": 0, "data": {}}  # bond_code -> full CB info
 _cb_suspension_cache: dict = {"ts": 0, "data": {}}
 CB_SUSPENSION_TTL = 3600  # 1 hour
 
+# ── TDCC Remaining Registration (剩餘張數, authoritative source) ──────────────
+# TDCC open-data CSV id=1-16 "發行公司無實體發行登記統計" (daily-updated).
+# Format: 資料日,證券代號,證券名稱,市場別,證券種類,登記數額
+# 登記數額 unit: for CBs it is 張 (NT$100,000 face each). This is more
+# up-to-date than CBAS's `circulating_balance` which can lag by days.
+_tdcc_remain_cache: dict = {"ts": 0, "data": {}}   # {code: int_amount}
+TDCC_REMAIN_TTL = 21600  # 6 hours (CSV refreshes daily)
+
+
+def load_tdcc_remain() -> dict:
+    """Fetch TDCC '無實體發行登記' CSV and return {code: 登記數額} dict."""
+    now = time.time()
+    if _tdcc_remain_cache["ts"] and (now - _tdcc_remain_cache["ts"]) < TDCC_REMAIN_TTL:
+        return _tdcc_remain_cache["data"]
+
+    url = "https://opendata.tdcc.com.tw/getOD.ashx?id=1-16"
+    result: dict = {}
+    try:
+        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"},
+                              timeout=30, verify=False)
+        # CSV is UTF-8 with BOM. Header: 資料日,證券代號,證券名稱,市場別,證券種類,登記數額
+        text = r.content.decode("utf-8-sig", errors="ignore")
+        lines = text.split("\n")
+        for ln in lines[1:]:
+            parts = ln.strip().split(",")
+            if len(parts) < 6:
+                continue
+            code = parts[1].strip()
+            amount_s = parts[5].strip()
+            if not code or not amount_s:
+                continue
+            try:
+                result[code] = int(float(amount_s.replace(",", "")))
+            except ValueError:
+                continue
+        logger.info(f"[tdcc-remain] loaded {len(result)} registrations")
+        _tdcc_remain_cache["data"] = result
+        _tdcc_remain_cache["ts"] = now
+    except Exception as e:
+        logger.error(f"[tdcc-remain] fetch failed: {e}")
+        return _tdcc_remain_cache.get("data", {})
+    return result
+
 
 def load_cb_suspensions() -> dict:
     """Fetch TPEX 停止轉換 CSV via JSON index; return dict {code: "start - end"} for suspended CBs.
@@ -582,11 +625,13 @@ def load_cb_suspensions() -> dict:
             start_d = _parse_ad(row[3])
             end_d   = _parse_ad(row[4])
 
+            WARN_DAYS = 10  # light up red N days before suspension starts
             if start_d and end_d:
-                if start_d <= today <= end_d:
+                warn_d = start_d - timedelta(days=WARN_DAYS)
+                if warn_d <= today <= end_d:
                     suspended[code] = f"{start_d.strftime('%Y/%m/%d')} - {end_d.strftime('%Y/%m/%d')}"
                     logger.info(f"[cb-suspension] {code} suspended {start_d}~{end_d}")
-            elif start_d and start_d <= today:
+            elif start_d and (start_d - timedelta(days=WARN_DAYS)) <= today:
                 suspended[code] = start_d.strftime('%Y/%m/%d')
 
         logger.info(f"[cb-suspension] total {len(suspended)} suspended CBs from {csv_url}")
@@ -704,6 +749,18 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
         result[s]["suspended"]       = date_range is not None
         result[s]["suspension_dates"] = date_range  # e.g. "2026/04/13 - 2026/06/11" or None
 
+    # ── Override remain_shares with TDCC open-data (authoritative) ─────────
+    # TDCC's "無實體發行登記統計" is the official daily source of outstanding
+    # CB registration in 張. CBAS's circulating_balance often lags by days.
+    tdcc = load_tdcc_remain()
+    for s in symbols:
+        amt = tdcc.get(s)
+        if amt is not None:
+            result[s]["remain_shares"] = amt
+            issued = result[s].get("issued_shares")
+            if issued and issued > 0:
+                result[s]["balance_ratio"] = round(amt / issued * 100, 2)
+
     # ── Collect underlying stock codes from CBAS (convert_target) ──────────
     target_map: dict[str, str] = {}   # cb_code → underlying_stock_code
     for s in symbols:
@@ -714,17 +771,15 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
         if target:
             target_map[s] = target
 
-    # ── Supplement change_pct from MIS for ALL CB symbols ─────────────────
-    # CBAS doesn't include yesterday's close, so we always query MIS.
-    by_sym = _tw_table.get("by_symbol", {})
+    # ── Supplement price + change_pct from MIS for ALL CB symbols ─────────
+    # CBAS's convertible_bond_market_price is the previous close and can be
+    # stale for suspended / low-volume CBs. MIS gives live last-trade / best-bid.
+    # IMPORTANT: do NOT use _tw_table[by_sym] here — that table catalogues the
+    # underlying stock's market (which may be TSE), while the CB itself always
+    # trades on OTC/TPEX. Always query both exchanges.
     cb_parts = []
     for s in symbols:
-        entry = by_sym.get(s)
-        if entry:
-            cb_parts.append(f"{entry['market']}_{s.lower()}.tw")
-        else:
-            # CBs are mostly OTC; also try TSE for listed CBs
-            cb_parts += [f"otc_{s.lower()}.tw", f"tse_{s.lower()}.tw"]
+        cb_parts += [f"otc_{s.lower()}.tw", f"tse_{s.lower()}.tw"]
     try:
         mis_url = ("https://mis.twse.com.tw/stock/api/getStockInfo.jsp"
                    f"?ex_ch={'|'.join(cb_parts)}")
@@ -733,7 +788,12 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
         for item in mis_r.json().get("msgArray", []):
             code = (item.get("c") or "").strip()
             if code in result:
-                _, change_pct = _mis_parse_price(item)
+                mis_price, change_pct = _mis_parse_price(item)
+                # MIS is the authoritative live source (z > best bid > prev close).
+                # CBAS's convertible_bond_market_price is often stale (esp. for
+                # suspended / low-volume CBs), so override with MIS when present.
+                if mis_price is not None:
+                    result[code]["price"] = mis_price
                 if change_pct is not None:
                     result[code]["change_pct"] = change_pct
     except Exception:

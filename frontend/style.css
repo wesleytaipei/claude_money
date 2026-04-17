@@ -588,7 +588,8 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 /* CB suspension status dot */
 .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
 .status-dot.red   { background: var(--red-2); box-shadow: 0 0 5px rgba(251,113,133,.7); }
-.status-dot.green { background: var(--green); box-shadow: 0 0 5px rgba(16,185,129,.5); }
+.status-dot.green  { background: var(--green); box-shadow: 0 0 5px rgba(16,185,129,.5); }
+.status-dot.orange { background: #f97316; box-shadow: 0 0 5px rgba(249,115,22,.7); }
 
 /* ══ Assets groups ═════════════════════════════════════════════════════════ */
 .group-block {

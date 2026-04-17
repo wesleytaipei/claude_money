@@ -311,6 +311,19 @@ async function loadHistory() {
 function updateLastSaveDisplay() {
   const el = document.getElementById('last-save');
   if (!el) return;
+  // Prefer precise localStorage timestamp (set on each save)
+  const ts = localStorage.getItem('hc_last_save_time');
+  if (ts) {
+    const d = new Date(ts);
+    const yy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    el.innerHTML = `上次儲存<br>${yy}/${mm}/${dd} ${hh}:${mi}`;
+    return;
+  }
+  // Fallback: use latest history snapshot date (date-only)
   const dates = Object.keys(state.history || {}).sort();
   if (!dates.length) { el.textContent = ''; return; }
   const last = dates[dates.length - 1];  // "2026-04-13"
@@ -869,7 +882,7 @@ function renderInvestmentsPage() {
   const baseHeaders = isCB
     ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
     : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : baseHeaders;
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
@@ -941,7 +954,15 @@ function renderInvestmentsPage() {
         ${makeChgCell(item._stock_change_pct)}
         <td style="text-align:center">${
           item._suspended === true
-            ? `<span class="status-dot red" title="停止轉換中&#10;${item._suspension_dates || ''}"></span>`
+            ? (() => {
+                // Parse start date from "YYYY/MM/DD - YYYY/MM/DD"
+                const startStr = (item._suspension_dates || '').split(' - ')[0];
+                const startDate = startStr ? new Date(startStr.replace(/\//g, '-')) : null;
+                const today = new Date(); today.setHours(0,0,0,0);
+                const isPreWarn = startDate && startDate > today;
+                const label = isPreWarn ? '⚠️ 即將停止轉換' : '🔴 停止轉換中';
+                return `<span class="status-dot ${isPreWarn ? 'orange' : 'red'}" title="${label}&#10;${item._suspension_dates || ''}"></span>`;
+              })()
             : item._suspended === false
               ? '<span class="status-dot green" title="可轉換"></span>'
               : '—'
@@ -1205,6 +1226,7 @@ async function saveSnapshot() {
   };
   try {
     await api('/api/snapshot', { method: 'POST', body: JSON.stringify(body) });
+    localStorage.setItem('hc_last_save_time', new Date().toISOString());
     // Reload history so charts & PnL grid reflect the new snapshot immediately
     await loadHistory();
     const page = currentPage();
@@ -1222,9 +1244,10 @@ async function refreshAll() {
   icoEl.innerHTML = '<span class="spinner"></span>';
   txtEl.textContent = '更新中...';
 
-  state._cbSuspensionLoaded = false;  // force re-fetch on next CB render
+  state._cbSuspensionLoaded = false;
   await loadIndices();
   await refreshPrices();
+  await refreshCbSuspensions();  // immediate — don't wait for CB tab visit
   await savePortfolio();
   calcTotals();
 

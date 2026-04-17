@@ -84,7 +84,22 @@
       "WebFetch(domain:www.tpex.org.tw)",
       "Bash(curl -s \"https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202604/RSdrs002.20260413-C.csv\" --insecure)",
       "Bash(python3 -c \"import sys; data=sys.stdin.buffer.read\\(\\); print\\(repr\\(data[:800]\\)\\)\")",
-      "Bash(curl -s \"http://localhost:8765/api/cb-suspension/reload\")"
+      "Bash(curl -s \"http://localhost:8765/api/cb-suspension/reload\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=15142,15364,15601\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=35831\")",
+      "Bash(curl -sk \"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_35831.tw\" -H \"User-Agent: Mozilla/5.0\" -H \"Referer: https://mis.twse.com.tw/stock/fibest.jsp\")",
+      "Bash(curl -s -X POST \"http://localhost:8765/api/cb-prices?symbols=35831,15142,15601\")",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=35831,15142,15601\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k, '→ price=', v.get\\('price'\\), 'chg=', v.get\\('change_pct'\\)\\) for k,v in d.items\\(\\)]\")",
+      "Bash(curl -sk \"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_35831.tw|tse_35831.tw\" -H \"User-Agent: Mozilla/5.0\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\('c=',i.get\\('c'\\),'ex=',i.get\\('ex'\\),'z=',i.get\\('z'\\),'y=',i.get\\('y'\\),'b=',\\(i.get\\('b'\\) or ''\\)[:20]\\) for i in d.get\\('msgArray',[]\\)]\")",
+      "Bash(tasklist)",
+      "Bash(wmic process *)",
+      "Bash(curl -sk \"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_35831.tw\" -H \"User-Agent: Mozilla/5.0\")",
+      "Bash(curl -sk \"https://www.tdcc.com.tw/portal/zh/smWeb/bookEntry\" -o /tmp/tdcc.html -D /tmp/tdcc_headers.txt)",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=15601,15142,35831,15364\")"
     ]
   }
 }
