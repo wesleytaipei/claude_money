@@ -1302,7 +1302,7 @@ function goPage(name) {
   else if (name === 'growth') renderGrowthChart();
   else if (name === 'trend') renderTrendChart();
   else if (name === 'history') renderHistoryPage();
-  else if (name === 'important') renderImportantInfo(true);
+  else if (name === 'important') renderImportantInfo(false);
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1828,15 +1828,30 @@ function _importantChangeColor(val) {
   return '';
 }
 
+const _importantCache = { ts: 0, data: null };
+const IMPORTANT_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours in ms
+
 async function renderImportantInfo(force = false) {
   const tbody = document.getElementById('important-tbody');
   if(!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">⏳ 正在抓取最新市場數據...</td></tr>';
+  const nowMs = Date.now();
+  const cacheValid = !force && _importantCache.data && (nowMs - _importantCache.ts) < IMPORTANT_CACHE_TTL;
+
+  if (!cacheValid) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px;">⏳ 正在抓取最新市場數據...</td></tr>';
+  }
 
   try {
-    const data = await api('/api/important-info' + (force ? '?force=true' : ''));
-    const now = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    let data;
+    if (cacheValid) {
+      data = _importantCache.data;
+    } else {
+      data = await api('/api/important-info' + (force ? '?force=true' : ''));
+      _importantCache.data = data;
+      _importantCache.ts = nowMs;
+    }
+    const fetchTime = new Date(_importantCache.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
     // changeKey: which field to derive arrow color from (null = no coloring)
     const rows = [
@@ -1928,7 +1943,7 @@ async function renderImportantInfo(force = false) {
     // Footer row with update time
     html += `<tr style="border-top:1px solid var(--border)">
       <td colspan="3" class="muted small" style="text-align:right; padding:8px 12px">
-        資料更新時間: ${now}
+        資料更新時間: ${fetchTime}${cacheValid ? '（快取）' : ''}
       </td>
     </tr>`;
 
