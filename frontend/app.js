@@ -1809,7 +1809,7 @@ async function renderImportantInfo(force = false) {
   }
   
   try {
-    const data = await api('/important-info' + (force ? '?force=true' : ''));
+    const data = await api('/api/important-info' + (force ? '?force=true' : ''));
     let html = '';
     
     const rows = [
