@@ -1296,6 +1296,7 @@ function goPage(name) {
   else if (name === 'growth') renderGrowthChart();
   else if (name === 'trend') renderTrendChart();
   else if (name === 'history') renderHistoryPage();
+  else if (name === 'important') renderImportantInfo();
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1304,7 +1305,7 @@ function goPage(name) {
   // Update mobile title and close sidebar
   const titles = {
     dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
-    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄'
+    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -1798,3 +1799,68 @@ async function init() {
 }
 
 init();
+
+// ══ Important Info ═════════════════════════════════════════════════════
+async function renderImportantInfo(force = false) {
+  const tbody = document.getElementById('important-tbody');
+  if(!tbody) return;
+  if(force) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">重新載入中，請稍候... (需耗時 5~10 秒)</td></tr>';
+  }
+  
+  try {
+    const data = await api('/important-info' + (force ? '?force=true' : ''));
+    let html = '';
+    
+    const rows = [
+      { name: '🇺🇸 美國10年期公債殖利率', src: 'MacroMicro', metric: data.us_10y_bond,
+        fmt: o => `${o.current}%`, sub: o => `前值: ${o.prev}%` },
+        
+      { name: '🇹🇼 台股大盤融資維持率', src: 'MacroMicro', metric: data.taiex_margin_ratio,
+        fmt: o => `${o.current}%`, sub: o => `前值: ${o.prev}%` },
+        
+      { name: '🇹🇼 上市當日融資增減', src: 'TWSE', metric: data.margin_balance_tse,
+        fmt: o => `餘額 ${o.balance} 億`, sub: o => `增加 ${o.increase > 0 ? '+' : ''}${o.increase} 億` },
+        
+      { name: '🇹🇼 上櫃當日融資增減', src: 'TPEX', metric: data.margin_balance_otc,
+        fmt: o => `餘額 ${o.balance} 億`, sub: o => `增加 ${o.increase > 0 ? '+' : ''}${o.increase} 億` },
+        
+      { name: '📈 台指期盤後 (WTX&)', src: 'Yahoo', metric: data.wtx,
+        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` },
+        
+      { name: '📈 富台期 (STWN&)', src: 'WantGoo', metric: data.stwn,
+        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` },
+        
+      { name: '🛢 布蘭特原油 (Brent)', src: 'MacroMicro', metric: data.brent,
+        fmt: o => `${o.current}`, sub: o => `前值: ${o.prev}` },
+        
+      { name: '🇺🇸 台積電 ADR (TSM)', src: 'Yahoo', metric: data.tsm_adr,
+        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` }
+    ];
+    
+    for(const r of rows) {
+      if(!r.metric) {
+        html += `<tr><td>${r.name}</td><td colspan="2" class="muted">讀取失敗</td><td>${r.src}</td></tr>`;
+        continue;
+      }
+      
+      const v1 = r.fmt(r.metric);
+      const v2 = r.sub(r.metric);
+      
+      let v2Color = '';
+      if(v2.includes('+')) v2Color = 'green';
+      if(v2.includes('-') && !v2.includes('前值')) v2Color = 'var(--danger)';
+      
+      html += `<tr>
+        <td style="font-weight:600">${r.name}</td>
+        <td style="font-size:16px">${v1}</td>
+        <td style="color:${v2Color}; font-weight:500">${v2}</td>
+        <td class="muted small">${r.src}</td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+  } catch(e) {
+    console.error(e);
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">資料載入失敗</td></tr>';
+  }
+}

@@ -43,6 +43,9 @@
         <button class="nav-item" data-page="history">
           <span class="nav-ico">📅</span><span>歷史紀錄</span>
         </button>
+        <button class="nav-item" data-page="important">
+          <span class="nav-ico">📣</span><span>重要資訊</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -144,6 +147,40 @@
             <h3>投資損益總覽</h3>
           </div>
           <div class="pnl-grid" id="pnl-grid"></div>
+        </div>
+      </section>
+
+      <!-- ══ IMPORTANT INFO ══ -->
+      <section class="page" id="page-important">
+        <div class="page-header">
+          <div>
+            <h1>重要資訊</h1>
+            <p class="page-sub">每日即時重要市場數據</p>
+          </div>
+          <div>
+            <button class="btn-primary" onclick="renderImportantInfo(true)">↺ 重新整理</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>重要金融數據</h3>
+          </div>
+          <div class="table-wrap">
+            <table class="important-table">
+              <thead>
+                <tr>
+                  <th>指標名稱</th>
+                  <th>最新數值</th>
+                  <th>前值 / 變化</th>
+                  <th>資料來源</th>
+                </tr>
+              </thead>
+              <tbody id="important-tbody">
+                <tr><td colspan="4" style="text-align:center; padding:20px;">資料載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 

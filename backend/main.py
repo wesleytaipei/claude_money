@@ -1095,6 +1095,14 @@ def get_indices():
     return fetch_indices()
 
 
+@app.get("/api/important-info")
+def get_important_info(force: bool = False):
+    import info_scraper
+    if force:
+        info_scraper._info_cache["ts"] = 0
+    return info_scraper.scrape_important_info()
+
+
 @app.post("/api/snapshot")
 async def save_snapshot(request: Request):
     body = await request.json()
