@@ -20,6 +20,11 @@ from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from info_scraper import scrape_important_info
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
 
@@ -403,6 +408,7 @@ def fetch_indices() -> dict:
         "dji":    "^DJI",
         "nasdaq": "^IXIC",
         "sox":    "^SOX",
+        "btc":    "BTC-USD",
     }
     fx_tickers = {"usd_twd": "USDTWD=X", "jpy_twd": "JPYTWD=X"}
 
@@ -1095,14 +1101,6 @@ def get_indices():
     return fetch_indices()
 
 
-@app.get("/api/important-info")
-def get_important_info(force: bool = False):
-    import info_scraper
-    if force:
-        info_scraper._info_cache["ts"] = 0
-    return info_scraper.scrape_important_info()
-
-
 @app.post("/api/snapshot")
 async def save_snapshot(request: Request):
     body = await request.json()
@@ -1393,6 +1391,16 @@ def stock_table_lookup(q: str = ""):
             if len(results) >= 10:
                 break
     return results
+
+
+@app.get("/api/important-info")
+def get_important_info(force: bool = False):
+    """Return important macro/market info from various sources."""
+    try:
+        return scrape_important_info(force)
+    except Exception as e:
+        logger.error(f"[important-info] failed: {e}")
+        return {"error": str(e)}
 
 
 # ── Serve frontend ───────────────────────────────────────────────────────────

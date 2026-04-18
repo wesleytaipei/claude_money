@@ -673,6 +673,7 @@ function renderIndices() {
     { key: 'dji',    name: '道瓊指數', market: 'us' },
     { key: 'nasdaq', name: '那斯達克', market: 'us' },
     { key: 'sox',    name: '費半指數', market: 'us' },
+    { key: 'btc',    name: '比特幣 (BTC)', market: 'us' },
   ];
   const html = items.map(it => {
     const d = idx[it.key];
@@ -680,10 +681,15 @@ function renderIndices() {
     const up = d.change >= 0;
     const arrow = up ? '▲' : '▼';
     const cls = up ? 'index-up' : 'index-down';
+    const isBtc = it.key === 'btc';
+    const priceStr = isBtc ? `$${Math.round(d.price).toLocaleString()}` : d.price.toLocaleString();
+    const changeStr = isBtc
+      ? `$${Math.round(Math.abs(d.change)).toLocaleString()} (${Math.abs(d.change_pct).toFixed(2)}%)`
+      : `${Math.abs(d.change).toFixed(2)} (${Math.abs(d.change_pct).toFixed(2)}%)`;
     return `<div class="index-item">
       <span class="index-name">${it.name}</span>
-      <span class="index-price">${d.price.toLocaleString()}</span>
-      <span class="index-change ${cls}">${arrow} ${Math.abs(d.change).toFixed(2)} (${Math.abs(d.change_pct).toFixed(2)}%)</span>
+      <span class="index-price">${priceStr}</span>
+      <span class="index-change ${cls}">${arrow} ${changeStr}</span>
     </div>`;
   }).join('');
   document.getElementById('indices-list').innerHTML = html;
@@ -1296,7 +1302,7 @@ function goPage(name) {
   else if (name === 'growth') renderGrowthChart();
   else if (name === 'trend') renderTrendChart();
   else if (name === 'history') renderHistoryPage();
-  else if (name === 'important') renderImportantInfo();
+  else if (name === 'important') renderImportantInfo(true);
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1801,66 +1807,134 @@ async function init() {
 init();
 
 // ══ Important Info ═════════════════════════════════════════════════════
+function _importantMetricFailed(metric) {
+  if (!metric) return true;
+  // price-style metric {price, change, change_pct}
+  if ('price' in metric) return metric.price === '-' || metric.price == null;
+  // current-style metric {current, prev}
+  if ('current' in metric) return metric.current === null || metric.current === undefined;
+  // balance-style metric {balance, increase}
+  if ('balance' in metric) return metric.balance === null || metric.balance === undefined;
+  return true;
+}
+
+function _importantChangeColor(val) {
+  if (val == null) return '';
+  const s = String(val);
+  const num = parseFloat(s.replace(/[+%,]/g, ''));
+  if (isNaN(num)) return '';
+  if (num > 0) return 'var(--green)';
+  if (num < 0) return 'var(--red)';
+  return '';
+}
+
 async function renderImportantInfo(force = false) {
   const tbody = document.getElementById('important-tbody');
   if(!tbody) return;
-  if(force) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">重新載入中，請稍候... (需耗時 5~10 秒)</td></tr>';
-  }
-  
+
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">⏳ 正在抓取最新市場數據...</td></tr>';
+
   try {
     const data = await api('/api/important-info' + (force ? '?force=true' : ''));
-    let html = '';
-    
+    const now = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+
+    // changeKey: which field to derive arrow color from (null = no coloring)
     const rows = [
-      { name: '🇺🇸 美國10年期公債殖利率', src: 'MacroMicro', metric: data.us_10y_bond,
-        fmt: o => `${o.current}%`, sub: o => `前值: ${o.prev}%` },
-        
-      { name: '🇹🇼 台股大盤融資維持率', src: 'MacroMicro', metric: data.taiex_margin_ratio,
-        fmt: o => `${o.current}%`, sub: o => `前值: ${o.prev}%` },
-        
-      { name: '🇹🇼 上市當日融資增減', src: 'TWSE', metric: data.margin_balance_tse,
-        fmt: o => `餘額 ${o.balance} 億`, sub: o => `增加 ${o.increase > 0 ? '+' : ''}${o.increase} 億` },
-        
-      { name: '🇹🇼 上櫃當日融資增減', src: 'TPEX', metric: data.margin_balance_otc,
-        fmt: o => `餘額 ${o.balance} 億`, sub: o => `增加 ${o.increase > 0 ? '+' : ''}${o.increase} 億` },
-        
-      { name: '📈 台指期盤後 (WTX&)', src: 'Yahoo', metric: data.wtx,
-        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` },
-        
-      { name: '📈 富台期 (STWN&)', src: 'WantGoo', metric: data.stwn,
-        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` },
-        
-      { name: '🛢 布蘭特原油 (Brent)', src: 'MacroMicro', metric: data.brent,
-        fmt: o => `${o.current}`, sub: o => `前值: ${o.prev}` },
-        
-      { name: '🇺🇸 台積電 ADR (TSM)', src: 'Yahoo', metric: data.tsm_adr,
-        fmt: o => `${o.price}`, sub: o => `${o.change} (${o.change_pct})` }
+      { name: '📈 台指期盤後 (WTX&)', src: 'Yahoo TW',
+        metric: data.wtx,
+        fmt: o => o.price,
+        sub: o => `${o.change} (${o.change_pct})`,
+        changeKey: 'change' },
+
+      { name: '📈 富台指 (TWNCON)', src: '鉅亨',
+        metric: data.twncon,
+        fmt: o => o.price,
+        sub: o => `${o.change} (${o.change_pct})`,
+        changeKey: 'change' },
+
+      { name: '🇺🇸 台積電 ADR (TSM)', src: 'Yahoo Finance',
+        metric: data.tsm_adr,
+        fmt: o => `$${o.price}`,
+        sub: o => `${o.change} (${o.change_pct})`,
+        changeKey: 'change' },
+
+      { name: '🇹🇼 上市融資餘額', src: 'TWSE',
+        metric: data.margin_balance_tse,
+        fmt: o => `${o.balance} 億`,
+        sub: o => `${Number(o.increase) >= 0 ? '+' : ''}${o.increase} 億`,
+        changeKey: 'increase' },
+
+      { name: '🇹🇼 上櫃融資餘額', src: 'TPEX',
+        metric: data.margin_balance_otc,
+        fmt: o => `${o.balance} 億`,
+        sub: o => `${Number(o.increase) >= 0 ? '+' : ''}${o.increase} 億`,
+        changeKey: 'increase' },
+
+      { name: '🇹🇼 台股大盤融資維持率', src: 'MacroMicro',
+        metric: data.taiex_margin_ratio,
+        fmt: o => `${o.current}%`,
+        sub: o => {
+          const chg = o.prev != null ? Math.round((o.current - o.prev) * 100) / 100 : null;
+          const sign = chg != null ? (chg >= 0 ? '+' : '') : '';
+          return o.prev != null ? `${o.prev}% (${sign}${chg}%)` : '—';
+        },
+        colorFn: o => o.current - o.prev },
+
+      { name: '🇺🇸 美國10年期公債殖利率', src: 'Yahoo Finance',
+        metric: data.us_10y_bond,
+        fmt: o => `${o.current}%`,
+        sub: o => o.change ? `${o.change} (${o.change_pct})` : `前值: ${o.prev}%`,
+        changeKey: 'change' },
+
+      { name: '🛢 布蘭特原油 (Brent)', src: 'Yahoo Finance',
+        metric: data.brent,
+        fmt: o => `$${o.current}`,
+        sub: o => o.change ? `${o.change} (${o.change_pct})` : `前值: $${o.prev}`,
+        changeKey: 'change' },
     ];
-    
-    for(const r of rows) {
-      if(!r.metric) {
-        html += `<tr><td>${r.name}</td><td colspan="2" class="muted">讀取失敗</td><td>${r.src}</td></tr>`;
+
+    let html = '';
+    for (const r of rows) {
+      if (_importantMetricFailed(r.metric)) {
+        html += `<tr>
+          <td style="font-weight:600">${r.name}</td>
+          <td class="muted">—</td>
+          <td class="muted small">讀取失敗</td>
+        </tr>`;
         continue;
       }
-      
-      const v1 = r.fmt(r.metric);
-      const v2 = r.sub(r.metric);
-      
-      let v2Color = '';
-      if(v2.includes('+')) v2Color = 'green';
-      if(v2.includes('-') && !v2.includes('前值')) v2Color = 'var(--danger)';
-      
+
+      let v1, v2;
+      try { v1 = r.fmt(r.metric); v2 = r.sub(r.metric); }
+      catch(_) {
+        html += `<tr>
+          <td style="font-weight:600">${r.name}</td>
+          <td class="muted">—</td>
+          <td class="muted small">讀取失敗</td>
+        </tr>`;
+        continue;
+      }
+
+      const changeVal = r.colorFn ? r.colorFn(r.metric) : (r.changeKey ? r.metric[r.changeKey] : null);
+      const subColor = _importantChangeColor(changeVal);
+
       html += `<tr>
         <td style="font-weight:600">${r.name}</td>
-        <td style="font-size:16px">${v1}</td>
-        <td style="color:${v2Color}; font-weight:500">${v2}</td>
-        <td class="muted small">${r.src}</td>
+        <td style="font-size:15px; font-weight:600; font-family:'JetBrains Mono',monospace">${v1}</td>
+        <td style="color:${subColor}; font-weight:500; font-family:'JetBrains Mono',monospace">${v2}</td>
       </tr>`;
     }
+
+    // Footer row with update time
+    html += `<tr style="border-top:1px solid var(--border)">
+      <td colspan="3" class="muted small" style="text-align:right; padding:8px 12px">
+        資料更新時間: ${now}
+      </td>
+    </tr>`;
+
     tbody.innerHTML = html;
   } catch(e) {
     console.error(e);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">資料載入失敗</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
   }
 }
