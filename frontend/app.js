@@ -880,8 +880,10 @@ function renderInvestmentsPage() {
 
   // Table
   const isCB = state.currentInv === 'cb';
+  const isStock = state.currentInv === 'stock';
   const isUS = state.currentInv === 'us';
   const cur = isUS ? 'USD' : 'TWD';
+  const showStar = isCB || isStock;
 
   // CB: hide 預估市值; 今日漲幅% at end of cbHeaders shows underlying stock's change%
   // Non-CB: 今日漲幅% stays after 目前價格
@@ -889,10 +891,29 @@ function renderInvestmentsPage() {
     ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
     : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
   const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
-  const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : baseHeaders;
+  const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : (isStock ? ['★', ...baseHeaders] : baseHeaders);
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
-  const numFromIdx = isCB ? 3 : 2;   // ★ shifts the threshold by 1 for CB
+  const numFromIdx = showStar ? 3 : 2;   // ★ shifts the threshold by 1
+
+  // Build alert map for TW stocks + CB underlying: stockCode → [reason strings]
+  const alertMap = {};
+  if (showStar) {
+    if (_cbListedCache.data?.items) {
+      for (const r of _cbListedCache.data.items) {
+        const sc = String(r.cb_code).slice(0, 4);
+        if (!alertMap[sc]) alertMap[sc] = [];
+        alertMap[sc].push(`近期掛牌CB: ${r.cb_code} ${r.name} (${r.listing})`);
+      }
+    }
+    if (_fscCache.data?.items) {
+      for (const r of _fscCache.data.items) {
+        const sc = String(r.code);
+        if (!alertMap[sc]) alertMap[sc] = [];
+        alertMap[sc].push(`近期核准${r.kind}: ${r.name} (${r.eff_date})`);
+      }
+    }
+  }
   document.getElementById('inv-thead').innerHTML =
     '<tr>' + headers.map((h, i) => `<th class="${i >= numFromIdx ? 'num' : ''}">${h}</th>`).join('') + '<th></th></tr>';
 
@@ -976,8 +997,13 @@ function renderInvestmentsPage() {
       `;
     }
 
-    const starCell = isCB
-      ? `<td><span class="star-btn ${item.highlighted ? 'on' : ''}" onclick="event.stopPropagation(); toggleHighlight(${idx})">${item.highlighted ? '★' : '☆'}</span></td>`
+    const autoReasons = showStar && item.symbol ? (alertMap[String(item.symbol).slice(0, 4)] || []) : [];
+    const isAutoHit = autoReasons.length > 0;
+    const showFilled = item.highlighted || isAutoHit;
+    const starCls = item.highlighted ? 'on' : (isAutoHit ? 'on auto' : '');
+    const starTitle = isAutoHit ? ` title="${autoReasons.join('&#10;')}"` : '';
+    const starCell = showStar
+      ? `<td><span class="star-btn ${starCls}"${starTitle} onclick="event.stopPropagation(); toggleHighlight(${idx})">${showFilled ? '★' : '☆'}</span></td>`
       : '';
 
     return `<tr class="${rowCls}" onclick="openEditPosition(${idx})" style="cursor:pointer">
@@ -1802,6 +1828,29 @@ async function init() {
     if (currentPage() === 'dashboard') renderDashboard();
     if (currentPage() === 'investments') renderInvestmentsPage();
   });
+
+  // Pre-fetch CB/FSC data so stock alert map is ready even without visiting 重要資訊
+  _prefetchAlertData();
+}
+
+async function _prefetchAlertData() {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    if (!_cbListedCache.data || _cbListedCache.date !== today) {
+      const d = await api('/api/cb-listed');
+      _cbListedCache.data = d; _cbListedCache.date = today;
+    }
+  } catch(e) { /* silent */ }
+  try {
+    if (!_fscCache.data || _fscCache.date !== today) {
+      const d = await api('/api/fsc-offerings');
+      _fscCache.data = d; _fscCache.date = today;
+    }
+  } catch(e) { /* silent */ }
+  // Re-render investments if currently visible so alert stars appear
+  if (currentPage() === 'investments' && state.currentInv === 'stock') {
+    renderInvestmentsPage();
+  }
 }
 
 init();
@@ -1950,6 +1999,189 @@ async function renderImportantInfo(force = false) {
     tbody.innerHTML = html;
   } catch(e) {
     console.error(e);
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
   }
+  // Also render sub-panels (fire-and-forget, each has its own cache)
+  renderCbListed();
+  renderFscOfferings();
+}
+
+// ── CB Listed ──────────────────────────────────────────────────────────────
+const _cbListedCache = { date: '', data: null };
+let _cbSortKey = 'date';
+let _cbSortAsc = true;
+
+async function renderCbListed() {
+  const tbody = document.getElementById('cb-tbody');
+  if (!tbody) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (_cbListedCache.data && _cbListedCache.date === today) {
+    _renderCbTable(_cbListedCache.data);
+    return;
+  }
+
+  try {
+    const data = await api('/api/cb-listed');
+    _cbListedCache.data = data;
+    _cbListedCache.date = today;
+    _renderCbTable(data);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
+  }
+}
+
+function cbSort(key) {
+  if (_cbSortKey === key) {
+    _cbSortAsc = !_cbSortAsc;
+  } else {
+    _cbSortKey = key;
+    _cbSortAsc = true;
+  }
+  if (_cbListedCache.data) _renderCbTable(_cbListedCache.data);
+}
+
+function _renderCbTable(data) {
+  const tbody = document.getElementById('cb-tbody');
+  const countEl = document.getElementById('cb-count');
+  const titleEl = document.getElementById('cb-panel-title');
+  if (!tbody) return;
+
+  let items = [...(data.items || [])];
+  if (countEl) countEl.textContent = `共 ${items.length} 筆`;
+  if (titleEl && data.data_date) titleEl.textContent = `📊 近期掛牌CB (${data.data_date})`;
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="muted" style="text-align:center; padding:16px">暫無資料</td></tr>';
+    return;
+  }
+
+  // Sort
+  items.sort((a, b) => {
+    const va = _cbSortKey === 'code' ? (parseInt(a.cb_code) || 0) : (a.listing || '');
+    const vb = _cbSortKey === 'code' ? (parseInt(b.cb_code) || 0) : (b.listing || '');
+    return _cbSortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  // Update sort buttons
+  const dateBtn = document.getElementById('cb-sort-date');
+  const codeBtn = document.getElementById('cb-sort-code');
+  if (dateBtn) dateBtn.textContent = `日期 ${_cbSortKey === 'date' ? (_cbSortAsc ? '↑' : '↓') : '↕'}`;
+  if (codeBtn) codeBtn.textContent = `代號 ${_cbSortKey === 'code' ? (_cbSortAsc ? '↑' : '↓') : '↕'}`;
+
+  // Color: highlight 有擔保 (anything that is NOT 無擔)
+  const tcriCell = t => {
+    const hasCollateral = !t.includes('無擔');
+    const color = hasCollateral ? '#22c55e' : 'var(--muted)';
+    return `<span style="color:${color}">${t}</span>`;
+  };
+
+  tbody.innerHTML = items.map(r => `<tr>
+    <td class="mono" style="font-weight:600">${r.cb_code}</td>
+    <td style="font-weight:600">${r.name}</td>
+    <td class="small">${tcriCell(r.tcri)}</td>
+    <td class="mono small">${r.amount}</td>
+    <td class="mono small">${r.years}</td>
+    <td class="mono small">${r.conv_price}</td>
+    <td class="mono small muted">${r.listing}</td>
+    <td class="small muted">${r.remarks}</td>
+  </tr>`).join('');
+}
+
+// ── FSC Offerings ──────────────────────────────────────────────────────────
+const _fscCache = { date: '', data: null };
+let _fscSortKey = 'date';   // 'date' | 'code'
+let _fscSortAsc = true;     // true = oldest first (default)
+
+async function renderFscOfferings() {
+  const tbody = document.getElementById('fsc-tbody');
+  if (!tbody) return;
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (_fscCache.data && _fscCache.date === today) {
+    _renderFscTable(_fscCache.data);
+    return;
+  }
+
+  try {
+    const data = await api('/api/fsc-offerings');
+    _fscCache.data = data;
+    _fscCache.date = today;
+    _renderFscTable(data);
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
+  }
+}
+
+function fscSort(key) {
+  if (_fscSortKey === key) {
+    _fscSortAsc = !_fscSortAsc;   // toggle direction
+  } else {
+    _fscSortKey = key;
+    _fscSortAsc = true;  // both default to ascending on first click
+  }
+  if (_fscCache.data) _renderFscTable(_fscCache.data);
+}
+
+function _renderFscTable(data) {
+  const tbody = document.getElementById('fsc-tbody');
+  const countEl = document.getElementById('fsc-count');
+  if (!tbody) return;
+
+  let items = [...(data.items || [])];
+  if (countEl) countEl.textContent = `共 ${items.length} 件`;
+
+  // Update panel title with Excel date
+  const titleEl = document.getElementById('fsc-panel-title');
+  if (titleEl && data.excel_date) {
+    titleEl.textContent = `📋 近期核准現金增資 / 轉換公司債 (${data.excel_date})`;
+  }
+
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center; padding:16px">暫無資料</td></tr>';
+    return;
+  }
+
+  // Sort
+  items.sort((a, b) => {
+    let va, vb;
+    if (_fscSortKey === 'code') {
+      va = parseInt(a.code) || 0;
+      vb = parseInt(b.code) || 0;
+    } else {
+      va = a.eff_raw || '';
+      vb = b.eff_raw || '';
+    }
+    return _fscSortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  // Update sort button labels
+  const dateBtn = document.getElementById('fsc-sort-date');
+  const codeBtn = document.getElementById('fsc-sort-code');
+  if (dateBtn) dateBtn.textContent = `日期 ${_fscSortKey === 'date' ? (_fscSortAsc ? '↑' : '↓') : '↕'}`;
+  if (codeBtn) codeBtn.textContent = `代號 ${_fscSortKey === 'code' ? (_fscSortAsc ? '↑' : '↓') : '↕'}`;
+
+  // CB subtype colors: 有擔保=yellow, 無擔保=primary(blue), 海外=purple
+  // CB subtype colors — keep clearly distinct from each other and from 現金增資 green
+  const cbSubColor = { '有擔保': '#fb923c', '無擔保': '#38bdf8', '海外': '#f472b6' };
+
+  const kindCell = r => {
+    if (r.kind === '現金增資') {
+      return `<span style="color:var(--green);font-weight:600">現金增資</span>`;
+    }
+    const subColor = cbSubColor[r.cb_sub] || '#94a3b8';
+    const subTag = r.cb_sub
+      ? ` <span style="color:${subColor};font-size:11px;font-weight:600">(${r.cb_sub})</span>`
+      : '';
+    return `<span style="color:#94a3b8;font-weight:600">轉換公司債</span>${subTag}`;
+  };
+
+  tbody.innerHTML = items.map(r => `<tr>
+    <td class="mono" style="font-weight:600">${r.code}</td>
+    <td style="font-weight:600">${r.name}</td>
+    <td>${kindCell(r)}</td>
+    <td class="mono small">${r.price || '—'}</td>
+    <td class="mono small">${r.amount}</td>
+    <td class="mono small muted">${r.eff_date}</td>
+  </tr>`).join('');
 }

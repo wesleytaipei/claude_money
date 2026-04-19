@@ -1403,6 +1403,192 @@ def get_important_info(force: bool = False):
         return {"error": str(e)}
 
 
+_cb_listed_cache: dict = {"date": "", "data": None}
+CB_LISTED_URL = "https://cbas16889.pscnet.com.tw/api/MiDownloadExcel/GetExcel_RecentlyCB"
+
+@app.get("/api/cb-listed")
+def get_cb_listed():
+    """Return recent listed CBs from cbas pscnet Excel. Cached per calendar day."""
+    global _cb_listed_cache
+    import io, pandas as pd
+    from datetime import date
+
+    today = date.today().isoformat()
+    if _cb_listed_cache["data"] is not None and _cb_listed_cache["date"] == today:
+        return _cb_listed_cache["data"]
+
+    try:
+        resp = http_requests.get(CB_LISTED_URL, verify=False, timeout=15)
+        resp.raise_for_status()
+        df = pd.read_excel(io.BytesIO(resp.content))
+
+        rows = []
+        for _, r in df.iterrows():
+            # 金額
+            try:
+                amt = float(r.get('發行量(億)', 0))
+                amt_str = f"{int(amt)}E" if amt == int(amt) else f"{amt}E"
+            except Exception:
+                amt_str = str(r.get('發行量(億)', ''))
+
+            # 年期：5年 → 5y
+            years = str(r.get('年期', '')).replace('年', 'y')
+
+            # 轉換價
+            try:
+                cp = r.get('轉換價', '')
+                conv_price = str(int(float(cp))) if float(cp) == int(float(cp)) else str(cp)
+            except Exception:
+                conv_price = str(r.get('轉換價', ''))
+
+            # 掛牌日：2026/04/15 → 115/04/15
+            listing_raw = str(r.get('掛牌日', ''))
+            try:
+                parts = listing_raw.split('/')
+                listing = f"{int(parts[0])-1911}/{parts[1]}/{parts[2]}" if len(parts) == 3 else listing_raw
+            except Exception:
+                listing = listing_raw
+
+            remarks = str(r.get('備註', '') or '').strip()
+            if remarks == 'nan':
+                remarks = ''
+
+            rows.append({
+                "cb_code":    str(r.get('CB代號', '')).strip(),
+                "name":       str(r.get('CB名稱', '')).strip(),
+                "tcri":       str(r.get('TCRI/擔保', '')).strip(),
+                "amount":     amt_str,
+                "years":      years,
+                "conv_price": conv_price,
+                "listing":    listing,
+                "remarks":    remarks,
+            })
+
+        td = date.today()
+        roc_date = f"{td.year - 1911}.{td.month}.{td.day}"
+        result = {"items": rows, "total": len(rows), "data_date": roc_date}
+        _cb_listed_cache = {"date": today, "data": result}
+        return result
+    except Exception as e:
+        logger.error(f"[cb-listed] {e}")
+        return {"items": [], "total": 0, "error": str(e)}
+
+
+_fsc_cache: dict = {"date": "", "data": None}
+FSC_EXCEL_URL = "https://www.fsc.gov.tw/userfiles/file/11504017%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx"
+
+def _roc_date_to_str(val) -> str:
+    """Convert ROC date int like 1150323 → '115/03/23'."""
+    try:
+        s = str(int(val))
+        if len(s) == 7:
+            return f"{s[:3]}/{s[3:5]}/{s[5:7]}"
+    except Exception:
+        pass
+    return ""
+
+def _amount_to_e(amount_raw, currency_raw) -> str:
+    """Format amount as xE. Default TWD (no label); USD shown explicitly."""
+    try:
+        yi = float(amount_raw) / 1e8
+        yi_str = f"{yi:.2f}".rstrip('0').rstrip('.')
+        currency = str(currency_raw or '').strip()
+        if currency == '美元':
+            return f"{yi_str}E USD"
+        return f"{yi_str}E"
+    except Exception:
+        return str(amount_raw)
+
+def _cb_subtype(cat: str) -> str:
+    """Extract CB subtype tag: 有擔保 / 無擔保 / 海外."""
+    if '海外' in cat:
+        return '海外'
+    if '有擔保' in cat:
+        return '有擔保'
+    if '無擔保' in cat:
+        return '無擔保'
+    return ''
+
+@app.get("/api/fsc-offerings")
+def get_fsc_offerings():
+    """Return approved 現金增資 / 轉換公司債 from FSC annual Excel. Cached per calendar day."""
+    global _fsc_cache
+    import io, pandas as pd
+    from datetime import date
+
+    today = date.today().isoformat()
+    cached = _fsc_cache["data"]
+    if cached is not None and _fsc_cache["date"] == today and cached.get("excel_date"):
+        return cached
+
+    try:
+        resp = http_requests.get(FSC_EXCEL_URL, verify=False, timeout=30)
+        resp.raise_for_status()
+        df = pd.read_excel(io.BytesIO(resp.content), header=2)
+
+        # Normalise column names
+        df.columns = [str(c).strip().replace('\u3000', '').replace('\n', '') for c in df.columns]
+        amt_col = next((c for c in df.columns if '金' in c and '額' in c), None)
+
+        # Filter: 生效日期 has a value AND 案件類別 matches target
+        df = df[df['生效日期'].notna()].copy()
+        df = df[df['案件類別'].str.contains('現金增資|轉換公司債', na=False)].copy()
+
+        rows = []
+        for _, r in df.iterrows():
+            cat = str(r.get('案件類別', ''))
+            kind = '現金增資' if '現金增資' in cat else '轉換公司債'
+
+            amount_raw = r.get(amt_col) if amt_col else None
+            amount_str = _amount_to_e(amount_raw, r.get('幣別', ''))
+
+            price_raw = r.get('發行價格', None)
+            try:
+                price = None if (price_raw is None or str(price_raw) == 'nan') else float(price_raw)
+                price_str = str(int(price)) if price and price == int(price) else (f"{price}" if price else '')
+            except Exception:
+                price_str = ''
+
+            eff_str = _roc_date_to_str(r.get('生效日期'))
+
+            rows.append({
+                "code":     str(r.get('證券代號', '')).strip().rstrip('*'),
+                "name":     str(r.get('公司名稱', '')).strip().rstrip('*'),
+                "kind":     kind,
+                "cb_sub":   _cb_subtype(cat) if kind == '轉換公司債' else '',
+                "amount":   amount_str,
+                "price":    price_str,
+                "eff_date": eff_str,
+                "eff_raw":  str(int(float(r['生效日期']))),
+            })
+
+        # Fetch update date from sfb.gov.tw (shown in the table next to the xlsx link)
+        import re as _re
+        excel_date = ''
+        try:
+            sfb_r = http_requests.get(
+                'https://www.sfb.gov.tw/ch/home.jsp?id=1016&parentpath=0,6,52',
+                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
+                verify=False, timeout=10
+            )
+            # Find date in <td> immediately before the xlsx link
+            m = _re.search(
+                r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,50}<td[^>]*>[^<]*<a[^>]*11504',
+                sfb_r.text
+            )
+            if m:
+                excel_date = m.group(1)
+        except Exception:
+            pass
+
+        result = {"items": rows, "total": len(rows), "excel_date": excel_date}
+        _fsc_cache = {"date": today, "data": result}
+        return result
+    except Exception as e:
+        logger.error(f"[fsc-offerings] {e}")
+        return {"items": [], "total": 0, "error": str(e)}
+
+
 # ── Serve frontend ───────────────────────────────────────────────────────────
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware

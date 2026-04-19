@@ -704,6 +704,7 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .yellow        { color: var(--yellow); }
 .blue          { color: var(--blue); }
 .small         { font-size: 11.5px; }
+.mono          { font-family: var(--mono); }
 .hidden        { display: none !important; }
 
 /* ══ Forms ═════════════════════════════════════════════════════════════════ */
@@ -906,6 +907,7 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 }
 .star-btn:hover { transform: scale(1.2); }
 .star-btn.on { color: #fbbf24; text-shadow: 0 0 10px rgba(251,191,36,.5); }
+.star-btn.auto { color: #fb923c !important; text-shadow: 0 0 10px rgba(251,146,60,.7); }
 
 /* Settings modal — checkbox list */
 .settings-section {

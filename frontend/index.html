@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=29" />
+  <link rel="stylesheet" href="/static/style.css?v=34" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -177,6 +177,63 @@
               </thead>
               <tbody id="important-tbody">
                 <tr><td colspan="4" style="text-align:center; padding:20px;">資料載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-head">
+            <h3 id="cb-panel-title">📊 近期掛牌CB</h3>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="panel-sub" id="cb-count">—</span>
+              <button class="btn-ghost" style="padding:4px 10px;font-size:12px" id="cb-sort-date" onclick="cbSort('date')">日期 ↑</button>
+              <button class="btn-ghost" style="padding:4px 10px;font-size:12px" id="cb-sort-code" onclick="cbSort('code')">代號 ↕</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="important-table">
+              <thead>
+                <tr>
+                  <th>CB代號</th>
+                  <th>名稱</th>
+                  <th>TCRI/擔保</th>
+                  <th>金額</th>
+                  <th>年限</th>
+                  <th>轉換價</th>
+                  <th>掛牌日</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody id="cb-tbody">
+                <tr><td colspan="8" style="text-align:center; padding:20px;">資料載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:20px">
+          <div class="panel-head">
+            <h3 id="fsc-panel-title">📋 近期核准現金增資 / 轉換公司債</h3>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="panel-sub" id="fsc-count">—</span>
+              <button class="btn-ghost" style="padding:4px 10px;font-size:12px" id="fsc-sort-date" onclick="fscSort('date')">日期 ↕</button>
+              <button class="btn-ghost" style="padding:4px 10px;font-size:12px" id="fsc-sort-code" onclick="fscSort('code')">代號 ↕</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="important-table">
+              <thead>
+                <tr>
+                  <th>代號</th>
+                  <th>公司名稱</th>
+                  <th>類別</th>
+                  <th>發行價格</th>
+                  <th>金額</th>
+                  <th>生效日期</th>
+                </tr>
+              </thead>
+              <tbody id="fsc-tbody">
+                <tr><td colspan="6" style="text-align:center; padding:20px;">資料載入中...</td></tr>
               </tbody>
             </table>
           </div>
@@ -362,6 +419,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=29"></script>
+  <script src="/static/app.js?v=34"></script>
 </body>
 </html>
