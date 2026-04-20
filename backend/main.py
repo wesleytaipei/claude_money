@@ -1023,7 +1023,7 @@ if not any(v.get("market") == "emg" for v in _tw_table.get("by_symbol", {}).valu
 
 
 def _tw_price_for_symbol(symbol: str) -> tuple[str, float | None]:
-    """Fetch name + price for a TW stock symbol via TWSE mis API."""
+    """Fetch name + price for a TW stock symbol via TWSE mis API, with yfinance fallback."""
     for ex in ["tse", "otc"]:
         try:
             url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex}_{symbol.lower()}.tw"
@@ -1045,7 +1045,18 @@ def _tw_price_for_symbol(symbol: str) -> tuple[str, float | None]:
                     return name, price
         except Exception:
             pass
+
+    # yfinance fallback — handles 6-char ETFs like 00988A not in MIS
+    for suffix in [".TW", ".TWO"]:
+        try:
+            fi = yf.Ticker(f"{symbol}{suffix}").fast_info
+            price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
+            if price:
+                return "", price  # name unknown via yf, return empty string
+        except Exception:
+            pass
     return "", None
+
 
 
 @app.get("/api/stock-lookup")
