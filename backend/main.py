@@ -333,22 +333,27 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
                     found.add(sym)
                     continue
 
-                # 2. Try yfinance fallback (standard)
-                suffix = ".TWO" if market == "otc" else ".TW"
-                yf_sym = f"{sym}{suffix}"
-                try:
-                    fi = yf.Ticker(yf_sym).fast_info
-                    price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
-                    prev = float(getattr(fi, "previous_close", None) or 0)
-                    change_pct = None
-                    if price and prev > 0:
-                        change_pct = round((price - prev) / prev * 100, 2)
-                    name = entry.get("name", "")
-                    hit = {"price": price, "change_pct": change_pct, "name": name, "ts": now}
-                    _tw_mis_cache[sym] = hit
-                    result[sym] = hit
+                # 2. Try yfinance fallback — try both suffixes so 6-char symbols
+                #    like 00988A work even when _tw_table market is unknown
+                suffixes = [".TWO", ".TW"] if market == "otc" else [".TW", ".TWO"]
+                yf_hit = None
+                for suffix in suffixes:
+                    yf_sym = f"{sym}{suffix}"
+                    try:
+                        fi = yf.Ticker(yf_sym).fast_info
+                        price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
+                        if price:
+                            prev = float(getattr(fi, "previous_close", None) or 0)
+                            change_pct = round((price - prev) / prev * 100, 2) if prev > 0 else None
+                            yf_hit = {"price": price, "change_pct": change_pct, "name": entry.get("name", ""), "ts": now}
+                            break
+                    except Exception:
+                        continue
+                if yf_hit:
+                    _tw_mis_cache[sym] = yf_hit
+                    result[sym] = yf_hit
                     found.add(sym)
-                except Exception:
+                else:
                     # Final miss
                     if sym not in result:
                         miss = {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
