@@ -22,6 +22,13 @@ from apscheduler.triggers.cron import CronTrigger
 
 import sys
 import os
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()  # loads variables from .env file into os.environ
+except ImportError:
+    pass
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from info_scraper import scrape_important_info
 

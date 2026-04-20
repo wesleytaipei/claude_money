@@ -10,3 +10,4 @@ pytz
 pandas
 openpyxl
 beautifulsoup4
+python-dotenv
