@@ -846,7 +846,7 @@ async def post_portfolio(request: Request):
 def get_prices(tickers: str = ""):
     if not tickers.strip():
         return {}
-    tks = [t.strip() for t in tickers.split(",") if t.strip()]
+    tks = [t.strip().upper() for t in tickers.split(",") if t.strip()]
     return fetch_prices(tks)
 
 
@@ -863,7 +863,7 @@ def get_tw_prices(symbols: str = ""):
 def get_cb_prices(symbols: str = ""):
     if not symbols.strip():
         return {}
-    syms = [s.strip() for s in symbols.split(",") if s.strip()]
+    syms = [s.strip().upper() for s in symbols.split(",") if s.strip()]
     return fetch_cb_prices(syms)
 
 

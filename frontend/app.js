@@ -376,7 +376,7 @@ async function refreshPrices() {
             if (g.group !== '股票') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
-              const d = data[item.symbol];
+              const d = data[item.symbol.toUpperCase()];   // normalize: 00988a → 00988A
               if (d && d.price != null) item.current_price = d.price;
               if (d && d.change_pct != null) item._change_pct = d.change_pct;
             }
@@ -397,7 +397,7 @@ async function refreshPrices() {
             if (g.group !== '美國股市') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
-              const d = data[item.symbol];
+              const d = data[item.symbol.toUpperCase()];
               if (d && d.price != null) item.current_price = d.price;
               if (d && d.change_pct != null) item._change_pct = d.change_pct;
             }
@@ -417,7 +417,7 @@ async function refreshPrices() {
             if (g.group !== '可轉債') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
-              const d = data[item.symbol];
+              const d = data[item.symbol.toUpperCase()];
               if (!d) continue;
               if (d.price)                    item.current_price     = d.price;
               if (d.change_pct != null)       item._change_pct       = d.change_pct;
