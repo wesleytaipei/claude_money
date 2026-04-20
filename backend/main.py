@@ -93,8 +93,30 @@ _indices_cache: dict = {"ts": 0, "data": {}}
 CACHE_TTL = 300  # 5 minutes
 
 
-# ── IO helpers ───────────────────────────────────────────────────────────────
+# ── IO helpers (Gist + Local) ────────────────────────────────────────────────
+GIST_ID = os.getenv("GIST_ID")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
 def load_json(path: Path, default):
+    # 1. Try fetching from GitHub Gist first
+    if GIST_ID and GITHUB_TOKEN:
+        try:
+            headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+            r = http_requests.get(f"https://api.github.com/gists/{GIST_ID}", headers=headers, timeout=10)
+            if r.status_code == 200:
+                files = r.json().get("files", {})
+                if path.name in files:
+                    content = files[path.name].get("content")
+                    if content:
+                        # Write what we fetched to local as a backup
+                        path.parent.mkdir(parents=True, exist_ok=True)
+                        with open(path, "w", encoding="utf-8") as f:
+                            f.write(content)
+                        return json.loads(content)
+        except Exception as e:
+            logger.error(f"[Gist] load_json failed for {path.name}: {e}. Falling back to local.")
+
+    # 2. Fall back to local file
     if not path.exists():
         return default
     try:
@@ -103,11 +125,32 @@ def load_json(path: Path, default):
     except Exception:
         return default
 
-
 def save_json(path: Path, data):
+    # 1. Always save locally
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+    # 2. Sync to GitHub Gist
+    if GIST_ID and GITHUB_TOKEN:
+        try:
+            headers = {
+                "Authorization": f"token {GITHUB_TOKEN}",
+                "Accept": "application/vnd.github.v3+json"
+            }
+            # Update only the specific file in the Gist
+            payload = {
+                "files": {
+                    path.name: {
+                        "content": json.dumps(data, ensure_ascii=False, indent=2)
+                    }
+                }
+            }
+            r = http_requests.patch(f"https://api.github.com/gists/{GIST_ID}", headers=headers, json=payload, timeout=10)
+            if r.status_code != 200:
+                logger.error(f"[Gist] save_json error for {path.name}: {r.status_code} {r.text}")
+        except Exception as e:
+            logger.error(f"[Gist] save_json exception for {path.name}: {e}")
 
 
 # ── Price fetching ───────────────────────────────────────────────────────────
