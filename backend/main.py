@@ -25,7 +25,9 @@ import os
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()  # loads variables from .env file into os.environ
+    # Use absolute path for .env file to ensure it's found regardless of where the app starts
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    load_dotenv(env_path)
 except ImportError:
     pass
 
@@ -103,6 +105,11 @@ CACHE_TTL = 300  # 5 minutes
 # ── IO helpers (Gist + Local) ────────────────────────────────────────────────
 GIST_ID = os.getenv("GIST_ID")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+if GIST_ID and GITHUB_TOKEN:
+    print(f"INFO: [Gist] Sync enabled. Gist ID: {GIST_ID[:5]}***")
+else:
+    print("WARNING: [Gist] Sync disabled. GIST_ID or GITHUB_TOKEN not found in environment.")
 
 def load_json(path: Path, default):
     # 1. Try fetching from GitHub Gist first
@@ -1541,7 +1548,26 @@ def get_cb_listed():
 
 
 _fsc_cache: dict = {"date": "", "data": None}
-FSC_EXCEL_URL = "https://www.fsc.gov.tw/userfiles/file/11504017%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx"
+FSC_SFB_INDEX = "https://www.sfb.gov.tw/ch/home.jsp?id=1016&parentpath=0,6,52"
+_FSC_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+
+def _fetch_fsc_excel_url() -> tuple[str, str]:
+    """Scrape sfb.gov.tw for the latest FSC Excel URL and its update date.
+    Returns (url, date_str) where date_str is like '115.4.22'."""
+    import re as _re
+    try:
+        r = http_requests.get(FSC_SFB_INDEX, headers=_FSC_UA, verify=False, timeout=10)
+        # Find href containing the xlsx file (filename starts with 115...)
+        href_m = _re.search(r'href="([^"]*115\d+[^"]*\.xlsx)"', r.text, _re.IGNORECASE)
+        date_m = _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,100}<td[^>]*>[^<]*<a[^>]*115\d', r.text)
+        url = href_m.group(1) if href_m else ""
+        if url and not url.startswith("http"):
+            url = "https://www.sfb.gov.tw" + url
+        date_str = date_m.group(1) if date_m else ""
+        return url, date_str
+    except Exception as e:
+        logger.warning(f"[fsc] sfb scrape failed: {e}")
+        return "", ""
 
 def _roc_date_to_str(val) -> str:
     """Convert ROC date int like 1150323 → '115/03/23'."""
@@ -1588,7 +1614,12 @@ def get_fsc_offerings():
         return cached
 
     try:
-        resp = http_requests.get(FSC_EXCEL_URL, verify=False, timeout=30)
+        excel_url, excel_date = _fetch_fsc_excel_url()
+        if not excel_url:
+            raise ValueError("Could not resolve FSC Excel URL from sfb.gov.tw")
+        logger.info(f"[fsc] fetching {excel_url} (date: {excel_date})")
+        resp = http_requests.get(excel_url, verify=False, timeout=30,
+                                  headers=_FSC_UA)
         resp.raise_for_status()
         df = pd.read_excel(io.BytesIO(resp.content), header=2)
 
@@ -1627,25 +1658,6 @@ def get_fsc_offerings():
                 "eff_date": eff_str,
                 "eff_raw":  str(int(float(r['生效日期']))),
             })
-
-        # Fetch update date from sfb.gov.tw (shown in the table next to the xlsx link)
-        import re as _re
-        excel_date = ''
-        try:
-            sfb_r = http_requests.get(
-                'https://www.sfb.gov.tw/ch/home.jsp?id=1016&parentpath=0,6,52',
-                headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-                verify=False, timeout=10
-            )
-            # Find date in <td> immediately before the xlsx link
-            m = _re.search(
-                r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,50}<td[^>]*>[^<]*<a[^>]*11504',
-                sfb_r.text
-            )
-            if m:
-                excel_date = m.group(1)
-        except Exception:
-            pass
 
         result = {"items": rows, "total": len(rows), "excel_date": excel_date}
         _fsc_cache = {"date": today, "data": result}
