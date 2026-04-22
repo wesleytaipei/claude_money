@@ -593,15 +593,19 @@ async function renderPnLGrid(year) {
 
   if (year === curYear) {
     // ── Current year: 5 cards ─────────────────────────────────────────
-    let allInvMV = 0, allInvCost = 0;
+    let allInvMV = 0, allInvCost = 0, allInvPnL = 0, allMargin = 0;
     for (const g of state.portfolio.investments) {
+      const isTWSt = g.group === '股票';
       for (const item of g.items) {
-        allInvMV   += item._mv_twd   || 0;
-        allInvCost += item._cost_twd || 0;
+        allInvMV   += item._mv_twd  || 0;
+        allInvCost += item._cost_twd || 0;   // 自備款合計
+        allInvPnL  += item._pnl_twd || 0;   // Σ (現價-均價)×股數，正確損益
+        if (isTWSt) allMargin += item._margin || 0;
       }
     }
-    const unrealized    = allInvMV - allInvCost;
-    const unrealizedPct = allInvCost > 0 ? unrealized / allInvCost * 100 : 0;
+    const allTotalCost  = allInvCost + allMargin;   // 自備款 + 融資 = 總買入成本
+    const unrealized    = allInvPnL;                // 正確：不受融資金額影響
+    const unrealizedPct = allTotalCost > 0 ? unrealized / allTotalCost * 100 : 0;
 
     // Find current year's first snapshot → starting net worth
     const curYearSnaps = Object.keys(state.history)
@@ -644,7 +648,7 @@ async function renderPnLGrid(year) {
         <div class="pnl-card">
           <div class="pnl-card-label">總投資市值</div>
           <div class="pnl-card-value">${fmtFull(allInvMV)}</div>
-          <div class="pnl-card-sub priv-amt">成本 ${fmtFull(allInvCost)}</div>
+          <div class="pnl-card-sub priv-amt">成本 ${fmtFull(allTotalCost)}${allMargin > 0 ? `（含融資 ${fmtFull(allMargin)}）` : ''}</div>
         </div>
         <div class="pnl-card">
           <div class="pnl-card-label">總投資標的數</div>
