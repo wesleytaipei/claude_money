@@ -229,8 +229,7 @@ function calcTotals() {
       const isTWSt  = g.group === '股票';
       const price   = Number(item.current_price) || 0;
       const cost    = Number(item.cost) || 0;          // 自備款 (user-entered out-of-pocket)
-      const margin  = isTWSt ? (Number(item.margin_amount) || 0) : 0;  // 融資金額
-      const equity  = cost - margin;                   // 真正自備款 (cost already is user's equity if margin tracked separately)
+      const margin  = isTWSt ? (Number(item.margin_amount) || 0) : 0;  // 融資借款
       const shares  = Number(item.shares) || 0;
       const entry   = Number(item.entry_price) || 0;
 
@@ -249,9 +248,8 @@ function calcTotals() {
       item._margin   = margin;
       item._pnl      = (price - entry) * shares;
       item._pnl_twd  = isUS ? item._pnl * state.usdTwd : item._pnl;
-      // 損益%: use equity (自備款) as denominator so leveraged return is reflected correctly
-      const pnlBase  = isTWSt && equity > 0 ? equity : cost;
-      item._pnl_pct  = pnlBase > 0 ? (item._pnl / pnlBase * 100) : 0;
+      // 損益%: cost = 自備款，直接當分母，反映融資槓桿後的報酬率
+      item._pnl_pct  = cost > 0 ? (item._pnl / cost * 100) : 0;
 
       if (!isExcluded('investments', gi, ii)) {
         groupSum   += mvTWD;
@@ -1213,12 +1211,13 @@ function showPositionModal(idx, item = null) {
       const hintEl   = document.getElementById('f-margin-hint');
       if (marginEl && hintEl) {
         const updateHint = () => {
-          const cost   = parseFloat(document.getElementById('f-cost')?.value.replace(/,/g, '')) || 0;
+          const equity = parseFloat(document.getElementById('f-cost')?.value.replace(/,/g, '')) || 0;
           const margin = parseFloat(marginEl.value.replace(/,/g, '')) || 0;
-          if (margin > 0 && cost > 0) {
-            const equity = cost - margin;
-            hintEl.textContent = `自備款 ${equity.toLocaleString()} 元（融資成數 ${(margin/cost*100).toFixed(0)}%）`;
-            hintEl.style.color = equity < 0 ? 'var(--danger)' : 'var(--muted)';
+          if (margin > 0 && equity > 0) {
+            const total = equity + margin;
+            const ratio = (margin / total * 100).toFixed(0);
+            hintEl.textContent = `總買入 ${total.toLocaleString()} 元（融資成數 ${ratio}%）`;
+            hintEl.style.color = 'var(--muted)';
           } else {
             hintEl.textContent = '';
           }
