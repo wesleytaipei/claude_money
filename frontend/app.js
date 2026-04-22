@@ -216,18 +216,23 @@ function calcTotals() {
   }
 
   // Investments
+  let totalInvPnL = 0;   // Σ item._pnl_twd — correct regardless of margin
+  let totalStockMargin = 0;  // sum of margin_amount from TW stocks
   for (let gi = 0; gi < p.investments.length; gi++) {
     const g = p.investments[gi];
     let groupSum = 0;
     let groupCost = 0;
     for (let ii = 0; ii < g.items.length; ii++) {
       const item = g.items[ii];
-      const isCB = g.group === '可轉債';
-      const isUS = g.group === '美國股市';
-      const price = Number(item.current_price) || 0;
-      const cost = Number(item.cost) || 0;
-      const shares = Number(item.shares) || 0;
-      const entry = Number(item.entry_price) || 0;
+      const isCB    = g.group === '可轉債';
+      const isUS    = g.group === '美國股市';
+      const isTWSt  = g.group === '股票';
+      const price   = Number(item.current_price) || 0;
+      const cost    = Number(item.cost) || 0;          // 自備款 (user-entered out-of-pocket)
+      const margin  = isTWSt ? (Number(item.margin_amount) || 0) : 0;  // 融資金額
+      const equity  = cost - margin;                   // 真正自備款 (cost already is user's equity if margin tracked separately)
+      const shares  = Number(item.shares) || 0;
+      const entry   = Number(item.entry_price) || 0;
 
       let mv;
       if (isCB) {
@@ -235,26 +240,34 @@ function calcTotals() {
       } else {
         mv = shares * price;
       }
-      const mvTWD = isUS ? mv * state.usdTwd : mv;
+      const mvTWD   = isUS ? mv * state.usdTwd : mv;
       const costTWD = isUS ? cost * state.usdTwd : cost;
 
-      item._mv = mv;
-      item._mv_twd = mvTWD;
+      item._mv       = mv;
+      item._mv_twd   = mvTWD;
       item._cost_twd = costTWD;
-      item._pnl = (price - entry) * shares;
-      item._pnl_twd = isUS ? item._pnl * state.usdTwd : item._pnl;
-      item._pnl_pct = cost > 0 ? ((price - entry) * shares / cost * 100) : 0;
+      item._margin   = margin;
+      item._pnl      = (price - entry) * shares;
+      item._pnl_twd  = isUS ? item._pnl * state.usdTwd : item._pnl;
+      // 損益%: use equity (自備款) as denominator so leveraged return is reflected correctly
+      const pnlBase  = isTWSt && equity > 0 ? equity : cost;
+      item._pnl_pct  = pnlBase > 0 ? (item._pnl / pnlBase * 100) : 0;
 
       if (!isExcluded('investments', gi, ii)) {
-        groupSum += mvTWD;
-        groupCost += costTWD;
+        groupSum   += mvTWD;
+        groupCost  += costTWD;
+        totalInvPnL += item._pnl_twd;
+        if (isTWSt) totalStockMargin += margin;
       }
     }
     groupTotals[g.group] = groupSum;
-    totalAssets += groupSum;
+    totalAssets     += groupSum;
     totalInvestment += groupSum;
-    totalInvCost += groupCost;
+    totalInvCost    += groupCost;
   }
+
+  // Auto-sync 股票融資 into liabilities (in-memory only; persisted on next savePortfolio)
+  _syncMarginLiability(p, totalStockMargin);
 
   // Liabilities
   let totalDebts = 0;
@@ -270,14 +283,35 @@ function calcTotals() {
     totalDebts += groupSum;
   }
 
-  const netWorth = totalAssets - totalDebts;
-  const leverage = netWorth > 0 ? totalAssets / netWorth : 0;
-  const exposure = netWorth > 0 ? (totalInvestment / netWorth * 100) : 0;
-  const invPnL = totalInvestment - totalInvCost;
+  const netWorth  = totalAssets - totalDebts;
+  const leverage  = netWorth > 0 ? totalAssets / netWorth : 0;
+  const exposure  = netWorth > 0 ? (totalInvestment / netWorth * 100) : 0;
+  // Use Σ _pnl_twd so margin doesn't inflate the P&L figure
+  const invPnL    = totalInvPnL;
   const invPnLPct = totalInvCost > 0 ? (invPnL / totalInvCost * 100) : 0;
 
   return { totalAssets, totalDebts, netWorth, leverage, exposure,
            totalInvestment, totalInvCost, invPnL, invPnLPct, groupTotals };
+}
+
+// Auto-manage "股票融資" entry in liabilities based on TW stock margin_amount sum
+function _syncMarginLiability(portfolio, totalMargin) {
+  const MARGIN_ITEM_NAME = '股票融資';
+  const MARGIN_GROUP     = '短期貸款';
+  let group = portfolio.liabilities.find(g => g.group === MARGIN_GROUP);
+  if (!group) {
+    // Create the group if it doesn't exist yet
+    group = { group: MARGIN_GROUP, items: [] };
+    portfolio.liabilities.push(group);
+  }
+  const idx = group.items.findIndex(i => i._auto_margin);
+  if (totalMargin > 0) {
+    const entry = { name: MARGIN_ITEM_NAME, amount: totalMargin, currency: 'TWD', rate: 1, _auto_margin: true, _twd: totalMargin };
+    if (idx >= 0) Object.assign(group.items[idx], entry);
+    else          group.items.push(entry);
+  } else if (idx >= 0) {
+    group.items.splice(idx, 1);  // remove when no margin
+  }
 }
 
 // ══ Data loading ════════════════════════════════════════════════════════
@@ -744,6 +778,20 @@ function renderItemRow(section, gi, ii, item, isLiab) {
   const twd = toTWD(Number(item.amount) || 0, item.currency);
 
   if (isLiab) {
+    // Auto-margin entry: read-only display, not manually editable
+    if (item._auto_margin) {
+      return `<div class="${rowCls}" style="opacity:.75">
+        <input value="${escapeAttr(item.name || '')}" disabled style="color:var(--primary-2)" />
+        <input class="num-input priv-num" type="text" value="${item.amount ?? 0}" disabled />
+        <select disabled>${curOpts}</select>
+        <input class="num-input priv-num" type="text" value="1" disabled />
+        <input class="num-input" type="text" value="" placeholder="自動" disabled />
+        <input value="" placeholder="自動" disabled />
+        <input class="num-input" type="text" value="" placeholder="自動" disabled />
+        <div class="calc-value red">${fmtFull(twd)}</div>
+        <button class="btn-icon" title="由股票融資金額自動計算" style="cursor:default;opacity:.4">🔒</button>
+      </div>`;
+    }
     return `<div class="${rowCls}">
       <input value="${escapeAttr(item.name || '')}" placeholder="名稱" onchange="updateItem('${section}',${gi},${ii},'name',this.value)" />
       <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
@@ -854,13 +902,14 @@ function renderInvestmentsPage() {
 
   document.getElementById('inv-title').textContent = groupName;
 
-  // Summary
-  let totalMV = 0, totalCost = 0;
+  // Summary — use Σ _pnl_twd so margin doesn't inflate the figure
+  let totalMV = 0, totalCost = 0, totalPnL = 0;
   for (const item of items) {
-    totalMV += item._mv_twd || 0;
+    totalMV   += item._mv_twd  || 0;
     totalCost += item._cost_twd || 0;
+    totalPnL  += item._pnl_twd || 0;
   }
-  const pnl = totalMV - totalCost;
+  const pnl    = totalPnL;
   const pnlPct = totalCost > 0 ? (pnl / totalCost * 100) : 0;
 
   document.getElementById('inv-summary').innerHTML = `
@@ -960,7 +1009,11 @@ function renderInvestmentsPage() {
       <td class="num">${priceCell(item.entry_price)}</td>
       <td class="num">${priceCell(item.current_price)}</td>
       ${isCB ? '' : makeChgCell(item._change_pct)}
-      <td class="num">${fmtFull(item.cost).replace('NT$ ', '')}</td>
+      <td class="num">${fmtFull(item.cost).replace('NT$ ', '')}${
+        isStock && item._margin > 0
+          ? `<br><span class="small muted">融資 ${(item._margin/10000).toFixed(0)}萬</span>`
+          : ''
+      }</td>
       ${isCB ? '' : `<td class="num">${fmtFull(mv).replace('NT$ ', '')}</td>`}
       <td class="num ${pnlClass(pnl)}">${pnl >= 0 ? '+' : ''}${fmtFull(pnl).replace('NT$ ', '')}</td>
       <td class="num ${pnlClass(pnlPct)}">${fmtPct(pnlPct)}</td>
@@ -1047,8 +1100,9 @@ function openEditPosition(idx) {
 }
 
 function showPositionModal(idx, item = null) {
-  const isCB = state.currentInv === 'cb';
-  const isUS = state.currentInv === 'us';
+  const isCB    = state.currentInv === 'cb';
+  const isUS    = state.currentInv === 'us';
+  const isStock = state.currentInv === 'stock';
   const isAdd = idx == null;
   const title = (isAdd ? '新增' : '編輯') + INV_GROUP_MAP[state.currentInv] + '部位';
   document.getElementById('modal-title').textContent = title;
@@ -1094,6 +1148,16 @@ function showPositionModal(idx, item = null) {
         <input id="f-cur" type="text" inputmode="decimal" value="${v('current_price')}" ${isCB ? 'placeholder="存檔後自動更新"' : ''} /></div>
       <div class="form-group"><label>投入成本 *</label><input id="f-cost" type="text" inputmode="decimal" value="${v('cost')}" /></div>
     </div>
+    ${isStock ? `
+    <div class="form-row">
+      <div class="form-group">
+        <label>融資金額 <span style="color:var(--muted);font-weight:400">（選填，有融資買進時填入）</span></label>
+        <input id="f-margin" type="text" inputmode="decimal" value="${v('margin_amount', '')}" placeholder="0" />
+      </div>
+      <div class="form-group" style="padding-top:28px">
+        <span class="small muted" id="f-margin-hint"></span>
+      </div>
+    </div>` : ''}
     ${cbFields}
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">取消</button>
@@ -1143,6 +1207,26 @@ function showPositionModal(idx, item = null) {
           if (data.price != null && !curEl.value) curEl.value = data.price;
         } catch (e) { console.warn('stock name lookup failed:', e); }
       });
+
+      // Margin hint: show equity = cost - margin in real time
+      const marginEl = document.getElementById('f-margin');
+      const hintEl   = document.getElementById('f-margin-hint');
+      if (marginEl && hintEl) {
+        const updateHint = () => {
+          const cost   = parseFloat(document.getElementById('f-cost')?.value.replace(/,/g, '')) || 0;
+          const margin = parseFloat(marginEl.value.replace(/,/g, '')) || 0;
+          if (margin > 0 && cost > 0) {
+            const equity = cost - margin;
+            hintEl.textContent = `自備款 ${equity.toLocaleString()} 元（融資成數 ${(margin/cost*100).toFixed(0)}%）`;
+            hintEl.style.color = equity < 0 ? 'var(--danger)' : 'var(--muted)';
+          } else {
+            hintEl.textContent = '';
+          }
+        };
+        marginEl.addEventListener('input', updateHint);
+        document.getElementById('f-cost')?.addEventListener('input', updateHint);
+        updateHint();
+      }
     }
   }
 }
@@ -1175,7 +1259,8 @@ window._cbLookup = async function(field, value) {
 };
 
 async function savePosition(idx) {
-  const isCB = state.currentInv === 'cb';
+  const isCB    = state.currentInv === 'cb';
+  const isStock = state.currentInv === 'stock';
   const groupName = INV_GROUP_MAP[state.currentInv];
   let group = state.portfolio.investments.find(g => g.group === groupName);
   if (!group) {
@@ -1203,6 +1288,7 @@ async function savePosition(idx) {
     entry_price: num('f-entry'),
     current_price: num('f-cur'),
     cost: num('f-cost'),
+    ...(isStock ? { margin_amount: num('f-margin') || 0 } : {}),
   };
 
   if (isCB) {
