@@ -1270,6 +1270,48 @@ async function saveSnapshot() {
 }
 
 // ══ Refresh all ═════════════════════════════════════════════════════════
+async function syncFromGist(force = false) {
+  const btn = document.getElementById('btn-sync-gist');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> 同步中...';
+  btn.disabled = true;
+  try {
+    const url = '/api/sync-from-gist' + (force ? '?force=true' : '');
+    const res = await api(url);
+    if (!res.ok) throw new Error(res.error || 'failed');
+
+    const pulled      = res.files.filter(f => f.action === 'pulled').map(f => f.name);
+    const localNewer  = res.files.filter(f => f.action === 'local_newer').map(f => f.name);
+    const inSync      = res.files.filter(f => f.action === 'in_sync').map(f => f.name);
+
+    if (pulled.length > 0) {
+      // Reload data from the freshly-written local files
+      await Promise.all([loadPortfolio(), loadManualHistory(), loadHistory()]);
+      calcTotals();
+      const page = currentPage();
+      if (page === 'dashboard') renderDashboard();
+      else if (page === 'investments') renderInvestmentsPage();
+      else if (page === 'assets') renderAssetsPage();
+    }
+
+    let msg = `☁️ [${res.env}] `;
+    if (pulled.length)     msg += `已更新: ${pulled.join(', ')}. `;
+    if (localNewer.length) msg += `本地較新 (未覆蓋): ${localNewer.join(', ')}. `;
+    if (inSync.length && !pulled.length && !localNewer.length) msg += '資料已是最新';
+
+    // If local has newer data, offer force pull
+    if (localNewer.length > 0 && !force) {
+      msg += ' 如需強制用雲端覆蓋，請長按同步按鈕。';
+    }
+    toast(msg, pulled.length > 0 ? 'success' : 'info');
+  } catch(e) {
+    toast('☁️ 同步失敗: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+
 async function refreshAll() {
   const icoEl = document.getElementById('refresh-ico');
   const txtEl = document.getElementById('refresh-txt');
@@ -1814,15 +1856,17 @@ async function init() {
   updateTime();
   setInterval(updateTime, 30000);
 
-  // Load data
+  // Load core data in parallel — portfolio first so we can render immediately
   await loadPortfolio();
-  await loadManualHistory();
-  await loadHistory();
-  await loadIndices();
   calcTotals();
-  renderDashboard();
+  renderDashboard();   // show skeleton with local prices right away
 
-  // Fetch prices in background
+  // Load the rest in parallel (indices is slowest — don't block the first paint)
+  await Promise.all([loadManualHistory(), loadHistory(), loadIndices()]);
+  calcTotals();
+  renderDashboard();   // re-render with fresh indices + history
+
+  // Fetch live prices in background
   refreshPrices().then(() => {
     calcTotals();
     if (currentPage() === 'dashboard') renderDashboard();

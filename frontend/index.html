@@ -55,6 +55,13 @@
         <button class="btn-action btn-refresh" onclick="refreshAll()">
           <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新數據</span>
         </button>
+        <button class="btn-action" id="btn-sync-gist"
+          onclick="syncFromGist(false)"
+          oncontextmenu="event.preventDefault(); if(confirm('強制用雲端資料覆蓋本地？')) syncFromGist(true)"
+          title="點擊：智慧同步（較新的版本優先）&#10;右鍵：強制用雲端覆蓋本地"
+          style="background:rgba(99,102,241,.15);color:var(--primary-2);border:1px solid rgba(99,102,241,.3)">
+          ☁️ 從雲端同步
+        </button>
       </div>
     </aside>
 

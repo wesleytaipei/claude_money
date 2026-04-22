@@ -6,6 +6,7 @@ import re
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import threading as _threading
 import urllib3
 import requests as http_requests
 
@@ -105,32 +106,95 @@ CACHE_TTL = 300  # 5 minutes
 # ── IO helpers (Gist + Local) ────────────────────────────────────────────────
 GIST_ID = os.getenv("GIST_ID")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GIST_ENABLED = bool(GIST_ID and GITHUB_TOKEN)
 
-if GIST_ID and GITHUB_TOKEN:
-    print(f"INFO: [Gist] Sync enabled. Gist ID: {GIST_ID[:5]}***")
+IS_RAILWAY = bool(os.getenv("RAILWAY_ENVIRONMENT_NAME") or os.getenv("RAILWAY_PROJECT_ID"))
+_ENV_LABEL = "Railway" if IS_RAILWAY else "Local"
+
+if GIST_ENABLED:
+    print(f"INFO: [Gist] {_ENV_LABEL} — bidirectional sync enabled. Gist ID: {GIST_ID[:5]}***")
 else:
-    print("WARNING: [Gist] Sync disabled. GIST_ID or GITHUB_TOKEN not found in environment.")
+    print("WARNING: [Gist] Sync disabled. GIST_ID or GITHUB_TOKEN not set.")
+
+_TS_KEY = "_last_modified"   # injected into every JSON file on save
+
+def _now_iso() -> str:
+    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+def _parse_ts(ts: str | None) -> float:
+    """Parse ISO timestamp to epoch float. Returns 0.0 on failure."""
+    if not ts:
+        return 0.0
+    try:
+        from datetime import timezone
+        return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+    except Exception:
+        return 0.0
+
+def _gist_headers():
+    return {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+def _pull_gist_all() -> dict[str, str]:
+    """Fetch all files from Gist. Returns {filename: content} or {} on failure."""
+    if not GIST_ENABLED:
+        return {}
+    try:
+        r = http_requests.get(
+            f"https://api.github.com/gists/{GIST_ID}",
+            headers=_gist_headers(), timeout=10
+        )
+        if r.status_code == 200:
+            return {
+                name: meta.get("content", "")
+                for name, meta in r.json().get("files", {}).items()
+                if meta.get("content")
+            }
+        logger.error(f"[Gist] pull failed: {r.status_code}")
+    except Exception as e:
+        logger.error(f"[Gist] pull exception: {e}")
+    return {}
+
+def sync_from_gist(force: bool = False) -> list[dict]:
+    """Pull files from Gist that are newer than local copies (timestamp-based).
+    With force=True, overwrites regardless of timestamp.
+    Returns list of {name, action, local_ts, gist_ts} for each file."""
+    gist_files = _pull_gist_all()
+    results = []
+    for name, content in gist_files.items():
+        path = DATA_DIR / name
+        try:
+            gist_data = json.loads(content)
+            gist_ts   = _parse_ts(gist_data.get(_TS_KEY))
+            local_data = load_json(path, {})
+            local_ts   = _parse_ts(local_data.get(_TS_KEY))
+
+            if force or gist_ts > local_ts:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                action = "pulled"
+                logger.info(f"[Gist] pulled {name} (gist {gist_ts:.0f} > local {local_ts:.0f})")
+            elif local_ts > gist_ts:
+                action = "local_newer"
+            else:
+                action = "in_sync"
+
+            results.append({
+                "name": name,
+                "action": action,
+                "local_ts": datetime.utcfromtimestamp(local_ts).strftime("%Y-%m-%dT%H:%M:%SZ") if local_ts else None,
+                "gist_ts":  datetime.utcfromtimestamp(gist_ts).strftime("%Y-%m-%dT%H:%M:%SZ")  if gist_ts  else None,
+            })
+        except Exception as e:
+            logger.error(f"[Gist] sync {name} failed: {e}")
+            results.append({"name": name, "action": "error", "error": str(e)})
+    return results
 
 def load_json(path: Path, default):
-    # 1. Try fetching from GitHub Gist first
-    if GIST_ID and GITHUB_TOKEN:
-        try:
-            headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-            r = http_requests.get(f"https://api.github.com/gists/{GIST_ID}", headers=headers, timeout=10)
-            if r.status_code == 200:
-                files = r.json().get("files", {})
-                if path.name in files:
-                    content = files[path.name].get("content")
-                    if content:
-                        # Write what we fetched to local as a backup
-                        path.parent.mkdir(parents=True, exist_ok=True)
-                        with open(path, "w", encoding="utf-8") as f:
-                            f.write(content)
-                        return json.loads(content)
-        except Exception as e:
-            logger.error(f"[Gist] load_json failed for {path.name}: {e}. Falling back to local.")
-
-    # 2. Fall back to local file
+    """Read from local file only."""
     if not path.exists():
         return default
     try:
@@ -140,31 +204,41 @@ def load_json(path: Path, default):
         return default
 
 def save_json(path: Path, data):
-    # 1. Always save locally
+    # 1. Stamp with current time
+    data[_TS_KEY] = _now_iso()
+
+    # 2. Save locally (fast, synchronous)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # 2. Sync to GitHub Gist
-    if GIST_ID and GITHUB_TOKEN:
-        try:
-            headers = {
-                "Authorization": f"token {GITHUB_TOKEN}",
-                "Accept": "application/vnd.github.v3+json"
-            }
-            # Update only the specific file in the Gist
-            payload = {
-                "files": {
-                    path.name: {
-                        "content": json.dumps(data, ensure_ascii=False, indent=2)
-                    }
-                }
-            }
-            r = http_requests.patch(f"https://api.github.com/gists/{GIST_ID}", headers=headers, json=payload, timeout=10)
-            if r.status_code != 200:
-                logger.error(f"[Gist] save_json error for {path.name}: {r.status_code} {r.text}")
-        except Exception as e:
-            logger.error(f"[Gist] save_json exception for {path.name}: {e}")
+    # 3. Push to Gist in background — but only if local is still newest
+    #    (re-check after write so rapid saves don't race)
+    if GIST_ENABLED:
+        local_ts = data[_TS_KEY]
+        content  = json.dumps(data, ensure_ascii=False, indent=2)
+        def _push():
+            try:
+                # Fetch Gist's current timestamp for this file before pushing
+                gist_files = _pull_gist_all()
+                gist_content = gist_files.get(path.name, "")
+                if gist_content:
+                    gist_ts = _parse_ts(json.loads(gist_content).get(_TS_KEY))
+                    if gist_ts > _parse_ts(local_ts):
+                        logger.warning(f"[Gist] push skipped for {path.name}: Gist is newer ({gist_ts:.0f} > {_parse_ts(local_ts):.0f})")
+                        return
+                payload = {"files": {path.name: {"content": content}}}
+                r = http_requests.patch(
+                    f"https://api.github.com/gists/{GIST_ID}",
+                    headers=_gist_headers(), json=payload, timeout=10
+                )
+                if r.status_code != 200:
+                    logger.error(f"[Gist] push error for {path.name}: {r.status_code}")
+                else:
+                    logger.info(f"[Gist] pushed {path.name} ({_ENV_LABEL})")
+            except Exception as e:
+                logger.error(f"[Gist] push exception for {path.name}: {e}")
+        _threading.Thread(target=_push, daemon=True).start()
 
 
 # ── Price fetching ───────────────────────────────────────────────────────────
@@ -461,9 +535,8 @@ def _fetch_tw_indices_mis() -> dict:
 
 def fetch_indices() -> dict:
     now = time.time()
-    # Cache temporarily disabled to force refresh with corrected MIS logic
-    # if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
-    #     return _indices_cache["data"]
+    if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
+        return _indices_cache["data"]
 
     # US indices + FX via yfinance
     us_index_tickers = {
@@ -885,6 +958,45 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
 @app.get("/api/health")
 def health():
     return {"ok": True}
+
+
+@app.get("/api/sync-from-gist")
+def api_sync_from_gist(force: bool = False):
+    """Pull files from Gist that are newer than local (timestamp-based).
+    ?force=true overwrites regardless of timestamp."""
+    if not GIST_ENABLED:
+        return {"ok": False, "error": "Gist not configured"}
+    results = sync_from_gist(force=force)
+    return {"ok": True, "env": _ENV_LABEL, "files": results}
+
+
+@app.get("/api/gist-status")
+def api_gist_status():
+    """Compare local vs Gist timestamps without pulling anything."""
+    if not GIST_ENABLED:
+        return {"ok": False, "error": "Gist not configured"}
+    gist_files = _pull_gist_all()
+    status = []
+    for name, content in gist_files.items():
+        path = DATA_DIR / name
+        try:
+            gist_ts  = _parse_ts(json.loads(content).get(_TS_KEY))
+            local_data = load_json(path, {})
+            local_ts = _parse_ts(local_data.get(_TS_KEY))
+            if gist_ts > local_ts:
+                state = "gist_newer"
+            elif local_ts > gist_ts:
+                state = "local_newer"
+            else:
+                state = "in_sync"
+            status.append({
+                "name": name, "state": state,
+                "local_ts": datetime.utcfromtimestamp(local_ts).strftime("%Y-%m-%dT%H:%M:%SZ") if local_ts else None,
+                "gist_ts":  datetime.utcfromtimestamp(gist_ts).strftime("%Y-%m-%dT%H:%M:%SZ")  if gist_ts  else None,
+            })
+        except Exception as e:
+            status.append({"name": name, "state": "error", "error": str(e)})
+    return {"ok": True, "env": _ENV_LABEL, "files": status}
 
 
 @app.get("/api/portfolio")
@@ -1384,6 +1496,29 @@ _scheduler.add_job(
 )
 _scheduler.start()
 logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ Sun 15:00")
+
+# On startup: sync newer files from Gist (timestamp-based, both envs).
+def _startup():
+    if GIST_ENABLED:
+        try:
+            results = sync_from_gist()
+            pulled = [r["name"] for r in results if r.get("action") == "pulled"]
+            local_newer = [r["name"] for r in results if r.get("action") == "local_newer"]
+            if pulled:
+                logger.info(f"[startup] pulled from Gist (newer): {pulled}")
+            if local_newer:
+                logger.info(f"[startup] local is newer (not overwritten): {local_newer}")
+        except Exception as e:
+            logger.warning(f"[startup] Gist sync error: {e}")
+    try:
+        logger.info("[startup] warming indices & important-info caches...")
+        fetch_indices()
+        scrape_important_info()
+        logger.info("[startup] warmup done")
+    except Exception as e:
+        logger.warning(f"[startup] warmup error: {e}")
+
+_threading.Thread(target=_startup, daemon=True).start()
 
 
 @app.get("/api/auto-snapshot/run")
