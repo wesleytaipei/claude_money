@@ -37,57 +37,131 @@ def fetch_macromicro(url):
         print(f"Error fetching macromicro {url}: {e}")
     return {"current": None, "prev": None}
 
-def fetch_twse_margin():
+_twse_margin_cache = {"date": "", "data": None}   # daily
+
+def _safe_float(v):
+    """Parse a string that may be '-', '', or a comma-number."""
     try:
-        r = requests.get("https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json", headers=HEADERS, verify=False, timeout=10)
-        tables = r.json().get('tables', [])
-        if tables:
-            data = tables[0].get('data', [])
-            if len(data) >= 3:
-                row = data[2] # 融資金額(仟元)
-                yest = float(row[4].replace(",", ""))
-                today = float(row[5].replace(",", ""))
-                increase = today - yest
-                return {
-                    "balance": round(today / 100000, 2), # convert to 億
-                    "increase": round(increase / 100000, 2)
-                }
+        return float(str(v).replace(",", "").strip())
+    except (ValueError, TypeError):
+        return None
+
+def fetch_twse_margin():
+    from datetime import date
+    today_str = date.today().isoformat()
+    if _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
+        return _twse_margin_cache["data"]
+    try:
+        r = requests.get(
+            "https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json",
+            headers=HEADERS, verify=False, timeout=15
+        )
+        r.raise_for_status()
+        payload = r.json()
+        tables = payload.get("tables", [])
+        if not tables:
+            print(f"[TWSE margin] empty tables — market closed or pre-data")
+            return {"balance": None, "increase": None}
+
+        # Find the 融資金額(仟元) row by scanning for the label instead of
+        # relying on a fixed index which can shift.
+        data = tables[0].get("data", [])
+        row = None
+        for candidate in data:
+            label = str(candidate[0]) if candidate else ""
+            if "融資金額" in label or "融資" in label:
+                row = candidate
+                break
+        if row is None and len(data) >= 3:
+            row = data[2]   # legacy fallback
+
+        if row is None or len(row) < 6:
+            print(f"[TWSE margin] unexpected row structure: {data[:3]}")
+            return {"balance": None, "increase": None}
+
+        yest_val  = _safe_float(row[4])
+        today_val = _safe_float(row[5])
+        if today_val is None:
+            print(f"[TWSE margin] non-numeric value in row: {row}")
+            return {"balance": None, "increase": None}
+
+        increase = (today_val - yest_val) if yest_val is not None else 0
+        result = {
+            "balance":  round(today_val / 100000, 2),   # 仟元 → 億
+            "increase": round(increase  / 100000, 2),
+        }
+        _twse_margin_cache["date"] = today_str
+        _twse_margin_cache["data"] = result
+        return result
     except Exception as e:
-        print(f"Error fetching TWSE margin: {e}")
+        print(f"[TWSE margin] error: {type(e).__name__}: {e}")
     return {"balance": None, "increase": None}
+
+_tpex_margin_cache = {"date": "", "data": None}   # daily
 
 def fetch_tpex_margin():
     """
     Fetch TPEX total margin balance (融資餘額).
-    The TPEX margin balance API returns a 'summary' array with two rows:
-      summary[0] → lot-count units (仟張)
-      summary[1] → value units (仟元)  ← this is what we want
-    Column layout (both per-stock data and summary rows):
-      [0]=代號 [1]=名稱 [2]=前日餘額(仟元) [3]=買進 [4]=賣出 [5]=還款
-      [6]=今日餘額(仟元) ...
+    summary[0] → lot-count units (仟張)
+    summary[1] → value units (仟元)  ← this is what we want
+    Cols: [0]=代號 [1]=名稱 [2]=前日餘額 [3]=買進 [4]=賣出 [5]=還款 [6]=今日餘額
     """
+    from datetime import date
+    import json as _json
+    today_str = date.today().isoformat()
+    if _tpex_margin_cache["date"] == today_str and _tpex_margin_cache["data"]:
+        return _tpex_margin_cache["data"]
     try:
-        url = "https://www.tpex.org.tw/web/stock/margin_trading/margin_balance/margin_bal_result.php?l=zh-tw&o=json"
+        url = ("https://www.tpex.org.tw/web/stock/margin_trading/margin_balance"
+               "/margin_bal_result.php?l=zh-tw&o=json")
         r = requests.get(url, headers=HEADERS, verify=False, timeout=15)
-        raw = r.content.decode("cp950", errors="replace")
-        import json as _json
+        r.raise_for_status()
+        # TPEX responds in cp950; fall back to utf-8 if decode fails
+        try:
+            raw = r.content.decode("cp950", errors="replace")
+        except Exception:
+            raw = r.text
         data = _json.loads(raw)
         tables = data.get("tables", [])
         if not tables:
-            raise ValueError("no tables in TPEX margin response")
+            print("[TPEX margin] empty tables — market closed or pre-data")
+            return {"balance": None, "increase": None}
+
         summary = tables[0].get("summary", [])
-        # summary[1] is the TWD-value row (larger numbers)
-        row = summary[1] if len(summary) >= 2 else (summary[0] if summary else None)
-        if row and len(row) >= 7:
-            today = float(str(row[6]).replace(",", ""))
-            yest  = float(str(row[2]).replace(",", ""))
-            increase = today - yest
-            return {
-                "balance": round(today / 100000, 2),   # 千元 → 億
-                "increase": round(increase / 100000, 2)
-            }
+        if not summary:
+            print(f"[TPEX margin] no summary in table; keys={list(tables[0].keys())}")
+            return {"balance": None, "increase": None}
+
+        # Pick the TWD-value row: summary[1] has larger absolute numbers than summary[0]
+        row = None
+        for candidate in summary:
+            t = _safe_float(candidate[6]) if len(candidate) >= 7 else None
+            if t is not None and t > 1_000_000:   # 仟元 → > 10 億 means it's the value row
+                row = candidate
+                break
+        if row is None:
+            row = summary[-1]   # last row is typically the value summary
+
+        if not row or len(row) < 7:
+            print(f"[TPEX margin] unexpected summary structure: {summary}")
+            return {"balance": None, "increase": None}
+
+        today_val = _safe_float(row[6])
+        yest_val  = _safe_float(row[2])
+        if today_val is None:
+            print(f"[TPEX margin] non-numeric today value in row: {row}")
+            return {"balance": None, "increase": None}
+
+        increase = (today_val - yest_val) if yest_val is not None else 0
+        result = {
+            "balance":  round(today_val / 100000, 2),   # 仟元 → 億
+            "increase": round(increase  / 100000, 2),
+        }
+        _tpex_margin_cache["date"] = today_str
+        _tpex_margin_cache["data"] = result
+        return result
     except Exception as e:
-        print(f"TPEX margin error: {e}")
+        print(f"[TPEX margin] error: {type(e).__name__}: {e}")
 
     return {"balance": None, "increase": None}
 
