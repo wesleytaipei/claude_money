@@ -1998,12 +1998,25 @@ async function init() {
   _prefetchAlertData();
 }
 
-async function _autoSyncFromGist() {
+async function _autoSyncFromGist(retry = true) {
   try {
     const res = await api('/api/sync-from-gist');   // non-force: only pull if Gist newer
-    if (!res.ok) return;
-    const pulled = res.files.filter(f => f.action === 'pulled');
-    if (pulled.length === 0) return;   // nothing changed, skip re-render
+    if (!res.ok) {
+      console.warn('[auto-sync] Gist not configured or error:', res.error);
+      return;
+    }
+
+    const pulled    = res.files.filter(f => f.action === 'pulled');
+    const anyChange = pulled.length > 0;
+
+    console.log(`[auto-sync] ${res.env} — pulled: ${pulled.length}`,
+      res.files.map(f => `${f.name}:${f.action}`).join(', '));
+
+    if (!anyChange) {
+      // Railway's background push may not have reached Gist yet — retry once after 4s
+      if (retry) setTimeout(() => _autoSyncFromGist(false), 4000);
+      return;
+    }
 
     // Reload whichever files were updated
     const names = pulled.map(f => f.name);
@@ -2015,16 +2028,15 @@ async function _autoSyncFromGist() {
 
     calcTotals();
     const page = currentPage();
-    if (page === 'dashboard')   renderDashboard();
+    if (page === 'dashboard')        renderDashboard();
     else if (page === 'investments') renderInvestmentsPage();
-    else if (page === 'assets') renderAssetsPage();
-    else if (page === 'growth') renderGrowthChart();
-    else if (page === 'trend')  renderTrendChart();
+    else if (page === 'assets')      renderAssetsPage();
+    else if (page === 'growth')      renderGrowthChart();
+    else if (page === 'trend')       renderTrendChart();
 
     const fileList = pulled.map(f => f.name.replace('.json', '')).join(', ');
     toast(`☁️ 已從雲端同步: ${fileList}`);
   } catch (e) {
-    // Silent — auto-sync failure shouldn't disrupt page load
     console.warn('[auto-sync] gist sync failed:', e);
   }
 }
