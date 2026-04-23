@@ -324,7 +324,7 @@
               <button class="btn-primary" onclick="renderGrowthChart()">更新圖表</button>
             </div>
           </div>
-          <div class="chart-container" style="height:480px">
+          <div class="chart-container" id="growth-chart-container" style="height:480px">
             <canvas id="growth-chart"></canvas>
           </div>
           <div id="growth-summary" class="pnl-grid" style="margin-top:20px"></div>
@@ -351,7 +351,7 @@
               <button class="btn-primary" onclick="renderTrendChart()">分析趨勢</button>
             </div>
           </div>
-          <div class="chart-container">
+          <div class="chart-container" id="trend-chart-container">
             <canvas id="trend-chart"></canvas>
           </div>
         </div>

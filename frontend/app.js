@@ -1489,8 +1489,9 @@ async function renderGrowthChart() {
     await loadHistory();
   }
 
-  const chartContainer = document.querySelector('#growth-chart')?.parentElement;
+  const chartContainer = document.getElementById('growth-chart-container');
   const summaryEl      = document.getElementById('growth-summary');
+  const today          = new Date().toISOString().slice(0, 10);
 
   const _showEmpty = (msg) => {
     if (chartContainer) chartContainer.style.display = 'none';
@@ -1506,11 +1507,11 @@ async function renderGrowthChart() {
     return;
   }
 
-  // Date range pickers — default: Jan 1 of current year
+  // Date range pickers — default: Jan 1 of current year → today
   const startEl = document.getElementById('growth-start');
   const endEl   = document.getElementById('growth-end');
   if (!startEl.value) startEl.value = new Date().getFullYear() + '-01-01';
-  if (!endEl.value)   endEl.value   = dates[dates.length - 1];
+  if (!endEl.value)   endEl.value   = today;
   const start = startEl.value;
   const end   = endEl.value;
 
@@ -1681,7 +1682,8 @@ async function renderTrendChart() {
     await loadHistory();
   }
 
-  const chartContainer = document.querySelector('#trend-chart')?.parentElement;
+  const chartContainer = document.getElementById('trend-chart-container');
+  const today = new Date().toISOString().slice(0, 10);
 
   const _showEmpty = (msg) => {
     if (chartContainer) chartContainer.innerHTML =
@@ -1689,7 +1691,7 @@ async function renderTrendChart() {
   };
   const _ensureCanvas = () => {
     if (!document.getElementById('trend-chart')) {
-      chartContainer.innerHTML = '<canvas id="trend-chart"></canvas>';
+      if (chartContainer) chartContainer.innerHTML = '<canvas id="trend-chart"></canvas>';
     }
   };
 
@@ -1702,10 +1704,10 @@ async function renderTrendChart() {
   const startEl = document.getElementById('trend-start');
   const endEl = document.getElementById('trend-end');
   if (!startEl.value) startEl.value = new Date().getFullYear() + '-01-01';
-  if (!endEl.value) endEl.value = allDates[allDates.length - 1];
+  if (!endEl.value)   endEl.value   = today;
 
   const start = startEl.value;
-  const end = endEl.value;
+  const end   = endEl.value;
 
   const filtered = allDates.filter(d => d >= start && d <= end);
   if (filtered.length < 2) {
