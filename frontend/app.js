@@ -1489,10 +1489,20 @@ async function renderGrowthChart() {
     await loadHistory();
   }
 
+  const chartContainer = document.querySelector('#growth-chart')?.parentElement;
+  const summaryEl      = document.getElementById('growth-summary');
+
+  const _showEmpty = (msg) => {
+    if (chartContainer) chartContainer.style.display = 'none';
+    if (summaryEl) summaryEl.innerHTML = `<div class="empty-state">${msg}</div>`;
+  };
+  const _showChart = () => {
+    if (chartContainer) chartContainer.style.display = '';
+  };
+
   const dates = Object.keys(state.history).sort();
   if (dates.length === 0) {
-    document.querySelector('#growth-chart').parentElement.innerHTML =
-      '<div class="empty-state">尚無歷史資料，點擊「💾 儲存資料」開始記錄</div>';
+    _showEmpty('尚無歷史資料，點擊「💾 儲存資料」開始記錄');
     return;
   }
 
@@ -1507,10 +1517,11 @@ async function renderGrowthChart() {
   // Filter
   const filtered = dates.filter(d => d >= start && d <= end);
   if (filtered.length === 0) {
-    document.querySelector('#growth-chart').parentElement.innerHTML =
-      '<div class="empty-state">所選範圍內無資料</div>';
+    _showEmpty('所選範圍內無資料');
     return;
   }
+
+  _showChart();
 
   // Collect all asset group names across range
   const allGroups = new Set();
@@ -1670,10 +1681,21 @@ async function renderTrendChart() {
     await loadHistory();
   }
 
+  const chartContainer = document.querySelector('#trend-chart')?.parentElement;
+
+  const _showEmpty = (msg) => {
+    if (chartContainer) chartContainer.innerHTML =
+      `<div class="empty-state" style="padding:40px 0;text-align:center">${msg}</div>`;
+  };
+  const _ensureCanvas = () => {
+    if (!document.getElementById('trend-chart')) {
+      chartContainer.innerHTML = '<canvas id="trend-chart"></canvas>';
+    }
+  };
+
   const allDates = Object.keys(state.history).sort();
   if (allDates.length === 0) {
-    document.querySelector('#trend-chart').parentElement.innerHTML =
-      '<div class="empty-state">尚無歷史資料，點擊「💾 儲存資料」開始記錄</div>';
+    _showEmpty('尚無歷史資料，點擊「💾 儲存資料」開始記錄');
     return;
   }
 
@@ -1687,10 +1709,11 @@ async function renderTrendChart() {
 
   const filtered = allDates.filter(d => d >= start && d <= end);
   if (filtered.length < 2) {
-    document.querySelector('#trend-chart').parentElement.innerHTML =
-      '<div class="empty-state">所選範圍內資料不足 (至少需要 2 筆)</div>';
+    _showEmpty('所選範圍內資料不足 (至少需要 2 筆)');
     return;
   }
+
+  _ensureCanvas();
 
   const labels = filtered;
   const first = state.history[filtered[0]];
