@@ -206,8 +206,11 @@ def load_json(path: Path, default):
 
 def save_json(path: Path, data):
     """Save data to local file only. Does NOT push to Gist.
-    Gist is only updated on explicit user confirmation (儲存資料 button)
-    via _gist_push_confirmed(), so timestamps are stable and meaningful."""
+    _last_modified is stripped so local_ts stays at 0 between confirmed saves.
+    This ensures auto-sync always prefers the last Gist-confirmed version
+    over unconfirmed local writes (price refreshes, position edits, etc.).
+    _last_modified is only set by _gist_push_confirmed() (儲存資料 button)."""
+    data.pop(_TS_KEY, None)   # clear — unconfirmed save, don't block Gist pull
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
