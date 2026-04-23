@@ -1408,11 +1408,15 @@ async function refreshAll() {
   txtEl.textContent = '更新中...';
 
   state._cbSuspensionLoaded = false;
-  await loadIndices();
-  await refreshPrices();
-  await refreshCbSuspensions();  // immediate — don't wait for CB tab visit
-  await savePortfolio();
+  // parallelize independent network fetches (previously sequential = sum of all three)
+  await Promise.all([
+    loadIndices(),
+    refreshPrices(),
+    refreshCbSuspensions(),
+  ]);
   calcTotals();
+  // fire-and-forget the save — Gist PATCH shouldn't block UI render
+  savePortfolio();
 
   const page = currentPage();
   if (page === 'dashboard') renderDashboard();

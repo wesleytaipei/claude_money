@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import threading as _threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib3
 import requests as http_requests
 
@@ -265,32 +266,30 @@ def fetch_prices(tickers: list[str]) -> dict:
             to_fetch.append(t)
 
     if to_fetch:
-        try:
-            tkrs = yf.Tickers(" ".join(to_fetch))
-            for t in to_fetch:
-                try:
-                    fi = tkrs.tickers[t].fast_info
-                    price = fi.last_price
-                    prev_close = getattr(fi, "previous_close", None)
-                    change_pct = None
-                    if price and prev_close and float(prev_close) > 0:
-                        change_pct = round((float(price) - float(prev_close)) / float(prev_close) * 100, 2)
-                    currency = getattr(fi, "currency", None) or "TWD"
-                    entry = {
-                        "price":      round(float(price), 4) if price else None,
-                        "change_pct": change_pct,
-                        "currency":   currency,
-                        "ts":         now,
-                    }
-                    _price_cache[t] = entry
-                    result[t] = entry
-                except Exception as e:
-                    err = {"price": None, "change_pct": None, "currency": "N/A", "error": str(e), "ts": now}
-                    _price_cache[t] = err
-                    result[t] = err
-        except Exception as e:
-            for t in to_fetch:
-                result[t] = {"price": None, "change_pct": None, "currency": "N/A", "error": str(e), "ts": now}
+        def _one(t: str) -> tuple[str, dict]:
+            try:
+                fi = yf.Ticker(t).fast_info
+                price = fi.last_price
+                prev_close = getattr(fi, "previous_close", None)
+                change_pct = None
+                if price and prev_close and float(prev_close) > 0:
+                    change_pct = round((float(price) - float(prev_close)) / float(prev_close) * 100, 2)
+                currency = getattr(fi, "currency", None) or "TWD"
+                return t, {
+                    "price":      round(float(price), 4) if price else None,
+                    "change_pct": change_pct,
+                    "currency":   currency,
+                    "ts":         now,
+                }
+            except Exception as e:
+                return t, {"price": None, "change_pct": None, "currency": "N/A", "error": str(e), "ts": now}
+
+        # Parallel yfinance fetches — each fast_info is its own HTTP call
+        with ThreadPoolExecutor(max_workers=min(8, len(to_fetch))) as ex:
+            for fut in as_completed([ex.submit(_one, t) for t in to_fetch]):
+                t, entry = fut.result()
+                _price_cache[t] = entry
+                result[t] = entry
 
     return result
 
@@ -442,54 +441,46 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
             result[code] = entry
             found.add(code)
 
-        # Symbols with null data or not found or missing change_pct → try Yahoo Scrape / yfinance
-        for sym in to_fetch:
-            # Even if found in MIS, if price was Null or change_pct was Null, we want fallback
-            # (MIS often reports price but '-' for z during off-hours, missing the % change)
-            if sym not in found or result[sym].get("price") is None or result[sym].get("change_pct") is None:
-                entry = by_sym.get(sym, {})
-                market = entry.get("market", "tse")
-                
-                # 1. Try Yahoo Scrape (Best for TW stocks accurate change%)
-                yahoo = _fetch_yahoo_tw_scrape(sym, market)
-                if yahoo.get("price"):
-                    hit = {
-                        "price":      yahoo["price"],
-                        "change_pct": yahoo["change_pct"],
-                        "name":       yahoo.get("name", entry.get("name", "")),
-                        "ts":         now,
-                    }
+        # Symbols with null data or not found or missing change_pct → fallback
+        # (MIS often reports price but '-' for z during off-hours, missing the % change)
+        need_fallback = [
+            sym for sym in to_fetch
+            if sym not in found or result[sym].get("price") is None or result[sym].get("change_pct") is None
+        ]
+
+        def _tw_fallback(sym: str) -> tuple[str, dict]:
+            entry = by_sym.get(sym, {})
+            market = entry.get("market", "tse")
+            # 1. Yahoo scrape (most accurate change%)
+            yahoo = _fetch_yahoo_tw_scrape(sym, market)
+            if yahoo.get("price"):
+                return sym, {
+                    "price":      yahoo["price"],
+                    "change_pct": yahoo["change_pct"],
+                    "name":       yahoo.get("name", entry.get("name", "")),
+                    "ts":         now,
+                }
+            # 2. yfinance — try both suffixes (handles 00988A etc.)
+            suffixes = [".TWO", ".TW"] if market == "otc" else [".TW", ".TWO"]
+            for suffix in suffixes:
+                try:
+                    fi = yf.Ticker(f"{sym}{suffix}").fast_info
+                    price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
+                    if price:
+                        prev = float(getattr(fi, "previous_close", None) or 0)
+                        change_pct = round((price - prev) / prev * 100, 2) if prev > 0 else None
+                        return sym, {"price": price, "change_pct": change_pct, "name": entry.get("name", ""), "ts": now}
+                except Exception:
+                    continue
+            # Final miss
+            return sym, {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
+
+        if need_fallback:
+            with ThreadPoolExecutor(max_workers=min(8, len(need_fallback))) as ex:
+                for fut in as_completed([ex.submit(_tw_fallback, s) for s in need_fallback]):
+                    sym, hit = fut.result()
                     _tw_mis_cache[sym] = hit
                     result[sym] = hit
-                    found.add(sym)
-                    continue
-
-                # 2. Try yfinance fallback — try both suffixes so 6-char symbols
-                #    like 00988A work even when _tw_table market is unknown
-                suffixes = [".TWO", ".TW"] if market == "otc" else [".TW", ".TWO"]
-                yf_hit = None
-                for suffix in suffixes:
-                    yf_sym = f"{sym}{suffix}"
-                    try:
-                        fi = yf.Ticker(yf_sym).fast_info
-                        price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
-                        if price:
-                            prev = float(getattr(fi, "previous_close", None) or 0)
-                            change_pct = round((price - prev) / prev * 100, 2) if prev > 0 else None
-                            yf_hit = {"price": price, "change_pct": change_pct, "name": entry.get("name", ""), "ts": now}
-                            break
-                    except Exception:
-                        continue
-                if yf_hit:
-                    _tw_mis_cache[sym] = yf_hit
-                    result[sym] = yf_hit
-                    found.add(sym)
-                else:
-                    # Final miss
-                    if sym not in result:
-                        miss = {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
-                        _tw_mis_cache[sym] = miss
-                        result[sym] = miss
 
     except Exception as e:
         logger.error(f"[tw-prices] MIS fetch failed: {e}")
