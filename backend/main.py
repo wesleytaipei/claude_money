@@ -205,41 +205,51 @@ def load_json(path: Path, default):
         return default
 
 def save_json(path: Path, data):
-    # 1. Stamp with current time
-    data[_TS_KEY] = _now_iso()
-
-    # 2. Save locally (fast, synchronous)
+    """Save data to local file only. Does NOT push to Gist.
+    Gist is only updated on explicit user confirmation (儲存資料 button)
+    via _gist_push_confirmed(), so timestamps are stable and meaningful."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # 3. Push to Gist in background — but only if local is still newest
-    #    (re-check after write so rapid saves don't race)
-    if GIST_ENABLED:
-        local_ts = data[_TS_KEY]
-        content  = json.dumps(data, ensure_ascii=False, indent=2)
-        def _push():
-            try:
-                # Fetch Gist's current timestamp for this file before pushing
-                gist_files = _pull_gist_all()
-                gist_content = gist_files.get(path.name, "")
-                if gist_content:
-                    gist_ts = _parse_ts(json.loads(gist_content).get(_TS_KEY))
-                    if gist_ts > _parse_ts(local_ts):
-                        logger.warning(f"[Gist] push skipped for {path.name}: Gist is newer ({gist_ts:.0f} > {_parse_ts(local_ts):.0f})")
-                        return
-                payload = {"files": {path.name: {"content": content}}}
-                r = http_requests.patch(
-                    f"https://api.github.com/gists/{GIST_ID}",
-                    headers=_gist_headers(), json=payload, timeout=10
-                )
-                if r.status_code != 200:
-                    logger.error(f"[Gist] push error for {path.name}: {r.status_code}")
-                else:
-                    logger.info(f"[Gist] pushed {path.name} ({_ENV_LABEL})")
-            except Exception as e:
-                logger.error(f"[Gist] push exception for {path.name}: {e}")
-        _threading.Thread(target=_push, daemon=True).start()
+
+def _gist_push_confirmed():
+    """Push alm_config + history to Gist with a confirmed timestamp.
+    Called ONLY when the user explicitly clicks 儲存資料 (save snapshot).
+    Stamps _last_modified on both files so sync comparison is meaningful."""
+    if not GIST_ENABLED:
+        return
+    ts = _now_iso()
+    files_to_push = {}
+    for path in [CONFIG_FILE, HISTORY_FILE]:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            data[_TS_KEY] = ts          # stamp confirmed time
+            content = json.dumps(data, ensure_ascii=False, indent=2)
+            # Write the stamped version back to local so local_ts matches Gist
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(content)
+            files_to_push[path.name] = {"content": content}
+        except Exception as e:
+            logger.error(f"[Gist] confirmed push prepare error for {path.name}: {e}")
+
+    def _push():
+        try:
+            r = http_requests.patch(
+                f"https://api.github.com/gists/{GIST_ID}",
+                headers=_gist_headers(),
+                json={"files": files_to_push},
+                timeout=15,
+            )
+            if r.status_code == 200:
+                logger.info(f"[Gist] confirmed push OK ({_ENV_LABEL}) ts={ts}")
+            else:
+                logger.error(f"[Gist] confirmed push error: {r.status_code}")
+        except Exception as e:
+            logger.error(f"[Gist] confirmed push exception: {e}")
+
+    _threading.Thread(target=_push, daemon=True).start()
 
 
 # ── Price fetching ───────────────────────────────────────────────────────────
@@ -1284,6 +1294,8 @@ async def save_snapshot(request: Request):
     date_key = body.get("date") or datetime.now().strftime("%Y-%m-%d")
     history[date_key] = {k: v for k, v in body.items() if k != "date"}
     save_json(HISTORY_FILE, history)
+    # 儲存資料 = confirmed version → push alm_config + history to Gist
+    _gist_push_confirmed()
     return {"ok": True, "date": date_key}
 
 
