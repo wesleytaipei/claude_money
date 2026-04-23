@@ -1507,13 +1507,11 @@ logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ 
 def _startup():
     if GIST_ENABLED:
         try:
-            results = sync_from_gist()
+            # Force pull on startup — Gist always holds the last confirmed version
+            # (儲存資料), so every deploy/restart should start from that clean state.
+            results = sync_from_gist(force=True)
             pulled = [r["name"] for r in results if r.get("action") == "pulled"]
-            local_newer = [r["name"] for r in results if r.get("action") == "local_newer"]
-            if pulled:
-                logger.info(f"[startup] pulled from Gist (newer): {pulled}")
-            if local_newer:
-                logger.info(f"[startup] local is newer (not overwritten): {local_newer}")
+            logger.info(f"[startup] force-pulled from Gist: {pulled or 'nothing changed'}")
         except Exception as e:
             logger.warning(f"[startup] Gist sync error: {e}")
     try:
