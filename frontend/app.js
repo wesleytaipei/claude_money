@@ -1991,8 +1991,42 @@ async function init() {
     if (currentPage() === 'investments') renderInvestmentsPage();
   });
 
+  // Auto-sync from Gist on page load (silent, timestamp-based — only pulls if Gist is newer)
+  _autoSyncFromGist();
+
   // Pre-fetch CB/FSC data so stock alert map is ready even without visiting 重要資訊
   _prefetchAlertData();
+}
+
+async function _autoSyncFromGist() {
+  try {
+    const res = await api('/api/sync-from-gist');   // non-force: only pull if Gist newer
+    if (!res.ok) return;
+    const pulled = res.files.filter(f => f.action === 'pulled');
+    if (pulled.length === 0) return;   // nothing changed, skip re-render
+
+    // Reload whichever files were updated
+    const names = pulled.map(f => f.name);
+    const tasks = [];
+    if (names.some(n => n.includes('alm_config'))) tasks.push(loadPortfolio());
+    if (names.some(n => n.includes('history')))    tasks.push(loadHistory());
+    if (names.some(n => n.includes('manual')))     tasks.push(loadManualHistory());
+    await Promise.all(tasks);
+
+    calcTotals();
+    const page = currentPage();
+    if (page === 'dashboard')   renderDashboard();
+    else if (page === 'investments') renderInvestmentsPage();
+    else if (page === 'assets') renderAssetsPage();
+    else if (page === 'growth') renderGrowthChart();
+    else if (page === 'trend')  renderTrendChart();
+
+    const fileList = pulled.map(f => f.name.replace('.json', '')).join(', ');
+    toast(`☁️ 已從雲端同步: ${fileList}`);
+  } catch (e) {
+    // Silent — auto-sync failure shouldn't disrupt page load
+    console.warn('[auto-sync] gist sync failed:', e);
+  }
 }
 
 async function _prefetchAlertData() {

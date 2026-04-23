@@ -47,6 +47,10 @@ def _safe_float(v):
         return None
 
 def fetch_twse_margin():
+    # Row layout of MI_MARGN tables[0].data:
+    #   [0] 融資(交易單位)   cols [4]=前日 [5]=今日  (in 張)
+    #   [1] 融券(交易單位)
+    #   [2] 融資金額(仟元)   cols [4]=前日 [5]=今日  ← the one we want
     from datetime import date
     today_str = date.today().isoformat()
     if _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
@@ -57,32 +61,25 @@ def fetch_twse_margin():
             headers=HEADERS, verify=False, timeout=15
         )
         r.raise_for_status()
-        payload = r.json()
-        tables = payload.get("tables", [])
+        tables = r.json().get("tables", [])
         if not tables:
-            print(f"[TWSE margin] empty tables — market closed or pre-data")
+            print("[TWSE margin] empty tables — market closed or pre-data")
             return {"balance": None, "increase": None}
 
-        # Find the 融資金額(仟元) row by scanning for the label instead of
-        # relying on a fixed index which can shift.
         data = tables[0].get("data", [])
-        row = None
-        for candidate in data:
-            label = str(candidate[0]) if candidate else ""
-            if "融資金額" in label or "融資" in label:
-                row = candidate
-                break
-        if row is None and len(data) >= 3:
-            row = data[2]   # legacy fallback
-
-        if row is None or len(row) < 6:
-            print(f"[TWSE margin] unexpected row structure: {data[:3]}")
+        if len(data) < 3:
+            print(f"[TWSE margin] unexpected row count: {len(data)}")
             return {"balance": None, "increase": None}
 
-        yest_val  = _safe_float(row[4])
-        today_val = _safe_float(row[5])
+        row = data[2]   # 融資金額(仟元) is always index 2
+        if len(row) < 6:
+            print(f"[TWSE margin] short row: {row}")
+            return {"balance": None, "increase": None}
+
+        yest_val  = _safe_float(row[4])   # 前日餘額(仟元)
+        today_val = _safe_float(row[5])   # 今日餘額(仟元)
         if today_val is None:
-            print(f"[TWSE margin] non-numeric value in row: {row}")
+            print(f"[TWSE margin] non-numeric today value: {row}")
             return {"balance": None, "increase": None}
 
         increase = (today_val - yest_val) if yest_val is not None else 0
@@ -132,22 +129,20 @@ def fetch_tpex_margin():
             print(f"[TPEX margin] no summary in table; keys={list(tables[0].keys())}")
             return {"balance": None, "increase": None}
 
-        # Pick the TWD-value row: summary[1] has larger absolute numbers than summary[0]
-        row = None
-        for candidate in summary:
-            t = _safe_float(candidate[6]) if len(candidate) >= 7 else None
-            if t is not None and t > 1_000_000:   # 仟元 → > 10 億 means it's the value row
-                row = candidate
-                break
-        if row is None:
-            row = summary[-1]   # last row is typically the value summary
-
-        if not row or len(row) < 7:
-            print(f"[TPEX margin] unexpected summary structure: {summary}")
+        # summary[0] = 合計(仟張) — lot count
+        # summary[1] = 合計金額(仟元) — TWD value  ← the one we want
+        # cols: [2]=前日餘額 [6]=今日餘額
+        if len(summary) < 2:
+            print(f"[TPEX margin] only {len(summary)} summary rows, expected 2")
             return {"balance": None, "increase": None}
 
-        today_val = _safe_float(row[6])
-        yest_val  = _safe_float(row[2])
+        row = summary[1]
+        if len(row) < 7:
+            print(f"[TPEX margin] short summary row: {row}")
+            return {"balance": None, "increase": None}
+
+        today_val = _safe_float(row[6])   # 今日餘額(仟元)
+        yest_val  = _safe_float(row[2])   # 前日餘額(仟元)
         if today_val is None:
             print(f"[TPEX margin] non-numeric today value in row: {row}")
             return {"balance": None, "increase": None}
