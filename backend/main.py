@@ -1605,6 +1605,251 @@ def stock_table_lookup(q: str = ""):
     return results
 
 
+# ── ETF Tracking (主動式ETF持股追蹤) ─────────────────────────────────────────
+_etf_tracking_cache: dict = {}   # fund_code → {"date": "YYYY-MM-DD", "data": {...}}
+
+# Map ETF code (user-facing) → ezmoney fundCode query param
+ETF_FUND_MAP: dict[str, str] = {
+    "00981A": "49YTW",
+}
+
+
+def _parse_roc_date(s: str) -> str:
+    """Convert ROC date string '115/04/23' → '2026-04-23'."""
+    try:
+        parts = str(s).replace("資料日期：", "").strip().split("/")
+        y = int(parts[0]) + 1911
+        return f"{y}-{parts[1]}-{parts[2]}"
+    except Exception:
+        return ""
+
+
+def _parse_ntd(s) -> float | None:
+    """Parse 'NTD 199,665,627,940' → 199665627940.0"""
+    try:
+        return float(str(s).replace("NTD", "").replace(",", "").strip())
+    except Exception:
+        return None
+
+
+def _parse_shares(s) -> int:
+    """Parse '9,113,000' → 9113000"""
+    try:
+        return int(str(s).replace(",", "").replace("*", "").strip())
+    except Exception:
+        return 0
+
+
+def _parse_pct(s) -> float:
+    """Parse '9.49%' → 9.49"""
+    try:
+        return float(str(s).replace("%", "").strip())
+    except Exception:
+        return 0.0
+
+
+def fetch_etf_holdings(fund_code: str) -> dict:
+    """Download ETF holdings Excel from ezmoney.com.tw. Cached per day.
+    Compares with previous day stored in DATA_DIR to derive operation types.
+    """
+    import io as _io
+    import pandas as _pd
+    from datetime import date as _date
+
+    today_str = _date.today().isoformat()
+
+    # In-memory daily cache
+    cached = _etf_tracking_cache.get(fund_code)
+    if cached and cached.get("date") == today_str:
+        return cached["data"]
+
+    ezmoney_code = ETF_FUND_MAP.get(fund_code.upper())
+    if not ezmoney_code:
+        return {"error": f"Unknown ETF: {fund_code}. Supported: {list(ETF_FUND_MAP)}"}
+
+    history_path = DATA_DIR / f"etf_{fund_code.lower()}_history.json"
+
+    # ── Download Excel ────────────────────────────────────────────────────────
+    try:
+        url = f"https://www.ezmoney.com.tw/ETF/Fund/AssetExcelNPOI?fundCode={ezmoney_code}"
+        r = http_requests.get(
+            url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False
+        )
+        r.raise_for_status()
+    except Exception as e:
+        logger.error(f"[etf] download failed: {e}")
+        # Fall back to last saved data
+        hist = load_json(history_path, {})
+        if hist:
+            last_date = sorted(hist.keys())[-1]
+            data = hist[last_date]
+            data["_stale"] = True
+            data["_cached_date"] = last_date
+            return data
+        return {"error": str(e), "fund_code": fund_code}
+
+    # ── Parse Excel ───────────────────────────────────────────────────────────
+    try:
+        df = _pd.read_excel(_io.BytesIO(r.content), sheet_name=0, header=None)
+    except Exception as e:
+        logger.error(f"[etf] excel parse failed: {e}")
+        return {"error": f"excel_parse: {e}"}
+
+    # Extract header metadata
+    date_str = _parse_roc_date(df.iloc[0, 0])
+    aum       = _parse_ntd(df.iloc[3, 1])
+    nav       = _parse_ntd(df.iloc[5, 1])   # 每單位淨值
+
+    # Find holdings header row ("股票代號")
+    header_row = None
+    for i, row in df.iterrows():
+        if str(row.iloc[0]).strip() == "股票代號":
+            header_row = i
+            break
+    if header_row is None:
+        return {"error": "holdings_header_not_found"}
+
+    today_holdings: dict[str, dict] = {}   # symbol → {name, shares, weight}
+    for i in range(header_row + 1, len(df)):
+        row = df.iloc[i]
+        sym = str(row.iloc[0]).replace("*", "").strip()
+        if not sym or sym == "nan":
+            break
+        name   = str(row.iloc[1]).strip()
+        shares = _parse_shares(row.iloc[2])
+        weight = _parse_pct(row.iloc[3])
+        today_holdings[sym] = {"name": name, "shares": shares, "weight": weight}
+
+    # ── Load history & derive operation types ─────────────────────────────────
+    history = load_json(history_path, {})
+
+    # Previous trading day data (last entry before today)
+    prev_date = None
+    prev_holdings: dict[str, dict] = {}
+    for d in sorted(history.keys(), reverse=True):
+        if d < date_str:
+            prev_date = d
+            prev_holdings = {h["symbol"]: h for h in history[d].get("holdings_raw", [])}
+            break
+
+    # Build enriched holdings with operationType
+    holdings = []
+    all_syms = set(today_holdings) | set(prev_holdings)
+
+    for sym in all_syms:
+        today = today_holdings.get(sym)
+        prev  = prev_holdings.get(sym)
+
+        if today and not prev:
+            op_type = "新增建倉"
+        elif prev and not today:
+            op_type = "全數清倉"
+        else:
+            t_sh = today["shares"]
+            p_sh = prev.get("shares", 0)
+            if t_sh > p_sh:
+                op_type = "股數加碼"
+            elif t_sh < p_sh:
+                op_type = "股數減碼"
+            else:
+                op_type = "持有"
+
+        if today:
+            cur_w    = today["weight"]
+            prev_w   = prev["weight"] if prev else 0.0
+            cur_sh   = today["shares"]
+            prev_sh  = prev.get("shares", 0) if prev else 0
+            sh_chg_p = round((cur_sh - prev_sh) / prev_sh * 100, 2) if prev_sh else 0.0
+            w_chg    = round(cur_w - prev_w, 2)
+            holdings.append({
+                "symbol":              sym,
+                "name":                today["name"],
+                "operationType":       op_type,
+                "shares":              cur_sh,
+                "prevShares":          prev_sh,
+                "sharesChangePercent": sh_chg_p,
+                "currentWeightPercent":cur_w,
+                "weightChangePercent": w_chg,
+            })
+        else:
+            # 全數清倉 — symbol only in prev
+            p_sh  = prev.get("shares", 0)
+            p_name = prev.get("name", sym)
+            holdings.append({
+                "symbol":              sym,
+                "name":                p_name,
+                "operationType":       "全數清倉",
+                "shares":              0,
+                "prevShares":          p_sh,
+                "sharesChangePercent": -100.0,
+                "currentWeightPercent":0.0,
+                "weightChangePercent": -prev.get("weight", 0.0),
+            })
+
+    # ── Fetch live stock prices from MIS ──────────────────────────────────────
+    live_syms = [s for s in today_holdings]   # only current holdings need price
+    try:
+        mis_prices = fetch_tw_prices_mis(live_syms) if live_syms else {}
+    except Exception:
+        mis_prices = {}
+
+    for h in holdings:
+        mp = mis_prices.get(h["symbol"], {})
+        h["closingPrice"]      = mp.get("price")
+        h["priceChangePercent"] = mp.get("change_pct")
+
+    # Summary counts
+    op_counts = {"新增建倉": 0, "股數加碼": 0, "股數減碼": 0, "全數清倉": 0}
+    for h in holdings:
+        op = h["operationType"]
+        if op in op_counts:
+            op_counts[op] += 1
+
+    # ETF name: derive from fund_code + known mapping
+    etf_names = {"00981A": "00981A 主動統一台股增長"}
+    fund_name = etf_names.get(fund_code, fund_code)
+
+    data = {
+        "fundName":     fund_name,
+        "aum":          aum,
+        "nav":          nav,
+        "date":         date_str,
+        "prevDate":     prev_date,
+        "holdings":     holdings,
+        "summaryCounts": op_counts,
+    }
+
+    # ── Persist today's raw holdings for future comparison ────────────────────
+    history[date_str] = {
+        "holdings_raw": [
+            {"symbol": sym, "name": v["name"], "shares": v["shares"], "weight": v["weight"]}
+            for sym, v in today_holdings.items()
+        ]
+    }
+    # Keep only last 30 days
+    for old in sorted(history.keys())[:-30]:
+        del history[old]
+    save_json(history_path, history)
+
+    _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
+    return data
+
+
+@app.get("/api/etf-tracking")
+def get_etf_tracking(code: str = "00981A", force: bool = False):
+    """ETF daily holdings. Cached per calendar day unless force=true."""
+    code = code.upper().strip()
+    if force:
+        _etf_tracking_cache.pop(code, None)
+    return fetch_etf_holdings(code)
+
+
+@app.get("/api/etf-list")
+def get_etf_list():
+    """Return the list of tracked ETF codes."""
+    return {"etfs": list(ETF_FUND_MAP.keys())}
+
+
 @app.get("/api/important-info")
 def get_important_info(force: bool = False):
     """Return important macro/market info from various sources."""

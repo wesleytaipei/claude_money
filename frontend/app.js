@@ -1464,6 +1464,7 @@ function goPage(name) {
   else if (name === 'trend') renderTrendChart();
   else if (name === 'history') renderHistoryPage();
   else if (name === 'important') renderImportantInfo(false);
+  else if (name === 'etf') renderEtfPage(false);
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1472,7 +1473,8 @@ function goPage(name) {
   // Update mobile title and close sidebar
   const titles = {
     dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
-    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊'
+    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊',
+    etf: 'ETF追蹤'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -2392,4 +2394,314 @@ function _renderFscTable(data) {
     <td class="mono small">${r.amount}</td>
     <td class="mono small muted">${r.eff_date}</td>
   </tr>`).join('');
+}
+
+// ══ ETF追蹤 ════════════════════════════════════════════════════════════════
+
+const _etfState = {
+  code: '00981A', list: ['00981A'], cache: {},
+  filterOp: 'all',   // 'all' | '新增建倉' | '股數加碼' | '股數減碼' | '全數清倉'
+  filterTop: 0,       // 0 = 全部, N = 前N大
+};
+
+async function renderEtfPage(force = false) {
+  const body  = document.getElementById('etf-body');
+  const subEl = document.getElementById('etf-sub');
+  const tabBar = document.getElementById('etf-tab-bar');
+  if (!body) return;
+
+  // Load ETF list once
+  if (_etfState.list.length <= 1) {
+    try {
+      const listRes = await api('/api/etf-list');
+      if (listRes.etfs?.length) _etfState.list = listRes.etfs;
+    } catch (_) {}
+  }
+
+  // Render tab bar
+  if (tabBar) {
+    tabBar.innerHTML = _etfState.list.map(c => `
+      <button onclick="_etfSwitchTab('${c}')"
+        style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;
+               border:1px solid ${c === _etfState.code ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+               background:${c === _etfState.code ? 'rgba(99,102,241,.15)' : 'transparent'};
+               color:${c === _etfState.code ? 'var(--primary-2)' : 'var(--text-muted)'}">
+        ${c}
+      </button>`).join('');
+  }
+
+  const cached = _etfState.cache[_etfState.code];
+  if (!force && cached) { _etfRender(cached); return; }
+
+  body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 正在抓取最新持股資料（約需 10–20 秒）…</div>';
+  if (subEl) subEl.textContent = '主動式ETF每日持股變化';
+
+  try {
+    const qs = `code=${encodeURIComponent(_etfState.code)}${force ? '&force=true' : ''}`;
+    const data = await api(`/api/etf-tracking?${qs}`);
+    if (data.error) {
+      body.innerHTML = `<div class="empty-state">❌ 載入失敗：${data.error}</div>`;
+      return;
+    }
+    _etfState.cache[_etfState.code] = data;
+    _etfRender(data);
+  } catch (e) {
+    body.innerHTML = `<div class="empty-state">❌ 請求失敗：${e.message}</div>`;
+  }
+}
+
+function _etfSwitchTab(code) {
+  _etfState.code = code;
+  renderEtfPage(false);
+}
+
+function _etfRender(data) {
+  const body  = document.getElementById('etf-body');
+  const subEl = document.getElementById('etf-sub');
+  if (!body) return;
+
+  const {
+    fundName = '—', aum, nav, date = '—', prevDate,
+    holdings = [], summaryCounts = {}, _stale, _cached_date
+  } = data;
+
+  const aumFmt  = aum ? `${(aum / 1e8).toFixed(2)} 億` : '—';
+  const navFmt  = nav ? `NAV ${nav.toFixed(2)}` : '';
+  const staleNote = _stale
+    ? `<span style="color:var(--text-muted);font-size:11px"> (快取 ${_cached_date})</span>` : '';
+  const compNote  = prevDate
+    ? `<span style="font-size:12px;color:var(--text-muted)">　vs ${prevDate}</span>` : '';
+  if (subEl) subEl.textContent = `${date}　規模：${aumFmt}　${navFmt}`;
+
+  const opCfg = {
+    '新增建倉': { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: '🆕' },
+    '股數加碼': { color: '#38bdf8', bg: 'rgba(56,189,248,.10)', icon: '➕' },
+    '股數減碼': { color: '#f59e0b', bg: 'rgba(245,158,11,.10)', icon: '➖' },
+    '全數清倉': { color: '#f43f5e', bg: 'rgba(244,63,94,.10)',  icon: '🔴' },
+    '持有':     { color: '#64748b', bg: 'transparent',          icon: '' },
+  };
+
+  const opOrder = ['新增建倉', '股數加碼', '股數減碼', '全數清倉', '持有'];
+
+  // Sort all holdings: operation priority first, then weight desc
+  const allSorted = [...holdings].sort((a, b) => {
+    const ai = opOrder.indexOf(a.operationType || '持有');
+    const bi = opOrder.indexOf(b.operationType || '持有');
+    if (ai !== bi) return ai - bi;
+    return (b.currentWeightPercent || 0) - (a.currentWeightPercent || 0);
+  });
+
+  // Summary cards (clickable to filter)
+  const ops = ['新增建倉', '股數加碼', '股數減碼', '全數清倉'];
+  const cardHtml = ops.map(op => {
+    const n   = summaryCounts[op] ?? 0;
+    const cfg = opCfg[op];
+    const active = _etfState.filterOp === op;
+    return `<div onclick="_etfSetOpFilter('${op}')" style="cursor:pointer;
+                background:var(--panel-bg);border-radius:12px;padding:14px 20px;min-width:100px;text-align:center;
+                border:2px solid ${active ? cfg.color : (n > 0 ? cfg.color + '66' : 'var(--border)')};
+                box-shadow:${active ? `0 0 0 3px ${cfg.color}33` : 'none'};
+                transition:all .15s">
+      <div style="font-size:24px;font-weight:800;color:${n > 0 ? cfg.color : 'var(--text-muted)'}">${n}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${cfg.icon} ${op}</div>
+    </div>`;
+  }).join('');
+
+  const noCompNote = !prevDate
+    ? `<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);
+                  border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#f59e0b">
+        ⚠️ 無前一日資料可比對，操作類型全部顯示為「持有」。明日起將自動顯示買賣變化。
+      </div>` : '';
+
+  body.innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:10px">
+        ${fundName}${staleNote}${compNote}
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">${cardHtml}</div>
+    </div>
+    ${noCompNote}
+    <div id="etf-filter-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+          margin-bottom:12px;padding:10px 14px;background:var(--panel-bg);
+          border:1px solid var(--border);border-radius:10px">
+      <span style="font-size:12px;color:var(--text-muted);font-weight:600">篩選</span>
+      <div id="etf-op-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      <div style="width:1px;height:20px;background:var(--border);margin:0 4px"></div>
+      <span style="font-size:12px;color:var(--text-muted);font-weight:600">占比排名</span>
+      <div id="etf-top-btns" style="display:flex;gap:6px"></div>
+      <span id="etf-filter-count" style="margin-left:auto;font-size:12px;color:var(--text-muted)"></span>
+    </div>
+    ${holdings.length === 0 ? '<div class="empty-state">尚無持股資料</div>' : `
+    <div class="panel" style="overflow-x:auto">
+      <table class="data-table" style="min-width:720px">
+        <thead><tr>
+          <th>#</th><th>代號</th><th>名稱</th><th>操作</th>
+          <th style="text-align:right">占比</th>
+          <th style="text-align:right">占比增減</th>
+          <th style="text-align:right">持股數</th>
+          <th style="text-align:right">股數增減%</th>
+          <th style="text-align:right">收盤價</th>
+          <th style="text-align:right">漲跌幅</th>
+        </tr></thead>
+        <tbody id="etf-tbody"></tbody>
+      </table>
+    </div>`}`;
+
+  // Store sorted list on state so filter can re-use
+  _etfState._allSorted = allSorted;
+  _etfRenderFilters();
+  _etfApplyFilters();
+}
+
+function _etfRenderFilters() {
+  // Op filter buttons
+  const opBtns = document.getElementById('etf-op-btns');
+  if (!opBtns) return;
+  const opOptions = [
+    { key: 'all',    label: '全部' },
+    { key: '新增建倉', label: '🆕 新增建倉' },
+    { key: '股數加碼', label: '➕ 加碼' },
+    { key: '股數減碼', label: '➖ 減碼' },
+    { key: '全數清倉', label: '🔴 清倉' },
+  ];
+  opBtns.innerHTML = opOptions.map(o => {
+    const active = _etfState.filterOp === o.key;
+    return `<button onclick="_etfSetOpFilter('${o.key}')"
+      style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+             border:1px solid ${active ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+             background:${active ? 'rgba(99,102,241,.18)' : 'transparent'};
+             color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
+      ${o.label}</button>`;
+  }).join('');
+
+  // Top-N buttons
+  const topBtns = document.getElementById('etf-top-btns');
+  if (!topBtns) return;
+  const topOptions = [
+    { key: 0,  label: '全部' },
+    { key: 10, label: 'Top 10' },
+    { key: 20, label: 'Top 20' },
+    { key: 30, label: 'Top 30' },
+  ];
+  topBtns.innerHTML = topOptions.map(o => {
+    const active = _etfState.filterTop === o.key;
+    return `<button onclick="_etfSetTopFilter(${o.key})"
+      style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+             border:1px solid ${active ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+             background:${active ? 'rgba(99,102,241,.18)' : 'transparent'};
+             color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
+      ${o.label}</button>`;
+  }).join('');
+}
+
+function _etfSetOpFilter(op) {
+  _etfState.filterOp = _etfState.filterOp === op ? 'all' : op;
+  _etfRenderFilters();
+  _etfApplyFilters();
+  // Also toggle summary card highlight
+  const cached = _etfState.cache[_etfState.code];
+  if (cached) _etfRenderCards(cached);
+}
+
+function _etfSetTopFilter(n) {
+  _etfState.filterTop = _etfState.filterTop === n ? 0 : n;
+  _etfRenderFilters();
+  _etfApplyFilters();
+}
+
+function _etfRenderCards(data) {
+  // Re-render just the summary cards without rebuilding the whole page
+  const { summaryCounts = {} } = data;
+  const opCfg = {
+    '新增建倉': { color: '#10b981', icon: '🆕' },
+    '股數加碼': { color: '#38bdf8', icon: '➕' },
+    '股數減碼': { color: '#f59e0b', icon: '➖' },
+    '全數清倉': { color: '#f43f5e', icon: '🔴' },
+  };
+  // cards are inside body — can't re-render individually easily, skip
+}
+
+function _etfApplyFilters() {
+  const tbody = document.getElementById('etf-tbody');
+  const countEl = document.getElementById('etf-filter-count');
+  if (!tbody || !_etfState._allSorted) return;
+
+  const opCfg = {
+    '新增建倉': { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: '🆕' },
+    '股數加碼': { color: '#38bdf8', bg: 'rgba(56,189,248,.10)', icon: '➕' },
+    '股數減碼': { color: '#f59e0b', bg: 'rgba(245,158,11,.10)', icon: '➖' },
+    '全數清倉': { color: '#f43f5e', bg: 'rgba(244,63,94,.10)',  icon: '🔴' },
+    '持有':     { color: '#64748b', bg: 'transparent',          icon: '' },
+  };
+
+  const fmtPct = (v) => {
+    if (v == null || v === 0) return '<span class="muted">—</span>';
+    const sign  = v > 0 ? '+' : '';
+    const color = v > 0 ? 'var(--green)' : 'var(--red)';
+    return `<span style="color:${color}">${sign}${Number(v).toFixed(2)}%</span>`;
+  };
+  const fmtPrice = (v) => v != null ? Number(v).toFixed(2) : '—';
+
+  // Top-N filter operates on weight rank (position in allSorted, within 持有+all)
+  // Rank is based on currentWeightPercent among current holdings (全數清倉 = 0 weight)
+  const ranked = [..._etfState._allSorted]
+    .filter(h => (h.currentWeightPercent ?? 0) > 0)
+    .sort((a, b) => (b.currentWeightPercent || 0) - (a.currentWeightPercent || 0));
+  const topSyms = new Set(
+    _etfState.filterTop > 0 ? ranked.slice(0, _etfState.filterTop).map(h => h.symbol) : []
+  );
+
+  let visible = _etfState._allSorted;
+
+  // Apply op filter
+  if (_etfState.filterOp !== 'all') {
+    visible = visible.filter(h => (h.operationType || '持有') === _etfState.filterOp);
+  }
+
+  // Apply top-N filter (intersect)
+  if (_etfState.filterTop > 0) {
+    visible = visible.filter(h => topSyms.has(h.symbol));
+  }
+
+  // Rank label: weight rank among all current holdings
+  const rankMap = new Map(ranked.map((h, i) => [h.symbol, i + 1]));
+
+  if (countEl) {
+    const total = _etfState._allSorted.length;
+    countEl.textContent = visible.length < total
+      ? `顯示 ${visible.length} / ${total} 檔`
+      : `共 ${total} 檔`;
+  }
+
+  tbody.innerHTML = visible.map(h => {
+    const op  = h.operationType || '持有';
+    const cfg = opCfg[op] || opCfg['持有'];
+    const badge = op !== '持有'
+      ? `<span style="background:${cfg.bg};color:${cfg.color};font-size:11px;font-weight:700;
+                      padding:2px 8px;border-radius:4px;border:1px solid ${cfg.color}">${op}</span>`
+      : `<span style="color:var(--text-muted);font-size:12px">持有</span>`;
+
+    const rank = rankMap.get(h.symbol);
+    const rankCell = rank
+      ? `<span style="color:var(--text-muted);font-size:12px">${rank}</span>`
+      : `<span style="color:var(--text-muted);font-size:12px">—</span>`;
+
+    const sharesStr = h.shares != null ? Number(h.shares).toLocaleString() : '—';
+    const prevSharesStr = (h.prevShares != null && h.prevShares !== h.shares && h.prevShares > 0)
+      ? `<br><span class="muted" style="font-size:11px">前 ${Number(h.prevShares).toLocaleString()}</span>`
+      : '';
+
+    return `<tr style="${op !== '持有' ? `background:${cfg.bg}` : ''}">
+      <td style="text-align:center">${rankCell}</td>
+      <td class="mono" style="font-weight:700">${h.symbol || '—'}</td>
+      <td style="font-weight:600">${h.name || '—'}</td>
+      <td>${badge}</td>
+      <td class="mono" style="text-align:right">${h.currentWeightPercent != null ? h.currentWeightPercent.toFixed(2) + '%' : '—'}</td>
+      <td class="mono" style="text-align:right">${fmtPct(h.weightChangePercent)}</td>
+      <td class="mono" style="text-align:right;line-height:1.3">${sharesStr}${prevSharesStr}</td>
+      <td class="mono" style="text-align:right">${fmtPct(h.sharesChangePercent)}</td>
+      <td class="mono" style="text-align:right">${fmtPrice(h.closingPrice)}</td>
+      <td class="mono" style="text-align:right">${fmtPct(h.priceChangePercent)}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted)">無符合條件的持股</td></tr>`;
 }
