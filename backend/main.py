@@ -1608,10 +1608,16 @@ def stock_table_lookup(q: str = ""):
 # ── ETF Tracking (主動式ETF持股追蹤) ─────────────────────────────────────────
 _etf_tracking_cache: dict = {}   # fund_code → {"date": "YYYY-MM-DD", "data": {...}}
 
-# Map ETF code (user-facing) → ezmoney fundCode query param
-ETF_FUND_MAP: dict[str, str] = {
-    "00981A": "49YTW",
+# ETF config: source type + source-specific params + display name
+ETF_CONFIG: dict[str, dict] = {
+    "00981A": {"source": "ezmoney",     "ezmoney_code": "49YTW",  "name": "00981A 主動統一台股增長"},
+    "00988A": {"source": "ezmoney",     "ezmoney_code": "61YTW",  "name": "00988A 主動統一全球增長"},
+    "00991A": {"source": "fhtrust",     "fhtrust_code": "ETF23",  "name": "00991A 復華台灣未來50"},
+    "00992A": {"source": "capitalfund", "cf_fund_id":   "500",    "name": "00992A 群益台灣科技創新"},
 }
+
+# Keep ETF_FUND_MAP as alias for legacy callers
+ETF_FUND_MAP = {k: v.get("ezmoney_code", k) for k, v in ETF_CONFIG.items()}
 
 
 def _parse_roc_date(s: str) -> str:
@@ -1648,185 +1654,280 @@ def _parse_pct(s) -> float:
         return 0.0
 
 
-def fetch_etf_holdings(fund_code: str) -> dict:
-    """Download ETF holdings Excel from ezmoney.com.tw. Cached per day.
-    Compares with previous day stored in DATA_DIR to derive operation types.
-    """
-    import io as _io
-    import pandas as _pd
-    from datetime import date as _date
+def _etf_raw_from_ezmoney(ezmoney_code: str) -> tuple[dict, dict]:
+    """Download & parse ezmoney Excel. Returns (meta, today_holdings dict)."""
+    import io as _io, pandas as _pd
+    url = f"https://www.ezmoney.com.tw/ETF/Fund/AssetExcelNPOI?fundCode={ezmoney_code}"
+    r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False)
+    r.raise_for_status()
+    df = _pd.read_excel(_io.BytesIO(r.content), sheet_name=0, header=None)
 
-    today_str = _date.today().isoformat()
-
-    # In-memory daily cache
-    cached = _etf_tracking_cache.get(fund_code)
-    if cached and cached.get("date") == today_str:
-        return cached["data"]
-
-    ezmoney_code = ETF_FUND_MAP.get(fund_code.upper())
-    if not ezmoney_code:
-        return {"error": f"Unknown ETF: {fund_code}. Supported: {list(ETF_FUND_MAP)}"}
-
-    history_path = DATA_DIR / f"etf_{fund_code.lower()}_history.json"
-
-    # ── Download Excel ────────────────────────────────────────────────────────
-    try:
-        url = f"https://www.ezmoney.com.tw/ETF/Fund/AssetExcelNPOI?fundCode={ezmoney_code}"
-        r = http_requests.get(
-            url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False
-        )
-        r.raise_for_status()
-    except Exception as e:
-        logger.error(f"[etf] download failed: {e}")
-        # Fall back to last saved data
-        hist = load_json(history_path, {})
-        if hist:
-            last_date = sorted(hist.keys())[-1]
-            data = hist[last_date]
-            data["_stale"] = True
-            data["_cached_date"] = last_date
-            return data
-        return {"error": str(e), "fund_code": fund_code}
-
-    # ── Parse Excel ───────────────────────────────────────────────────────────
-    try:
-        df = _pd.read_excel(_io.BytesIO(r.content), sheet_name=0, header=None)
-    except Exception as e:
-        logger.error(f"[etf] excel parse failed: {e}")
-        return {"error": f"excel_parse: {e}"}
-
-    # Extract header metadata
     date_str = _parse_roc_date(df.iloc[0, 0])
-    aum       = _parse_ntd(df.iloc[3, 1])
-    nav       = _parse_ntd(df.iloc[5, 1])   # 每單位淨值
+    aum      = _parse_ntd(df.iloc[3, 1])
+    nav      = _parse_ntd(df.iloc[5, 1])
 
-    # Find holdings header row ("股票代號")
     header_row = None
     for i, row in df.iterrows():
         if str(row.iloc[0]).strip() == "股票代號":
-            header_row = i
-            break
+            header_row = i; break
     if header_row is None:
-        return {"error": "holdings_header_not_found"}
+        raise ValueError("holdings_header_not_found")
 
-    today_holdings: dict[str, dict] = {}   # symbol → {name, shares, weight}
+    holdings: dict[str, dict] = {}
     for i in range(header_row + 1, len(df)):
         row = df.iloc[i]
         sym = str(row.iloc[0]).replace("*", "").strip()
-        if not sym or sym == "nan":
-            break
-        name   = str(row.iloc[1]).strip()
-        shares = _parse_shares(row.iloc[2])
-        weight = _parse_pct(row.iloc[3])
-        today_holdings[sym] = {"name": name, "shares": shares, "weight": weight}
+        if not sym or sym == "nan": break
+        holdings[sym] = {
+            "name": str(row.iloc[1]).strip(),
+            "shares": _parse_shares(row.iloc[2]),
+            "weight": _parse_pct(row.iloc[3]),
+        }
+    return {"date": date_str, "aum": aum, "nav": nav}, holdings
 
-    # ── Load history & derive operation types ─────────────────────────────────
-    history = load_json(history_path, {})
 
-    # Previous trading day data (last entry before today)
+def _etf_raw_from_fhtrust(fhtrust_code: str) -> tuple[dict, dict]:
+    """Download & parse Franklin Hua-An Trust Excel. Tries today and 3 prior business days."""
+    import io as _io, pandas as _pd
+    from datetime import date as _date, timedelta as _td
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    content = None
+    used_date = ""
+    for delta in range(5):
+        d = _date.today() - _td(days=delta)
+        if d.weekday() >= 5: continue   # skip weekends
+        url = f"https://www.fhtrust.com.tw/api/assetsExcel/{fhtrust_code}/{d.strftime('%Y%m%d')}"
+        try:
+            r = http_requests.get(url, headers=headers, timeout=20, verify=False)
+            if r.status_code == 200 and len(r.content) > 1000:
+                content = r.content; used_date = d.isoformat(); break
+        except Exception:
+            continue
+    if content is None:
+        raise ConnectionError("fhtrust: no data found in last 5 days")
+
+    df = _pd.read_excel(_io.BytesIO(content), sheet_name=0, header=None)
+
+    # Date: row 2 col 0 → '日期: 2026/04/24'
+    raw_date = str(df.iloc[2, 0]).replace("日期:", "").replace("日期：", "").strip()
+    try:
+        parts = raw_date.split("/")
+        date_str = f"{parts[0]}-{parts[1].zfill(2)}-{parts[2].zfill(2)}"
+    except Exception:
+        date_str = used_date
+
+    aum = _parse_ntd(str(df.iloc[4, 0]).replace(",", "").strip())
+    try:
+        nav = float(df.iloc[8, 0])
+    except Exception:
+        nav = None
+
+    # Header at first row where col[0] == '證券代號'
+    header_row = None
+    for i, row in df.iterrows():
+        if str(row.iloc[0]).strip() == "證券代號":
+            header_row = i; break
+    if header_row is None:
+        raise ValueError("fhtrust: holdings_header_not_found")
+
+    holdings: dict[str, dict] = {}
+    for i in range(header_row + 1, len(df)):
+        row = df.iloc[i]
+        sym = str(row.iloc[0]).replace("*", "").strip()
+        if not sym or sym == "nan": break
+        # col2=股數, col4=權重(%) e.g. '14.929%'
+        holdings[sym] = {
+            "name":   str(row.iloc[1]).strip(),
+            "shares": _parse_shares(row.iloc[2]),
+            "weight": _parse_pct(row.iloc[4]),
+        }
+    return {"date": date_str, "aum": aum, "nav": nav}, holdings
+
+
+def _etf_raw_from_capitalfund(cf_fund_id: str) -> tuple[dict, dict]:
+    """Fetch Capital Fund ETF portfolio via JSON API."""
+    url = "https://www.capitalfund.com.tw/CFWeb/api/etf/buyback"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Referer": f"https://www.capitalfund.com.tw/etf/product/detail/{cf_fund_id}/portfolio",
+    }
+    r = http_requests.post(url, json={"fundId": cf_fund_id, "type": "portfolio"},
+                           headers=headers, timeout=20, verify=False)
+    r.raise_for_status()
+    body = r.json()
+    if body.get("code") != 200:
+        raise ValueError(f"capitalfund API error: {body.get('code')}")
+
+    data   = body["data"]
+    pcf    = data.get("pcf", {})
+    stocks = data.get("stocks", [])
+
+    # date2 = "2026-04-24"
+    raw_date = pcf.get("date2", "")
+    try:
+        date_str = raw_date[:10]   # take YYYY-MM-DD
+    except Exception:
+        from datetime import date as _date
+        date_str = _date.today().isoformat()
+
+    aum = pcf.get("nav")           # total AUM (TWD)
+    nav = pcf.get("pUnit")         # per-unit NAV
+
+    holdings: dict[str, dict] = {}
+    for s in stocks:
+        sym = str(s.get("stocNo", "")).strip()
+        if not sym: continue
+        holdings[sym] = {
+            "name":   str(s.get("stocName", "")).strip(),
+            "shares": int(s.get("share", 0) or 0),
+            "weight": float(s.get("weightRound") or s.get("weight") or 0),
+        }
+    return {"date": date_str, "aum": aum, "nav": nav}, holdings
+
+
+def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
+                         history: dict) -> dict:
+    """Compare today vs previous day, enrich with prices, return full data dict."""
+    date_str = meta["date"]
+
+    # Previous trading day (latest history entry before today)
     prev_date = None
     prev_holdings: dict[str, dict] = {}
+    prev_aum: float | None = None
     for d in sorted(history.keys(), reverse=True):
         if d < date_str:
             prev_date = d
             prev_holdings = {h["symbol"]: h for h in history[d].get("holdings_raw", [])}
+            prev_aum = history[d].get("aum")
             break
 
-    # Build enriched holdings with operationType
+    # Build enriched holdings
     holdings = []
-    all_syms = set(today_holdings) | set(prev_holdings)
-
-    for sym in all_syms:
+    for sym in set(today_holdings) | set(prev_holdings):
         today = today_holdings.get(sym)
         prev  = prev_holdings.get(sym)
 
-        if today and not prev:
-            op_type = "新增建倉"
-        elif prev and not today:
-            op_type = "全數清倉"
+        if today and not prev:      op_type = "新增建倉"
+        elif prev and not today:    op_type = "全數清倉"
         else:
-            t_sh = today["shares"]
-            p_sh = prev.get("shares", 0)
-            if t_sh > p_sh:
-                op_type = "股數加碼"
-            elif t_sh < p_sh:
-                op_type = "股數減碼"
-            else:
-                op_type = "持有"
+            t_sh, p_sh = today["shares"], prev.get("shares", 0)
+            op_type = "股數加碼" if t_sh > p_sh else "股數減碼" if t_sh < p_sh else "持有"
 
         if today:
-            cur_w    = today["weight"]
-            prev_w   = prev["weight"] if prev else 0.0
-            cur_sh   = today["shares"]
-            prev_sh  = prev.get("shares", 0) if prev else 0
-            sh_chg_p = round((cur_sh - prev_sh) / prev_sh * 100, 2) if prev_sh else 0.0
-            w_chg    = round(cur_w - prev_w, 2)
+            cur_sh  = today["shares"]
+            prev_sh = prev.get("shares", 0) if prev else 0
+            cur_w   = today["weight"]
+            prev_w  = prev.get("weight", 0.0) if prev else 0.0
             holdings.append({
                 "symbol":              sym,
                 "name":                today["name"],
                 "operationType":       op_type,
                 "shares":              cur_sh,
                 "prevShares":          prev_sh,
-                "sharesChangePercent": sh_chg_p,
-                "currentWeightPercent":cur_w,
-                "weightChangePercent": w_chg,
+                "sharesChangePercent": round((cur_sh - prev_sh) / prev_sh * 100, 2) if prev_sh else 0.0,
+                "currentWeightPercent": cur_w,
+                "weightChangePercent": round(cur_w - prev_w, 2),
             })
-        else:
-            # 全數清倉 — symbol only in prev
-            p_sh  = prev.get("shares", 0)
-            p_name = prev.get("name", sym)
+        else:  # 全數清倉
+            p_sh = prev.get("shares", 0)
             holdings.append({
                 "symbol":              sym,
-                "name":                p_name,
+                "name":                prev.get("name", sym),
                 "operationType":       "全數清倉",
                 "shares":              0,
                 "prevShares":          p_sh,
                 "sharesChangePercent": -100.0,
-                "currentWeightPercent":0.0,
+                "currentWeightPercent": 0.0,
                 "weightChangePercent": -prev.get("weight", 0.0),
             })
 
-    # ── Fetch live stock prices from MIS ──────────────────────────────────────
-    live_syms = [s for s in today_holdings]   # only current holdings need price
+    # Fetch live prices from MIS (current holdings only)
+    live_syms = [s for s in today_holdings]
     try:
         mis_prices = fetch_tw_prices_mis(live_syms) if live_syms else {}
     except Exception:
         mis_prices = {}
-
     for h in holdings:
         mp = mis_prices.get(h["symbol"], {})
-        h["closingPrice"]      = mp.get("price")
+        h["closingPrice"]       = mp.get("price")
         h["priceChangePercent"] = mp.get("change_pct")
 
     # Summary counts
     op_counts = {"新增建倉": 0, "股數加碼": 0, "股數減碼": 0, "全數清倉": 0}
     for h in holdings:
-        op = h["operationType"]
-        if op in op_counts:
-            op_counts[op] += 1
+        if h["operationType"] in op_counts:
+            op_counts[h["operationType"]] += 1
 
-    # ETF name: derive from fund_code + known mapping
-    etf_names = {"00981A": "00981A 主動統一台股增長"}
-    fund_name = etf_names.get(fund_code, fund_code)
+    # AUM change
+    aum = meta.get("aum")
+    aum_change = round(aum - prev_aum, 0) if (aum and prev_aum) else None
 
-    data = {
-        "fundName":     fund_name,
+    return {
+        "fundName":     ETF_CONFIG.get(fund_code, {}).get("name", fund_code),
         "aum":          aum,
-        "nav":          nav,
+        "aumChange":    aum_change,
+        "prevAum":      prev_aum,
+        "nav":          meta.get("nav"),
         "date":         date_str,
         "prevDate":     prev_date,
         "holdings":     holdings,
         "summaryCounts": op_counts,
     }
 
-    # ── Persist today's raw holdings for future comparison ────────────────────
-    history[date_str] = {
+
+def fetch_etf_holdings(fund_code: str) -> dict:
+    """Fetch ETF holdings from the appropriate source. Cached per calendar day."""
+    from datetime import date as _date
+    today_str = _date.today().isoformat()
+
+    cached = _etf_tracking_cache.get(fund_code)
+    if cached and cached.get("date") == today_str:
+        return cached["data"]
+
+    cfg = ETF_CONFIG.get(fund_code.upper())
+    if not cfg:
+        return {"error": f"Unknown ETF: {fund_code}. Supported: {list(ETF_CONFIG)}"}
+
+    history_path = DATA_DIR / f"etf_{fund_code.lower()}_history.json"
+
+    # ── Fetch raw data from source ────────────────────────────────────────────
+    try:
+        source = cfg["source"]
+        if source == "ezmoney":
+            meta, today_holdings = _etf_raw_from_ezmoney(cfg["ezmoney_code"])
+        elif source == "fhtrust":
+            meta, today_holdings = _etf_raw_from_fhtrust(cfg["fhtrust_code"])
+        elif source == "capitalfund":
+            meta, today_holdings = _etf_raw_from_capitalfund(cfg["cf_fund_id"])
+        else:
+            return {"error": f"Unknown source: {source}"}
+    except Exception as e:
+        logger.error(f"[etf] {fund_code} fetch error: {e}")
+        # Return stale history
+        hist = load_json(history_path, {})
+        if hist:
+            last_date = sorted(hist.keys())[-1]
+            stale = hist[last_date].get("_full_data", {})
+            if stale:
+                stale["_stale"] = True; stale["_cached_date"] = last_date
+                return stale
+        return {"error": str(e), "fund_code": fund_code}
+
+    history = load_json(history_path, {})
+    data    = _etf_build_enriched(fund_code, meta, today_holdings, history)
+
+    # ── Persist today for future comparisons ─────────────────────────────────
+    history[meta["date"]] = {
+        "aum": meta.get("aum"),
         "holdings_raw": [
             {"symbol": sym, "name": v["name"], "shares": v["shares"], "weight": v["weight"]}
             for sym, v in today_holdings.items()
-        ]
+        ],
+        "_full_data": data,   # stale fallback
     }
-    # Keep only last 30 days
     for old in sorted(history.keys())[:-30]:
         del history[old]
     save_json(history_path, history)
@@ -1846,8 +1947,8 @@ def get_etf_tracking(code: str = "00981A", force: bool = False):
 
 @app.get("/api/etf-list")
 def get_etf_list():
-    """Return the list of tracked ETF codes."""
-    return {"etfs": list(ETF_FUND_MAP.keys())}
+    """Return the list of tracked ETF codes with display names."""
+    return {"etfs": [{"code": k, "name": v["name"]} for k, v in ETF_CONFIG.items()]}
 
 
 @app.get("/api/important-info")

@@ -2399,9 +2399,9 @@ function _renderFscTable(data) {
 // ══ ETF追蹤 ════════════════════════════════════════════════════════════════
 
 const _etfState = {
-  code: '00981A', list: ['00981A'], cache: {},
-  filterOp: 'all',   // 'all' | '新增建倉' | '股數加碼' | '股數減碼' | '全數清倉'
-  filterTop: 0,       // 0 = 全部, N = 前N大
+  code: '00981A', list: [], cache: {},
+  filterOp: 'all',
+  filterTop: 0,
 };
 
 async function renderEtfPage(force = false) {
@@ -2410,30 +2410,31 @@ async function renderEtfPage(force = false) {
   const tabBar = document.getElementById('etf-tab-bar');
   if (!body) return;
 
-  // Load ETF list once
-  if (_etfState.list.length <= 1) {
+  // Load ETF list once (now returns [{code, name}])
+  if (_etfState.list.length === 0) {
     try {
       const listRes = await api('/api/etf-list');
       if (listRes.etfs?.length) _etfState.list = listRes.etfs;
     } catch (_) {}
+    if (_etfState.list.length === 0) _etfState.list = [{ code: '00981A', name: '00981A 主動統一台股增長' }];
   }
 
   // Render tab bar
   if (tabBar) {
-    tabBar.innerHTML = _etfState.list.map(c => `
-      <button onclick="_etfSwitchTab('${c}')"
-        style="padding:4px 12px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;
-               border:1px solid ${c === _etfState.code ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
-               background:${c === _etfState.code ? 'rgba(99,102,241,.15)' : 'transparent'};
-               color:${c === _etfState.code ? 'var(--primary-2)' : 'var(--text-muted)'}">
-        ${c}
+    tabBar.innerHTML = _etfState.list.map(e => `
+      <button onclick="_etfSwitchTab('${e.code}')"
+        style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+               border:1px solid ${e.code === _etfState.code ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+               background:${e.code === _etfState.code ? 'rgba(99,102,241,.15)' : 'transparent'};
+               color:${e.code === _etfState.code ? 'var(--primary-2)' : 'var(--text-muted)'}">
+        ${e.code}
       </button>`).join('');
   }
 
   const cached = _etfState.cache[_etfState.code];
   if (!force && cached) { _etfRender(cached); return; }
 
-  body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 正在抓取最新持股資料（約需 10–20 秒）…</div>';
+  body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 正在下載持股資料…</div>';
   if (subEl) subEl.textContent = '主動式ETF每日持股變化';
 
   try {
@@ -2461,17 +2462,26 @@ function _etfRender(data) {
   if (!body) return;
 
   const {
-    fundName = '—', aum, nav, date = '—', prevDate,
+    fundName = '—', aum, aumChange, prevAum, nav, date = '—', prevDate,
     holdings = [], summaryCounts = {}, _stale, _cached_date
   } = data;
 
+  // ── Meta bar ──────────────────────────────────────────────────────────────
   const aumFmt  = aum ? `${(aum / 1e8).toFixed(2)} 億` : '—';
-  const navFmt  = nav ? `NAV ${nav.toFixed(2)}` : '';
+  const navFmt  = nav != null ? nav.toFixed(2) : '—';
+
+  let aumChgHtml = '';
+  if (aumChange != null) {
+    const sign  = aumChange >= 0 ? '+' : '';
+    const color = aumChange >= 0 ? 'var(--green)' : 'var(--red)';
+    aumChgHtml = `<span style="color:${color};font-size:12px;margin-left:4px">${sign}${(aumChange / 1e8).toFixed(2)} 億</span>`;
+  }
+
   const staleNote = _stale
     ? `<span style="color:var(--text-muted);font-size:11px"> (快取 ${_cached_date})</span>` : '';
   const compNote  = prevDate
     ? `<span style="font-size:12px;color:var(--text-muted)">　vs ${prevDate}</span>` : '';
-  if (subEl) subEl.textContent = `${date}　規模：${aumFmt}　${navFmt}`;
+  if (subEl) subEl.textContent = `${date}　規模：${aumFmt}`;
 
   const opCfg = {
     '新增建倉': { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: '🆕' },
@@ -2508,36 +2518,56 @@ function _etfRender(data) {
   }).join('');
 
   const noCompNote = !prevDate
-    ? `<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);
-                  border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#f59e0b">
+    ? `<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35);
+                  border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:#f59e0b">
         ⚠️ 無前一日資料可比對，操作類型全部顯示為「持有」。明日起將自動顯示買賣變化。
       </div>` : '';
 
   body.innerHTML = `
-    <div style="margin-bottom:14px">
-      <div style="font-size:15px;font-weight:700;margin-bottom:10px">
-        ${fundName}${staleNote}${compNote}
+    <!-- Fund header -->
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:15px;font-weight:700;margin-bottom:6px">${fundName}${staleNote}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
+                      padding:8px 14px;min-width:110px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">規模</div>
+            <div style="font-size:14px;font-weight:700">${aumFmt}${aumChgHtml}</div>
+          </div>
+          <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
+                      padding:8px 14px;min-width:80px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">淨值</div>
+            <div style="font-size:14px;font-weight:700">${navFmt}</div>
+          </div>
+          <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
+                      padding:8px 14px;min-width:80px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">資料日期</div>
+            <div style="font-size:13px;font-weight:600">${date}${compNote}</div>
+          </div>
+        </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">${cardHtml}</div>
     </div>
     ${noCompNote}
     <div id="etf-filter-bar" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-          margin-bottom:12px;padding:10px 14px;background:var(--panel-bg);
+          margin-bottom:12px;padding:8px 14px;background:var(--panel-bg);
           border:1px solid var(--border);border-radius:10px">
-      <span style="font-size:12px;color:var(--text-muted);font-weight:600">篩選</span>
-      <div id="etf-op-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-      <div style="width:1px;height:20px;background:var(--border);margin:0 4px"></div>
-      <span style="font-size:12px;color:var(--text-muted);font-weight:600">占比排名</span>
-      <div id="etf-top-btns" style="display:flex;gap:6px"></div>
-      <span id="etf-filter-count" style="margin-left:auto;font-size:12px;color:var(--text-muted)"></span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600">篩選</span>
+      <div id="etf-op-btns" style="display:flex;gap:5px;flex-wrap:wrap"></div>
+      <div style="width:1px;height:18px;background:var(--border);margin:0 2px"></div>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600">權重排名</span>
+      <div id="etf-top-btns" style="display:flex;gap:5px"></div>
+      <span id="etf-filter-count" style="margin-left:auto;font-size:11px;color:var(--text-muted)"></span>
     </div>
     ${holdings.length === 0 ? '<div class="empty-state">尚無持股資料</div>' : `
     <div class="panel" style="overflow-x:auto">
-      <table class="data-table" style="min-width:720px">
+      <table class="data-table" style="min-width:680px">
         <thead><tr>
-          <th>#</th><th>代號</th><th>名稱</th><th>操作</th>
-          <th style="text-align:right">占比</th>
-          <th style="text-align:right">占比增減</th>
+          <th style="text-align:center;width:36px">#</th>
+          <th>標的</th>
+          <th>操作</th>
+          <th style="text-align:right">權重</th>
+          <th style="text-align:right">權重增減</th>
           <th style="text-align:right">持股數</th>
           <th style="text-align:right">股數增減%</th>
           <th style="text-align:right">收盤價</th>
@@ -2687,21 +2717,33 @@ function _etfApplyFilters() {
       : `<span style="color:var(--text-muted);font-size:12px">—</span>`;
 
     const sharesStr = h.shares != null ? Number(h.shares).toLocaleString() : '—';
-    const prevSharesStr = (h.prevShares != null && h.prevShares !== h.shares && h.prevShares > 0)
-      ? `<br><span class="muted" style="font-size:11px">前 ${Number(h.prevShares).toLocaleString()}</span>`
+    const prevSharesNote = (h.prevShares != null && h.prevShares !== h.shares && h.prevShares > 0)
+      ? `<div style="font-size:10px;color:var(--text-muted);margin-top:1px">前 ${Number(h.prevShares).toLocaleString()}</div>`
+      : '';
+
+    const wPct = h.currentWeightPercent;
+    const wBar = wPct > 0
+      ? `<div style="height:3px;border-radius:2px;background:${cfg.color};opacity:.5;
+                     width:${Math.min(wPct * 6, 100)}%;margin-top:3px"></div>`
       : '';
 
     return `<tr style="${op !== '持有' ? `background:${cfg.bg}` : ''}">
-      <td style="text-align:center">${rankCell}</td>
-      <td class="mono" style="font-weight:700">${h.symbol || '—'}</td>
-      <td style="font-weight:600">${h.name || '—'}</td>
-      <td>${badge}</td>
-      <td class="mono" style="text-align:right">${h.currentWeightPercent != null ? h.currentWeightPercent.toFixed(2) + '%' : '—'}</td>
+      <td style="text-align:center;color:var(--text-muted);font-size:12px">${rankCell}</td>
+      <td style="line-height:1.3;padding:8px 10px">
+        <div class="mono" style="font-weight:700;font-size:13px;color:var(--text)">${h.symbol || '—'}</div>
+        <div style="font-size:11px;color:var(--text-muted)">${h.name || ''}</div>
+      </td>
+      <td style="white-space:nowrap">${badge}</td>
+      <td class="mono" style="text-align:right">
+        ${wPct != null ? `<div style="font-weight:600">${wPct.toFixed(2)}%</div>${wBar}` : '—'}
+      </td>
       <td class="mono" style="text-align:right">${fmtPct(h.weightChangePercent)}</td>
-      <td class="mono" style="text-align:right;line-height:1.3">${sharesStr}${prevSharesStr}</td>
+      <td class="mono" style="text-align:right;font-size:12px">
+        <div>${sharesStr}</div>${prevSharesNote}
+      </td>
       <td class="mono" style="text-align:right">${fmtPct(h.sharesChangePercent)}</td>
-      <td class="mono" style="text-align:right">${fmtPrice(h.closingPrice)}</td>
+      <td class="mono" style="text-align:right;font-weight:600">${fmtPrice(h.closingPrice)}</td>
       <td class="mono" style="text-align:right">${fmtPct(h.priceChangePercent)}</td>
     </tr>`;
-  }).join('') || `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted)">無符合條件的持股</td></tr>`;
+  }).join('') || `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted)">無符合條件的持股</td></tr>`;
 }
