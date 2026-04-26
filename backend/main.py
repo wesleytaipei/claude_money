@@ -1008,10 +1008,46 @@ def get_portfolio():
     return load_json(CONFIG_FILE, {"assets": [], "liabilities": [], "investments": []})
 
 
+def _gist_push_portfolio():
+    """Push only alm_config.json to Gist after any portfolio edit (e.g. star toggle, position save).
+    Stamps _last_modified so the other instance picks it up on next startup sync."""
+    if not GIST_ENABLED:
+        return
+    ts = _now_iso()
+    try:
+        with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        data[_TS_KEY] = ts
+        content = json.dumps(data, ensure_ascii=False, indent=2)
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            f.write(content)
+    except Exception as e:
+        logger.error(f"[Gist] portfolio push prepare error: {e}")
+        return
+
+    def _push():
+        try:
+            r = http_requests.patch(
+                f"https://api.github.com/gists/{GIST_ID}",
+                headers=_gist_headers(),
+                json={"files": {CONFIG_FILE.name: {"content": content}}},
+                timeout=15,
+            )
+            if r.status_code == 200:
+                logger.info(f"[Gist] portfolio push OK ts={ts}")
+            else:
+                logger.error(f"[Gist] portfolio push error: {r.status_code}")
+        except Exception as e:
+            logger.error(f"[Gist] portfolio push exception: {e}")
+
+    _threading.Thread(target=_push, daemon=True).start()
+
+
 @app.post("/api/portfolio")
 async def post_portfolio(request: Request):
     data = await request.json()
     save_json(CONFIG_FILE, data)
+    _gist_push_portfolio()
     return {"ok": True}
 
 
