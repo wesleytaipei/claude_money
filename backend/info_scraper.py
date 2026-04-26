@@ -13,7 +13,8 @@ CACHE_TTL = 300 # 5 minutes cache
 _info_cache = {"ts": 0, "data": {}}
 
 FIRECRAWL_API_KEY = "fc-d6d780def05343a5b032c3d22e89e15d"
-_margin_ratio_cache = {"ts": 0, "data": None}  # daily data — cache 6 hours
+_margin_ratio_cache = {"ts": 0, "data": None}       # daily data — cache 6 hours
+_tpex_margin_ratio_cache = {"ts": 0, "data": None}  # daily data — cache 6 hours
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -360,47 +361,213 @@ def fetch_macromicro_metric(url):
 
 def fetch_taiex_margin_ratio():
     """
-    Fetch 台股大盤融資維持率 from MacroMicro via Firecrawl stealth proxy.
-    Cached for 6 hours — TWSE publishes this daily after market close.
+    Compute 台股大盤融資維持率 directly from TWSE OpenAPI — no third-party dependency.
+
+    融資維持率 = 擔保品市值 / 融資債務 × 100%
+               = Σ(融資餘額_千股 × 收盤價) / 融資金額_仟元 × 100%
+
+    Data sources (all free TWSE public APIs):
+      - openapi.twse.com.tw/v1/exchangeReport/MI_MARGN   → per-stock margin lots
+      - openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL → per-stock closing price
+      - twse.com.tw/rwd/zh/marginTrading/MI_MARGN?selectType=MS → total debt (仟元)
+
+    Cached for 6 hours (TWSE publishes after-hours data daily).
     """
     global _margin_ratio_cache
     now = time.time()
     if _margin_ratio_cache["data"] and (now - _margin_ratio_cache["ts"]) < 21600:
         return _margin_ratio_cache["data"]
+
+    ua = HEADERS
     try:
-        payload = {
-            "url": "https://www.macromicro.me/charts/53117/taiwan-taiex-maintenance-margin",
-            "formats": ["json"],
-            "jsonOptions": {
-                "prompt": (
-                    "Extract the current value and previous value of 融資維持率. "
-                    "Return {\"current\": float_without_percent, \"prev\": float_without_percent}"
-                )
-            },
-            "waitFor": 8000,
-            "proxy": "stealth",
-        }
-        r = requests.post(
-            "https://api.firecrawl.dev/v1/scrape",
-            json=payload,
-            headers={"Authorization": f"Bearer {FIRECRAWL_API_KEY}"},
-            timeout=60,
+        # ── 1. Per-stock margin positions (in 千股 / lots) ────────────────────
+        r_margin = requests.get(
+            "https://openapi.twse.com.tw/v1/exchangeReport/MI_MARGN",
+            headers=ua, timeout=20, verify=False
         )
-        j = r.json()
-        if j.get("success"):
-            data_json = j.get("data", {}).get("json", {})
-            curr = data_json.get("current")
-            prev = data_json.get("prev")
-            if curr is not None:
-                result = {"current": float(curr), "prev": float(prev) if prev is not None else None}
-                _margin_ratio_cache = {"ts": now, "data": result}
-                return result
+        margin_list = r_margin.json()  # [{股票代號, 融資今日餘額, ...}, ...]
+
+        # ── 2. Per-stock closing prices ───────────────────────────────────────
+        r_prices = requests.get(
+            "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+            headers=ua, timeout=20, verify=False
+        )
+        price_map = {}
+        for item in r_prices.json():
+            code = str(item.get("Code", "")).strip()
+            try:
+                p = float(str(item.get("ClosingPrice", "") or "").replace(",", ""))
+                if p > 0:
+                    price_map[code] = p
+            except Exception:
+                pass
+
+        # ── 3. Total margin debt (仟元) from summary ──────────────────────────
+        r_sum = requests.get(
+            "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN",
+            params={"response": "json", "selectType": "MS"},
+            headers=ua, timeout=15, verify=False
+        )
+        total_debt_kt = 0.0
+        for table in r_sum.json().get("tables", []):
+            for row in table.get("data", []):
+                if "融資金額" in str(row[0]):
+                    # fields: 項目|買進|賣出|現金(券)償還|前日餘額|今日餘額
+                    total_debt_kt = float(str(row[5]).replace(",", ""))  # index 5 = 今日餘額
+                    break
+
+        if total_debt_kt <= 0:
+            raise ValueError("Could not read total margin debt from TWSE")
+
+        # ── 4. Compute collateral value (仟元) ────────────────────────────────
+        # 融資今日餘額 unit = 千股 (lots); price unit = NTD/share
+        # collateral_千元 = Σ (lots × 1000 shares × price) / 1000 = Σ (lots × price)
+        collateral_kt = 0.0
+        for item in margin_list:
+            code = str(item.get("股票代號", "")).strip()
+            try:
+                lots = float(str(item.get("融資今日餘額", "0") or "0").replace(",", ""))
+            except Exception:
+                lots = 0.0
+            if lots <= 0:
+                continue
+            price = price_map.get(code)
+            if price:
+                collateral_kt += lots * price
+
+        # ── 5. Ratio ──────────────────────────────────────────────────────────
+        ratio = collateral_kt / total_debt_kt * 100.0
+        result = {"current": round(ratio, 2), "prev": None}
+        _margin_ratio_cache = {"ts": now, "data": result}
+        return result
+
     except Exception as e:
-        print(f"Error fetching taiex margin ratio: {e}")
+        print(f"Error computing taiex margin ratio: {e}")
+
     # Return stale cache if available
     if _margin_ratio_cache["data"]:
         return _margin_ratio_cache["data"]
     return {"current": None, "prev": None}
+
+
+def fetch_tpex_margin_ratio():
+    """
+    Compute 上櫃融資維持率 from TPEX APIs — no third-party dependency.
+
+    上櫃融資維持率 = Σ(資餘額_張 × 收盤價) / 融資金額_仟元 × 100%
+
+    1 張 = 1000 shares; price = NTD/share
+    → collateral_仟元 = Σ(lots_張 × price)   [same unit math as TWSE 千股 × price]
+
+    Data sources:
+      - tpex.org.tw/web/stock/margin_trading/margin_balance/margin_bal_result.php
+          → per-stock lots (row[6] = 資餘額 in 張) + summary total debt
+      - tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes
+          → per-stock closing prices (SecuritiesCompanyCode, Close)
+
+    Cached for 6 hours.
+    """
+    global _tpex_margin_ratio_cache
+    now = time.time()
+    if _tpex_margin_ratio_cache["data"] and (now - _tpex_margin_ratio_cache["ts"]) < 21600:
+        return _tpex_margin_ratio_cache["data"]
+
+    import json as _json
+    ua = HEADERS
+    try:
+        # ── 1. Per-stock margin positions + total debt ────────────────────────
+        r_margin = requests.get(
+            "https://www.tpex.org.tw/web/stock/margin_trading/margin_balance/margin_bal_result.php",
+            params={"l": "zh-tw", "o": "json", "s": "0,asc"},
+            headers=ua, timeout=20, verify=False
+        )
+        try:
+            raw = r_margin.content.decode("cp950", errors="replace")
+        except Exception:
+            raw = r_margin.text
+        margin_data = _json.loads(raw)
+        tables = margin_data.get("tables", [])
+        if not tables:
+            raise ValueError("TPEX margin_bal_result: empty tables")
+
+        margin_rows = tables[0].get("data", [])
+        summary = tables[0].get("summary", [])
+
+        # summary[1][6] = 融資金額 今日餘額 (仟元)
+        if len(summary) < 2 or len(summary[1]) < 7:
+            raise ValueError(f"TPEX summary format unexpected: {summary}")
+        total_debt_kt = float(str(summary[1][6]).replace(",", ""))
+        if total_debt_kt <= 0:
+            raise ValueError("TPEX total margin debt is 0 or missing")
+
+        # ── 2. TPEX closing prices ────────────────────────────────────────────
+        r_prices = requests.get(
+            "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
+            headers=ua, timeout=20, verify=False
+        )
+        price_map = {}
+        for item in r_prices.json():
+            code = str(item.get("SecuritiesCompanyCode", "")).strip()
+            try:
+                p = float(str(item.get("Close", "") or "").replace(",", ""))
+                if p > 0:
+                    price_map[code] = p
+            except Exception:
+                pass
+
+        # ── 3. Collateral value (仟元) ────────────────────────────────────────
+        # row[0]=代號, row[6]=資餘額(張); collateral_仟元 = Σ(lots_張 × price)
+        collateral_kt = 0.0
+        for row in margin_rows:
+            if len(row) < 7:
+                continue
+            code = str(row[0]).strip()
+            try:
+                lots = float(str(row[6]).replace(",", ""))
+            except Exception:
+                lots = 0.0
+            if lots <= 0:
+                continue
+            price = price_map.get(code)
+            if price:
+                collateral_kt += lots * price
+
+        # ── 4. Ratio ──────────────────────────────────────────────────────────
+        ratio = collateral_kt / total_debt_kt * 100.0
+        result = {"current": round(ratio, 2), "prev": None}
+        _tpex_margin_ratio_cache = {"ts": now, "data": result}
+        return result
+
+    except Exception as e:
+        print(f"Error computing TPEX margin ratio: {e}")
+
+    if _tpex_margin_ratio_cache["data"]:
+        return _tpex_margin_ratio_cache["data"]
+    return {"current": None, "prev": None}
+
+
+def _fetch_wtx():
+    """Fetch WTX 台指期 — Yahoo TW HTML first, fallback to ^TWII spot via yfinance."""
+    # 1. Try existing Yahoo TW scraper
+    result = fetch_yahoo_future("WTX%26")
+    if result.get("price") not in ("-", None):
+        return result
+    # 2. Fallback: yfinance TAIEX spot index (^TWII) as proxy
+    try:
+        tk = yf.Ticker("^TWII").fast_info
+        price = round(float(tk.last_price or 0), 0)
+        prev  = round(float(tk.previous_close or 0), 0)
+        if price > 1000:
+            change = round(price - prev, 0)
+            pct    = round((change / prev) * 100, 2) if prev else 0
+            return {
+                "price":      str(int(price)),
+                "change":     f"+{int(change)}" if change > 0 else str(int(change)),
+                "change_pct": f"{pct}%",
+            }
+    except Exception as e:
+        print(f"[WTX fallback ^TWII] {e}")
+    return {"price": "-", "change": "-", "change_pct": "-"}
 
 
 def scrape_important_info(force=False):
@@ -412,22 +579,24 @@ def scrape_important_info(force=False):
 
     # Fetch all data concurrently
     with ThreadPoolExecutor(max_workers=10) as executor:
-        f_us10y      = executor.submit(fetch_yf_metric, "^TNX")
+        f_us10y       = executor.submit(fetch_yf_metric, "^TNX")
         f_taiex_ratio = executor.submit(fetch_taiex_margin_ratio)
-        f_brent      = executor.submit(fetch_yf_metric, "BZ=F")
-        f_wtx        = executor.submit(fetch_yahoo_future, "WTX%26")
-        f_twncon     = executor.submit(fetch_cnyes_twncon)
-        f_tsm        = executor.submit(fetch_tsm_adr)
-        f_margin_tse = executor.submit(fetch_twse_margin)
-        f_margin_otc = executor.submit(fetch_tpex_margin)
+        f_tpex_ratio  = executor.submit(fetch_tpex_margin_ratio)
+        f_brent       = executor.submit(fetch_yf_metric, "BZ=F")
+        f_wtx         = executor.submit(_fetch_wtx)
+        f_twncon      = executor.submit(fetch_cnyes_twncon)
+        f_tsm         = executor.submit(fetch_tsm_adr)
+        f_margin_tse  = executor.submit(fetch_twse_margin)
+        f_margin_otc  = executor.submit(fetch_tpex_margin)
 
         data = {
-            "us_10y_bond":       f_us10y.result(),
+            "us_10y_bond":        f_us10y.result(),
             "taiex_margin_ratio": f_taiex_ratio.result(),
-            "brent":             f_brent.result(),
-            "wtx":               f_wtx.result(),
-            "twncon":            f_twncon.result(),
-            "tsm_adr":           f_tsm.result(),
+            "tpex_margin_ratio":  f_tpex_ratio.result(),
+            "brent":              f_brent.result(),
+            "wtx":                f_wtx.result(),
+            "twncon":             f_twncon.result(),
+            "tsm_adr":            f_tsm.result(),
             "margin_balance_tse": f_margin_tse.result(),
             "margin_balance_otc": f_margin_otc.result(),
         }

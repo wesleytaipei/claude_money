@@ -964,6 +964,37 @@ function renderInvestmentsPage() {
         alertMap[sc].push(`近期核准${r.kind}: ${r.name} (${r.eff_date})`);
       }
     }
+
+    // ── ETF追蹤 cross-reference ──────────────────────────────────────────
+    const _opShort = { '新增建倉': '新增建倉', '股數加碼': '加碼', '股數減碼': '減碼', '全數清倉': '清倉' };
+    for (const etfCode of _etfFocusCodes) {
+      const etfData = _etfState.cache[etfCode];
+      if (!etfData?.holdings) continue;
+      const ranked = [...etfData.holdings]
+        .filter(h => (h.currentWeightPercent ?? 0) > 0)
+        .sort((a, b) => (b.currentWeightPercent || 0) - (a.currentWeightPercent || 0));
+      const top10  = new Set(ranked.slice(0, 10).map(h => h.symbol));
+      const rankOf = new Map(ranked.map((h, i) => [h.symbol, i + 1]));
+      for (const h of etfData.holdings) {
+        const parts = [];
+        if (top10.has(h.symbol)) parts.push(`TOP${rankOf.get(h.symbol)}`);
+        const opS = _opShort[h.operationType];
+        if (opS) parts.push(opS);
+        if (!parts.length) continue;
+        if (!alertMap[h.symbol]) alertMap[h.symbol] = [];
+        alertMap[h.symbol].push(`[${etfCode}] ${parts.join(' ')}`);
+      }
+    }
+
+    // ── 重要資訊 cross-reference: TSM ADR → 2330 ─────────────────────────
+    if (_importantCache.data) {
+      const tsm = _importantCache.data.tsm_adr;
+      if (tsm?.price && tsm.price !== '-') {
+        const dir = String(tsm.change || '').startsWith('+') ? '▲' : '▼';
+        if (!alertMap['2330']) alertMap['2330'] = [];
+        alertMap['2330'].push(`TSM ADR ${dir} ${tsm.change_pct}`);
+      }
+    }
   }
   document.getElementById('inv-thead').innerHTML =
     '<tr>' + headers.map((h, i) => `<th class="${i >= numFromIdx ? 'num' : ''}">${h}</th>`).join('') + '<th></th></tr>';
@@ -2088,7 +2119,7 @@ function _importantChangeColor(val) {
 }
 
 const _importantCache = { ts: 0, data: null };
-const IMPORTANT_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 hours in ms
+const IMPORTANT_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function renderImportantInfo(force = false) {
   const tbody = document.getElementById('important-tbody');
@@ -2144,8 +2175,18 @@ async function renderImportantInfo(force = false) {
         sub: o => `${Number(o.increase) >= 0 ? '+' : ''}${o.increase} 億`,
         changeKey: 'increase' },
 
-      { name: '🇹🇼 台股大盤融資維持率', src: 'MacroMicro',
+      { name: '🇹🇼 上市融資維持率', src: 'TWSE',
         metric: data.taiex_margin_ratio,
+        fmt: o => `${o.current}%`,
+        sub: o => {
+          const chg = o.prev != null ? Math.round((o.current - o.prev) * 100) / 100 : null;
+          const sign = chg != null ? (chg >= 0 ? '+' : '') : '';
+          return o.prev != null ? `${o.prev}% (${sign}${chg}%)` : '—';
+        },
+        colorFn: o => o.current - o.prev },
+
+      { name: '🇹🇼 上櫃融資維持率', src: 'TPEX',
+        metric: data.tpex_margin_ratio,
         fmt: o => `${o.current}%`,
         sub: o => {
           const chg = o.prev != null ? Math.round((o.current - o.prev) * 100) / 100 : null;
@@ -2398,11 +2439,30 @@ function _renderFscTable(data) {
 
 // ══ ETF追蹤 ════════════════════════════════════════════════════════════════
 
+/** Format a price-change % with 漲停/跌停 background highlight (matches cell-limit-up/down CSS). */
+function _fmtPctLimit(v) {
+  if (v == null) return '<span class="muted">—</span>';
+  const isUp = v >= 9.8, isDn = v <= -9.8;
+  const sign = v > 0 ? '+' : '';
+  const txt  = `${sign}${Number(v).toFixed(2)}%`;
+  if (isUp)
+    return `<span style="background:rgba(16,185,129,.15);color:#34d399;font-weight:700;
+                         padding:2px 6px;border-radius:4px;display:inline-block">${txt}</span>`;
+  if (isDn)
+    return `<span style="background:rgba(220,38,38,.20);color:#fb7185;font-weight:700;
+                         padding:2px 6px;border-radius:4px;display:inline-block">${txt}</span>`;
+  const color = v > 0 ? 'var(--green)' : 'var(--red)';
+  return `<span style="color:${color}">${txt}</span>`;
+}
+
 const _etfState = {
   code: '00981A', list: [], cache: {},
-  filterOp: 'all',
+  filterOps: new Set(),   // empty = 全部
   filterTop: 0,
+  view: 'focus',          // 'focus' | 'detail'
 };
+
+const _etfFocusCodes = ['00981A', '00991A', '00992A'];
 
 async function renderEtfPage(force = false) {
   const body  = document.getElementById('etf-body');
@@ -2419,40 +2479,70 @@ async function renderEtfPage(force = false) {
     if (_etfState.list.length === 0) _etfState.list = [{ code: '00981A', name: '00981A 主動統一台股增長' }];
   }
 
-  // Render tab bar
+  // Render tab bar (ETF tabs left, view toggle right)
   if (tabBar) {
-    tabBar.innerHTML = _etfState.list.map(e => `
+    const isFocus = _etfState.view === 'focus';
+    const etfTabs = !isFocus ? _etfState.list.map(e => `
       <button onclick="_etfSwitchTab('${e.code}')"
         style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
                border:1px solid ${e.code === _etfState.code ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
                background:${e.code === _etfState.code ? 'rgba(99,102,241,.15)' : 'transparent'};
                color:${e.code === _etfState.code ? 'var(--primary-2)' : 'var(--text-muted)'}">
         ${e.code}
-      </button>`).join('');
+      </button>`).join('') : '';
+    tabBar.innerHTML = `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${etfTabs}</div>
+      <div style="margin-left:auto;display:flex;gap:4px">
+        <button onclick="_etfSwitchView('detail')"
+          style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+                 border:1px solid ${!isFocus ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+                 background:${!isFocus ? 'rgba(99,102,241,.15)' : 'transparent'};
+                 color:${!isFocus ? 'var(--primary-2)' : 'var(--text-muted)'}">📋 ETF追蹤</button>
+        <button onclick="_etfSwitchView('focus')"
+          style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+                 border:1px solid ${isFocus ? '#fbbf24' : 'rgba(148,163,184,.3)'};
+                 background:${isFocus ? 'rgba(251,191,36,.12)' : 'transparent'};
+                 color:${isFocus ? '#fbbf24' : 'var(--text-muted)'}">⭐ 重點關注</button>
+      </div>
+    </div>`;
   }
 
-  const cached = _etfState.cache[_etfState.code];
+  // Dispatch to focus view
+  if (_etfState.view === 'focus') {
+    _etfRenderFocusView();
+    return;
+  }
+
+  const fetchCode = _etfState.code;  // capture before async gap
+  const cached = _etfState.cache[fetchCode];
   if (!force && cached) { _etfRender(cached); return; }
 
   body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 正在下載持股資料…</div>';
   if (subEl) subEl.textContent = '主動式ETF每日持股變化';
 
   try {
-    const qs = `code=${encodeURIComponent(_etfState.code)}${force ? '&force=true' : ''}`;
+    const qs = `code=${encodeURIComponent(fetchCode)}${force ? '&force=true' : ''}`;
     const data = await api(`/api/etf-tracking?${qs}`);
+    if (_etfState.code !== fetchCode) return;  // tab switched mid-flight, discard
     if (data.error) {
       body.innerHTML = `<div class="empty-state">❌ 載入失敗：${data.error}</div>`;
       return;
     }
-    _etfState.cache[_etfState.code] = data;
+    _etfState.cache[fetchCode] = data;
     _etfRender(data);
   } catch (e) {
+    if (_etfState.code !== fetchCode) return;
     body.innerHTML = `<div class="empty-state">❌ 請求失敗：${e.message}</div>`;
   }
 }
 
 function _etfSwitchTab(code) {
   _etfState.code = code;
+  renderEtfPage(false);
+}
+
+function _etfSwitchView(v) {
+  _etfState.view = v;
   renderEtfPage(false);
 }
 
@@ -2506,7 +2596,7 @@ function _etfRender(data) {
   const cardHtml = ops.map(op => {
     const n   = summaryCounts[op] ?? 0;
     const cfg = opCfg[op];
-    const active = _etfState.filterOp === op;
+    const active = _etfState.filterOps.has(op);
     return `<div onclick="_etfSetOpFilter('${op}')" style="cursor:pointer;
                 background:var(--panel-bg);border-radius:12px;padding:14px 20px;min-width:100px;text-align:center;
                 border:2px solid ${active ? cfg.color : (n > 0 ? cfg.color + '66' : 'var(--border)')};
@@ -2588,21 +2678,27 @@ function _etfRenderFilters() {
   const opBtns = document.getElementById('etf-op-btns');
   if (!opBtns) return;
   const opOptions = [
-    { key: 'all',    label: '全部' },
     { key: '新增建倉', label: '🆕 新增建倉' },
     { key: '股數加碼', label: '➕ 加碼' },
     { key: '股數減碼', label: '➖ 減碼' },
     { key: '全數清倉', label: '🔴 清倉' },
   ];
-  opBtns.innerHTML = opOptions.map(o => {
-    const active = _etfState.filterOp === o.key;
-    return `<button onclick="_etfSetOpFilter('${o.key}')"
+  const anyActive = _etfState.filterOps.size > 0;
+  opBtns.innerHTML =
+    `<button onclick="_etfClearOpFilter()"
       style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
-             border:1px solid ${active ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
-             background:${active ? 'rgba(99,102,241,.18)' : 'transparent'};
-             color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
-      ${o.label}</button>`;
-  }).join('');
+             border:1px solid ${!anyActive ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+             background:${!anyActive ? 'rgba(99,102,241,.18)' : 'transparent'};
+             color:${!anyActive ? 'var(--primary-2)' : 'var(--text-muted)'}">全部</button>` +
+    opOptions.map(o => {
+      const active = _etfState.filterOps.has(o.key);
+      return `<button onclick="_etfSetOpFilter('${o.key}')"
+        style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+               border:1px solid ${active ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+               background:${active ? 'rgba(99,102,241,.18)' : 'transparent'};
+               color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
+        ${o.label}</button>`;
+    }).join('');
 
   // Top-N buttons
   const topBtns = document.getElementById('etf-top-btns');
@@ -2624,13 +2720,17 @@ function _etfRenderFilters() {
   }).join('');
 }
 
-function _etfSetOpFilter(op) {
-  _etfState.filterOp = _etfState.filterOp === op ? 'all' : op;
+function _etfClearOpFilter() {
+  _etfState.filterOps.clear();
   _etfRenderFilters();
   _etfApplyFilters();
-  // Also toggle summary card highlight
-  const cached = _etfState.cache[_etfState.code];
-  if (cached) _etfRenderCards(cached);
+}
+
+function _etfSetOpFilter(op) {
+  if (_etfState.filterOps.has(op)) _etfState.filterOps.delete(op);
+  else _etfState.filterOps.add(op);
+  _etfRenderFilters();
+  _etfApplyFilters();
 }
 
 function _etfSetTopFilter(n) {
@@ -2683,9 +2783,9 @@ function _etfApplyFilters() {
 
   let visible = _etfState._allSorted;
 
-  // Apply op filter
-  if (_etfState.filterOp !== 'all') {
-    visible = visible.filter(h => (h.operationType || '持有') === _etfState.filterOp);
+  // Apply op filter (multi-select, empty = all)
+  if (_etfState.filterOps.size > 0) {
+    visible = visible.filter(h => _etfState.filterOps.has(h.operationType || '持有'));
   }
 
   // Apply top-N filter (intersect)
@@ -2722,10 +2822,6 @@ function _etfApplyFilters() {
       : '';
 
     const wPct = h.currentWeightPercent;
-    const wBar = wPct > 0
-      ? `<div style="height:3px;border-radius:2px;background:${cfg.color};opacity:.5;
-                     width:${Math.min(wPct * 6, 100)}%;margin-top:3px"></div>`
-      : '';
 
     return `<tr style="${op !== '持有' ? `background:${cfg.bg}` : ''}">
       <td style="text-align:center;color:var(--text-muted);font-size:12px">${rankCell}</td>
@@ -2735,7 +2831,7 @@ function _etfApplyFilters() {
       </td>
       <td style="white-space:nowrap">${badge}</td>
       <td class="mono" style="text-align:right">
-        ${wPct != null ? `<div style="font-weight:600">${wPct.toFixed(2)}%</div>${wBar}` : '—'}
+        ${wPct != null ? `<div style="font-weight:600">${wPct.toFixed(2)}%</div>` : '—'}
       </td>
       <td class="mono" style="text-align:right">${fmtPct(h.weightChangePercent)}</td>
       <td class="mono" style="text-align:right;font-size:12px">
@@ -2743,7 +2839,188 @@ function _etfApplyFilters() {
       </td>
       <td class="mono" style="text-align:right">${fmtPct(h.sharesChangePercent)}</td>
       <td class="mono" style="text-align:right;font-weight:600">${fmtPrice(h.closingPrice)}</td>
-      <td class="mono" style="text-align:right">${fmtPct(h.priceChangePercent)}</td>
+      <td class="mono" style="text-align:right">${_fmtPctLimit(h.priceChangePercent)}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted)">無符合條件的持股</td></tr>`;
+}
+
+// ── ETF 重點關注 ────────────────────────────────────────────────────────────
+async function _etfRenderFocusView() {
+  const body  = document.getElementById('etf-body');
+  const subEl = document.getElementById('etf-sub');
+  if (!body) return;
+
+  if (subEl) subEl.textContent = '00981A · 00991A · 00992A 重點標的彙整';
+  body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 彙整各ETF重點標的…</div>';
+
+  const opCfg = {
+    '新增建倉': { color: '#10b981', bg: 'rgba(16,185,129,.12)', icon: '🆕', short: '新增建倉' },
+    '股數加碼': { color: '#38bdf8', bg: 'rgba(56,189,248,.10)', icon: '➕', short: '加碼' },
+    '股數減碼': { color: '#f59e0b', bg: 'rgba(245,158,11,.10)', icon: '➖', short: '減碼' },
+    '全數清倉': { color: '#f43f5e', bg: 'rgba(244,63,94,.10)',  icon: '🔴', short: '清倉' },
+  };
+  const etfColor = { '00981A': '#6366f1', '00991A': '#10b981', '00992A': '#f59e0b' };
+
+  // Parallel fetch; use cache when available
+  const settled = await Promise.allSettled(_etfFocusCodes.map(async code => {
+    if (_etfState.cache[code]) return { code, data: _etfState.cache[code] };
+    const data = await api(`/api/etf-tracking?code=${code}`);
+    if (!data.error) _etfState.cache[code] = data;
+    return { code, data };
+  }));
+
+  if (_etfState.view !== 'focus') return;  // switched away mid-fetch
+
+  // symbol → { name, price, changePct, etfEntries: [{etf, reasons, weight, op}] }
+  const stockMap = new Map();
+
+  for (const res of settled) {
+    if (res.status !== 'fulfilled') continue;
+    const { code, data } = res.value;
+    if (!data || data.error || !Array.isArray(data.holdings)) continue;
+
+    const ranked = [...data.holdings]
+      .filter(h => (h.currentWeightPercent ?? 0) > 0)
+      .sort((a, b) => (b.currentWeightPercent || 0) - (a.currentWeightPercent || 0));
+    const top10 = new Set(ranked.slice(0, 10).map(h => h.symbol));
+    const rankOf = new Map(ranked.map((h, i) => [h.symbol, i + 1]));
+
+    for (const h of data.holdings) {
+      const reasons = [];
+      if (h.operationType && h.operationType !== '持有')
+        reasons.push({ type: 'op', op: h.operationType });
+      if (top10.has(h.symbol))
+        reasons.push({ type: 'top10', rank: rankOf.get(h.symbol) });
+      if (reasons.length === 0) continue;
+
+      if (!stockMap.has(h.symbol))
+        stockMap.set(h.symbol, { name: h.name, price: null, changePct: null, etfEntries: [] });
+      const s = stockMap.get(h.symbol);
+      if (h.closingPrice != null) { s.price = h.closingPrice; s.changePct = h.priceChangePercent; }
+      s.etfEntries.push({ etf: code, reasons, weight: h.currentWeightPercent ?? 0, op: h.operationType });
+    }
+  }
+
+  if (stockMap.size === 0) {
+    body.innerHTML = `<div class="empty-state">⚠️ 尚無資料，請先切換到「ETF追蹤」頁面載入各檔ETF</div>`;
+    return;
+  }
+
+  const opPri = { '新增建倉': 0, '股數加碼': 1, '股數減碼': 2, '全數清倉': 3 };
+  const entries = [...stockMap.entries()].sort((a, b) => {
+    const [, av] = a, [, bv] = b;
+    // Multi-ETF first
+    if (bv.etfEntries.length !== av.etfEntries.length) return bv.etfEntries.length - av.etfEntries.length;
+    // Best op priority
+    const bestOp = v => Math.min(...v.etfEntries.map(e => opPri[e.op] ?? 99));
+    const opDiff = bestOp(av) - bestOp(bv);
+    if (opDiff !== 0) return opDiff;
+    // Max weight
+    return Math.max(...bv.etfEntries.map(e => e.weight)) - Math.max(...av.etfEntries.map(e => e.weight));
+  });
+
+  const fmtPct = _fmtPctLimit;
+
+  // Categorise into 3 buckets
+  const isSell = s => s.etfEntries.some(e => e.op === '股數減碼' || e.op === '全數清倉');
+  const tMulti = entries.filter(([, s]) => s.etfEntries.length > 1);
+  const tSell  = entries.filter(([, s]) => s.etfEntries.length === 1 && isSell(s));
+  const tOther = entries.filter(([, s]) => s.etfEntries.length === 1 && !isSell(s));
+
+  // Compact row for a single stock
+  const mkRow = ([sym, s]) => {
+    const multi = s.etfEntries.length > 1;
+    const tags = s.etfEntries.map(e => {
+      const ec = etfColor[e.etf] || '#94a3b8';
+      const chips = e.reasons.map(r => {
+        if (r.type === 'op') {
+          const c = opCfg[r.op];
+          return `<span style="background:${c.bg};color:${c.color};font-size:11px;font-weight:700;
+                              padding:1px 5px;border-radius:3px;border:1px solid ${c.color}">${c.icon}${c.short}</span>`;
+        }
+        return `<span style="background:rgba(99,102,241,.15);color:#818cf8;font-size:11px;font-weight:700;
+                            padding:1px 5px;border-radius:3px;border:1px solid rgba(99,102,241,.3)">TOP${r.rank}</span>`;
+      }).join(' ');
+      return `<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;flex-wrap:wrap">
+        <span style="background:${ec}22;color:${ec};font-size:11px;font-weight:700;
+                    padding:1px 5px;border-radius:3px;min-width:52px;text-align:center">${e.etf}</span>
+        ${chips}
+      </div>`;
+    }).join('');
+    const multiBadge = multi
+      ? ` <span style="background:rgba(251,191,36,.18);color:#fbbf24;font-size:11px;font-weight:800;
+                      padding:1px 5px;border-radius:3px;border:1px solid rgba(251,191,36,.5)">★${s.etfEntries.length}</span>`
+      : '';
+    const pc = (s.changePct ?? 0) > 0 ? 'var(--green)' : (s.changePct ?? 0) < 0 ? 'var(--red)' : 'var(--text)';
+    return `<tr>
+      <td style="padding:7px 10px;white-space:nowrap">
+        <div style="display:flex;align-items:center;gap:4px">
+          <span class="mono" style="font-weight:700;font-size:14px">${sym}</span>${multiBadge}
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.3;margin-top:1px">${s.name || ''}</div>
+      </td>
+      <td style="padding:7px 10px;white-space:nowrap">${tags}</td>
+      <td class="mono" style="text-align:right;padding:7px 10px;font-size:13px;font-weight:600;color:${pc};white-space:nowrap">
+        ${s.price != null ? Number(s.price).toFixed(2) : '—'}
+      </td>
+      <td class="mono" style="text-align:right;padding:7px 10px;font-size:12px;white-space:nowrap">
+        ${fmtPct(s.changePct)}
+      </td>
+    </tr>`;
+  };
+
+  const mkTable = (list, accent) => {
+    if (list.length === 0) return '<div style="padding:16px;text-align:center;font-size:12px;color:var(--text-muted)">—</div>';
+    return `<table class="data-table" style="width:auto;min-width:100%">
+      <thead style="background:${accent}12"><tr>
+        <th style="font-size:12px;font-weight:700;padding:6px 10px;border-bottom:2px solid ${accent}44;white-space:nowrap">標的</th>
+        <th style="font-size:12px;font-weight:700;padding:6px 10px;border-bottom:2px solid ${accent}44;white-space:nowrap">關注原因</th>
+        <th style="font-size:12px;font-weight:700;padding:6px 10px;text-align:right;border-bottom:2px solid ${accent}44;white-space:nowrap">收盤價</th>
+        <th style="font-size:12px;font-weight:700;padding:6px 10px;text-align:right;border-bottom:2px solid ${accent}44;white-space:nowrap">漲跌幅</th>
+      </tr></thead>
+      <tbody>${list.map(mkRow).join('')}</tbody>
+    </table>`;
+  };
+
+  const mkSection = (icon, title, list, accent) =>
+    `<div style="border-radius:10px;overflow:hidden;border:1px solid ${accent}44;background:var(--panel-bg);display:flex;flex-direction:column">
+      <div style="padding:8px 14px;background:${accent}1c;border-bottom:1px solid ${accent}33;
+                  display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <span style="font-size:16px">${icon}</span>
+        <span style="font-weight:800;font-size:15px;color:${accent};letter-spacing:.3px">${title}</span>
+        <span style="font-size:12px;font-weight:600;color:${accent}99;margin-left:auto">${list.length} 檔</span>
+      </div>
+      <div style="overflow-y:auto;flex:1">${mkTable(list, accent)}</div>
+    </div>`;
+
+  // Date/time header
+  const fetchedAt = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+  const etfDateTags = settled
+    .filter(r => r.status === 'fulfilled' && r.value?.data && !r.value.data.error)
+    .map(r => {
+      const { code, data } = r.value;
+      const d = data.date || data._cached_date || '—';
+      const ec = etfColor[code] || '#94a3b8';
+      const staleTag = data._stale
+        ? ` <span style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;
+                         padding:0 4px;border-radius:3px">舊</span>`
+        : '';
+      return `<span style="background:${ec}18;color:${ec};font-size:11px;font-weight:700;
+                           padding:2px 8px;border-radius:4px;border:1px solid ${ec}44">
+                ${code} <span style="font-weight:400">${d}</span>${staleTag}
+              </span>`;
+    }).join('');
+
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600">資料日期</span>
+      ${etfDateTags}
+      <span style="font-size:11px;color:var(--text-muted);margin-left:auto">取得時間 ${fetchedAt}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch">
+      ${mkSection('★', '多檔共同入選', tMulti, '#fbbf24')}
+      ${mkSection('📈', '新增建倉 / 加碼', tOther, '#38bdf8')}
+      ${mkSection('⚠️', '減碼 / 清倉', tSell, '#f43f5e')}
+    </div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:8px">共 ${entries.length} 個重點標的</div>`;
 }

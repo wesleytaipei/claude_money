@@ -1821,9 +1821,12 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
             prev_sh = prev.get("shares", 0) if prev else 0
             cur_w   = today["weight"]
             prev_w  = prev.get("weight", 0.0) if prev else 0.0
+            # Standardize name via TW stock table
+            canonical_name = (_tw_table.get("by_symbol", {}).get(sym, {}) or {}).get("name", "")
+            display_name = canonical_name or today["name"]
             holdings.append({
                 "symbol":              sym,
-                "name":                today["name"],
+                "name":                display_name,
                 "operationType":       op_type,
                 "shares":              cur_sh,
                 "prevShares":          prev_sh,
@@ -1833,9 +1836,11 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
             })
         else:  # 全數清倉
             p_sh = prev.get("shares", 0)
+            prev_name = prev.get("name", sym)
+            canonical_name = (_tw_table.get("by_symbol", {}).get(sym, {}) or {}).get("name", "")
             holdings.append({
                 "symbol":              sym,
-                "name":                prev.get("name", sym),
+                "name":                canonical_name or prev_name,
                 "operationType":       "全數清倉",
                 "shares":              0,
                 "prevShares":          p_sh,
@@ -1883,6 +1888,7 @@ def fetch_etf_holdings(fund_code: str) -> dict:
     from datetime import date as _date
     today_str = _date.today().isoformat()
 
+    # 1. In-memory cache (fastest, lost on restart)
     cached = _etf_tracking_cache.get(fund_code)
     if cached and cached.get("date") == today_str:
         return cached["data"]
@@ -1893,7 +1899,15 @@ def fetch_etf_holdings(fund_code: str) -> dict:
 
     history_path = DATA_DIR / f"etf_{fund_code.lower()}_history.json"
 
-    # ── Fetch raw data from source ────────────────────────────────────────────
+    # 2. History JSON cache (survives server restarts — once per day)
+    _hist_pre = load_json(history_path, {})
+    if today_str in _hist_pre and _hist_pre[today_str].get("_full_data"):
+        data = _hist_pre[today_str]["_full_data"]
+        _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
+        logger.info(f"[etf] {fund_code}: loaded today's data from history JSON (no re-fetch)")
+        return data
+
+    # 3. Fetch raw data from source ───────────────────────────────────────────
     try:
         source = cfg["source"]
         if source == "ezmoney":
@@ -1907,16 +1921,15 @@ def fetch_etf_holdings(fund_code: str) -> dict:
     except Exception as e:
         logger.error(f"[etf] {fund_code} fetch error: {e}")
         # Return stale history
-        hist = load_json(history_path, {})
-        if hist:
-            last_date = sorted(hist.keys())[-1]
-            stale = hist[last_date].get("_full_data", {})
+        if _hist_pre:
+            last_date = sorted(_hist_pre.keys())[-1]
+            stale = _hist_pre[last_date].get("_full_data", {})
             if stale:
                 stale["_stale"] = True; stale["_cached_date"] = last_date
                 return stale
         return {"error": str(e), "fund_code": fund_code}
 
-    history = load_json(history_path, {})
+    history = _hist_pre  # reuse already-loaded dict
     data    = _etf_build_enriched(fund_code, meta, today_holdings, history)
 
     # ── Persist today for future comparisons ─────────────────────────────────
@@ -2036,23 +2049,37 @@ _fsc_cache: dict = {"date": "", "data": None}
 FSC_SFB_INDEX = "https://www.sfb.gov.tw/ch/home.jsp?id=1016&parentpath=0,6,52"
 _FSC_UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
+_fsc_last_good_url: dict = {"url": "", "date_str": ""}  # persisted across cache misses
+
 def _fetch_fsc_excel_url() -> tuple[str, str]:
     """Scrape sfb.gov.tw for the latest FSC Excel URL and its update date.
     Returns (url, date_str) where date_str is like '115.4.22'."""
     import re as _re
+    headers = {**_FSC_UA, "Referer": "https://www.sfb.gov.tw/"}
     try:
-        r = http_requests.get(FSC_SFB_INDEX, headers=_FSC_UA, verify=False, timeout=10)
-        # Find href containing the xlsx file (filename starts with 115...)
-        href_m = _re.search(r'href="([^"]*115\d+[^"]*\.xlsx)"', r.text, _re.IGNORECASE)
-        date_m = _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,100}<td[^>]*>[^<]*<a[^>]*115\d', r.text)
+        r = http_requests.get(FSC_SFB_INDEX, headers=headers, verify=False, timeout=15)
+        text = r.text
+
+        # Try specific ROC-year xlsx first, then any xlsx
+        href_m = (_re.search(r'href="([^"]*11[0-9]\d+[^"]*\.xlsx)"', text, _re.IGNORECASE)
+                  or _re.search(r'href="([^"]*\.xlsx)"', text, _re.IGNORECASE))
+        # Date: ROC format like 115.4.22 near the link
+        date_m = (_re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,200}<td[^>]*>[^<]*<a[^>]*\.xlsx', text)
+                  or _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})', text))
+
         url = href_m.group(1) if href_m else ""
         if url and not url.startswith("http"):
             url = "https://www.sfb.gov.tw" + url
         date_str = date_m.group(1) if date_m else ""
+
+        if url:
+            _fsc_last_good_url["url"] = url
+            _fsc_last_good_url["date_str"] = date_str
         return url, date_str
     except Exception as e:
         logger.warning(f"[fsc] sfb scrape failed: {e}")
-        return "", ""
+        # Return last known good URL as fallback
+        return _fsc_last_good_url.get("url", ""), _fsc_last_good_url.get("date_str", "")
 
 def _roc_date_to_str(val) -> str:
     """Convert ROC date int like 1150323 → '115/03/23'."""
@@ -2115,6 +2142,13 @@ def get_fsc_offerings():
         # Filter: 生效日期 has a value AND 案件類別 matches target
         df = df[df['生效日期'].notna()].copy()
         df = df[df['案件類別'].str.contains('現金增資|轉換公司債', na=False)].copy()
+
+        # Filter: 生效日期 within last 90 days (ROC date int comparison)
+        from datetime import timedelta
+        cutoff = date.today() - timedelta(days=90)
+        cutoff_roc_int = (cutoff.year - 1911) * 10000 + cutoff.month * 100 + cutoff.day
+        df['_eff_int'] = pd.to_numeric(df['生效日期'], errors='coerce')
+        df = df[df['_eff_int'] >= cutoff_roc_int].copy()
 
         rows = []
         for _, r in df.iterrows():
