@@ -570,6 +570,99 @@ def _fetch_wtx():
     return {"price": "-", "change": "-", "change_pct": "-"}
 
 
+_chip_cache: dict = {}
+_CHIP_TTL = 3600  # 1 hour — chip data published weekly, but cache for 1h
+
+def fetch_chip_data(symbol: str) -> dict:
+    """
+    Scrape major shareholder (>400 lots) weekly data from norway.twsthr.info.
+
+    Table is a pivot: rows = shareholding tiers, columns = weeks.
+    Structure per data row: [empty, label, 人數_w1, 張數_w1, %_w1, empty, 人數_w2, 張數_w2, ...]
+    '* 400 張以上' row → cells[3]=curr_big, cells[7]=prev_big
+    '合計'         row → cells[3]=total (集保總張數)
+    Dates extracted from thead (8-digit numeric cells).
+
+    Formula: change_pct = (curr_big - prev_big) / total * 100
+    (relative to total shares, matching KGI display convention)
+
+    Returns {total, current, prev, change, change_pct, current_date, prev_date}
+    or {error: "..."} on failure.
+    """
+    symbol = str(symbol).strip()
+    now = time.time()
+    cached = _chip_cache.get(symbol)
+    if cached and (now - cached["ts"]) < _CHIP_TTL:
+        return cached["data"]
+
+    url = f"https://norway.twsthr.info/StockHolders.aspx?stock={symbol}"
+    hdrs = {**HEADERS, "Referer": "https://norway.twsthr.info/"}
+    try:
+        r = requests.get(url, hdrs, timeout=15, verify=False)
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        def _int(s):
+            try:
+                return int(str(s).replace(",", "").strip())
+            except Exception:
+                return 0
+
+        # ── Dates from thead ──────────────────────────────────────────────────
+        dates = []
+        thead = soup.find("thead")
+        if thead:
+            for th in thead.find_all(["th", "td"]):
+                t = th.get_text(strip=True)
+                if t.isdigit() and len(t) == 8:
+                    dates.append(t)
+
+        # ── Rows ─────────────────────────────────────────────────────────────
+        tbody = soup.find("tbody")
+        if not tbody:
+            return {"error": "no table"}
+
+        row_400 = None
+        row_total = None
+        for tr in tbody.find_all("tr"):
+            cells = [td.get_text(strip=True) for td in tr.find_all("td")]
+            if len(cells) < 8:
+                continue
+            label = cells[1]
+            if "400" in label and "以上" in label:
+                row_400 = cells
+            elif label == "合計":
+                row_total = cells
+
+        if not row_400 or not row_total:
+            return {"error": "rows not found"}
+
+        curr_big = _int(row_400[3])    # 張數 current week
+        prev_big = _int(row_400[7])    # 張數 prev week
+        total    = _int(row_total[3])  # 集保總張數
+
+        if total <= 0:
+            return {"error": "total=0"}
+
+        change = curr_big - prev_big
+        change_pct = round(change / total * 100, 2)
+
+        result = {
+            "total":        total,
+            "current":      curr_big,
+            "prev":         prev_big,
+            "change":       change,
+            "change_pct":   change_pct,
+            "current_date": dates[0] if len(dates) > 0 else "",
+            "prev_date":    dates[1] if len(dates) > 1 else "",
+        }
+        _chip_cache[symbol] = {"ts": now, "data": result}
+        return result
+
+    except Exception as e:
+        print(f"[chip] {symbol} error: {e}")
+        return {"error": str(e)}
+
+
 def scrape_important_info(force=False):
     global _info_cache
     now = time.time()

@@ -939,8 +939,10 @@ function renderInvestmentsPage() {
   // CB: hide 預估市值; 今日漲幅% at end of cbHeaders shows underlying stock's change%
   // Non-CB: 今日漲幅% stays after 目前價格
   const baseHeaders = isCB
-    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
-    : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
+    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%', '大戶籌碼']
+    : isStock
+      ? ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%', '大戶籌碼']
+      : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
   const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : (isStock ? ['★', ...baseHeaders] : baseHeaders);
 
@@ -1017,6 +1019,33 @@ function renderInvestmentsPage() {
   // Map sorted index back to original index for edit/delete ops
   const origIdx = sortedItems.map(item => items.indexOf(item));
 
+  // Async chip data loading — fires after table render, updates cells in-place
+  function _loadChips(syms) {
+    for (const sym of syms) {
+      if (_chipCache[sym] !== undefined) {
+        // Already cached (null=loading, object=done/error) — update cells if done
+        if (_chipCache[sym] !== null) {
+          document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
+            td.innerHTML = _chipCellHtml(_chipCache[sym]);
+          });
+        }
+        continue;
+      }
+      _chipCache[sym] = null;  // mark as loading (shows ⋯)
+      api(`/api/chip-data?symbol=${encodeURIComponent(sym)}`).then(data => {
+        _chipCache[sym] = data;
+        document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
+          td.innerHTML = _chipCellHtml(data);
+        });
+      }).catch(() => {
+        _chipCache[sym] = { error: true };
+        document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
+          td.innerHTML = _chipCellHtml({ error: true });
+        });
+      });
+    }
+  }
+
   tbody.innerHTML = sortedItems.map((item, si) => {
     const idx = origIdx[si];
     const mv = item._mv || 0;
@@ -1035,6 +1064,13 @@ function renderInvestmentsPage() {
       return `<td class="num ${cls}">${fmtPct(pct)}</td>`;
     };
 
+    const chipSym = isStock ? String(item.symbol || '').slice(0, 4)
+                  : isCB   ? _cbToParentSym(item.symbol || '')
+                  : null;
+    const chipTd = chipSym
+      ? `<td class="num" data-chip="${chipSym}">${_chipCellHtml(_chipCache[chipSym])}</td>`
+      : '';
+
     const baseCells = `
       <td><span class="symbol-badge">${item.symbol || '—'}</span></td>
       <td>${item.name || '—'}</td>
@@ -1050,6 +1086,7 @@ function renderInvestmentsPage() {
       ${isCB ? '' : `<td class="num">${fmtFull(mv).replace('NT$ ', '')}</td>`}
       <td class="num ${pnlClass(pnl)}">${pnl >= 0 ? '+' : ''}${fmtFull(pnl).replace('NT$ ', '')}</td>
       <td class="num ${pnlClass(pnlPct)}">${fmtPct(pnlPct)}</td>
+      ${chipTd}
     `;
 
     let cbCells = '';
@@ -1097,6 +1134,17 @@ function renderInvestmentsPage() {
       <td><button class="btn-icon" onclick="event.stopPropagation(); deletePosition(${idx})">✕</button></td>
     </tr>`;
   }).join('');
+
+  // Fire async chip data fetches for all visible TW/CB symbols
+  if (showStar) {
+    const syms = [...new Set(
+      sortedItems
+        .filter(i => i.symbol)
+        .map(i => isCB ? _cbToParentSym(i.symbol) : String(i.symbol).slice(0, 4))
+        .filter(Boolean)
+    )];
+    _loadChips(syms);
+  }
 }
 
 function switchInvTab(inv) {
@@ -2120,6 +2168,31 @@ function _importantChangeColor(val) {
 
 const _importantCache = { ts: 0, data: null };
 const IMPORTANT_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+// ── Chip data (大戶籌碼) cache — persists across page re-renders ────────────
+const _chipCache = {};  // { symbol: {total,current,prev,change,change_pct,...} | null | {error} }
+
+function _cbToParentSym(code) {
+  // CB codes: 4-digit parent + 1-2 digit series  e.g. 15601→1560, 23161→2316
+  const s = String(code || '').trim();
+  return s.length >= 5 ? s.slice(0, 4) : s;
+}
+
+function _chipCellHtml(data) {
+  if (data === null) return '<span class="muted" style="font-size:11px">⋯</span>';  // loading
+  if (!data || data.error) return '<span class="muted" style="font-size:11px">—</span>';
+  const pct = data.change_pct;
+  const sign = pct > 0 ? '+' : '';
+  const color = pct > 0 ? 'var(--green)' : pct < 0 ? 'var(--red)' : 'var(--text-muted)';
+  const dateStr = data.current_date ? data.current_date.slice(4) : '';  // "0424"
+  const chgStr  = (data.change >= 0 ? '+' : '') + (data.change || 0).toLocaleString();
+  const tip = `總張數: ${(data.total||0).toLocaleString()}`
+    + `&#10;大戶本週: ${(data.current||0).toLocaleString()}張 (${data.current_date})`
+    + `&#10;大戶前週: ${(data.prev||0).toLocaleString()}張 (${data.prev_date})`
+    + `&#10;變化: ${chgStr}張`;
+  return `<span style="color:${color}" title="${tip}">${sign}${pct}%`
+    + `<br><span class="muted" style="font-size:10px">${dateStr}</span></span>`;
+}
 
 async function renderImportantInfo(force = false) {
   const tbody = document.getElementById('important-tbody');

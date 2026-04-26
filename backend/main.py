@@ -34,7 +34,7 @@ except ImportError:
     pass
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from info_scraper import scrape_important_info
+from info_scraper import scrape_important_info, fetch_chip_data
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
@@ -1049,6 +1049,14 @@ async def post_portfolio(request: Request):
     save_json(CONFIG_FILE, data)
     _gist_push_portfolio()
     return {"ok": True}
+
+
+@app.get("/api/chip-data")
+def get_chip_data(symbol: str = ""):
+    """Fetch >400-lot major shareholder weekly change for a given stock code."""
+    if not symbol.strip():
+        return {"error": "symbol required"}
+    return fetch_chip_data(symbol.strip())
 
 
 @app.get("/api/prices")
