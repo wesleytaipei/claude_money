@@ -2205,14 +2205,11 @@ function _chipCellHtml(data) {
   }
 
   const runPct = data.run_change_pct ?? pct;
-  const absRunPct = Math.abs(runPct).toFixed(2);
   const isDown = runPct < 0;
   const color  = isDown ? 'var(--red)' : 'var(--green)';
-  const label  = isDown ? `減少${absRunPct}%` : `增加${absRunPct}%`;
-  const wkBadge = (data.run_weeks || 1) >= 3
-    ? `<span style="font-size:10px;opacity:.75"> 連${data.run_weeks}週</span>` : '';
+  const sign   = isDown ? '' : '+';
 
-  return `<span style="color:${color};font-size:11px;white-space:nowrap" title="${tip}">${label}${wkBadge}</span>`;
+  return `<span style="color:${color};font-size:11px;white-space:nowrap" title="${tip}">${sign}${runPct.toFixed(2)}%</span>`;
 }
 
 async function renderImportantInfo(force = false) {
