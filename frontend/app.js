@@ -939,11 +939,11 @@ function renderInvestmentsPage() {
   // CB: hide 預估市值; 今日漲幅% at end of cbHeaders shows underlying stock's change%
   // Non-CB: 今日漲幅% stays after 目前價格
   const baseHeaders = isCB
-    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%', '大戶籌碼']
+    ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
     : isStock
       ? ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%', '大戶籌碼']
       : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '今日漲幅%', '停止轉換'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '大戶籌碼', '今日漲幅%', '停止轉換'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : (isStock ? ['★', ...baseHeaders] : baseHeaders);
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
@@ -1067,9 +1067,11 @@ function renderInvestmentsPage() {
     const chipSym = isStock ? String(item.symbol || '').slice(0, 4)
                   : isCB   ? _cbToParentSym(item.symbol || '')
                   : null;
-    const chipTd = chipSym
+    const chipTdEl = chipSym
       ? `<td class="num" data-chip="${chipSym}">${_chipCellHtml(_chipCache[chipSym])}</td>`
-      : '';
+      : '<td class="num muted">—</td>';
+    // Stock: chip goes at end of baseCells; CB: chip goes into cbCells after 現股價格
+    const chipTd = (chipSym && !isCB) ? chipTdEl : '';
 
     const baseCells = `
       <td><span class="symbol-badge">${item.symbol || '—'}</span></td>
@@ -1101,6 +1103,7 @@ function renderInvestmentsPage() {
         <td class="num">${item.conversion_price ? Number(item.conversion_price).toFixed(2) : '—'}</td>
         <td class="num ${percentWarnClass(item.premium_rate, 5, 20)}">${item.premium_rate != null && item.premium_rate !== 0 ? Number(item.premium_rate).toFixed(2) + '%' : '—'}</td>
         <td class="num">${item.stock_price ? Number(item.stock_price).toFixed(2) : '—'}</td>
+        ${chipTdEl}
         ${makeChgCell(item._stock_change_pct)}
         <td style="text-align:center">${
           item._suspended === true
@@ -2179,19 +2182,37 @@ function _cbToParentSym(code) {
 }
 
 function _chipCellHtml(data) {
-  if (data === null) return '<span class="muted" style="font-size:11px">⋯</span>';  // loading
+  if (data === null) return '<span class="muted" style="font-size:11px">⋯</span>';
   if (!data || data.error) return '<span class="muted" style="font-size:11px">—</span>';
-  const pct = data.change_pct;
-  const sign = pct > 0 ? '+' : '';
-  const color = pct > 0 ? 'var(--green)' : pct < 0 ? 'var(--red)' : 'var(--text-muted)';
-  const dateStr = data.current_date ? data.current_date.slice(4) : '';  // "0424"
-  const chgStr  = (data.change >= 0 ? '+' : '') + (data.change || 0).toLocaleString();
-  const tip = `總張數: ${(data.total||0).toLocaleString()}`
+
+  const pct = data.change_pct ?? 0;
+  const isFlat = Math.abs(pct) < 0.05;
+
+  // Build tooltip (共用)
+  const sign1 = (data.change || 0) >= 0 ? '+' : '';
+  let tip = `集保總張數: ${(data.total||0).toLocaleString()}`
     + `&#10;大戶本週: ${(data.current||0).toLocaleString()}張 (${data.current_date})`
     + `&#10;大戶前週: ${(data.prev||0).toLocaleString()}張 (${data.prev_date})`
-    + `&#10;變化: ${chgStr}張`;
-  return `<span style="color:${color}" title="${tip}">${sign}${pct}%`
-    + `<br><span class="muted" style="font-size:10px">${dateStr}</span></span>`;
+    + `&#10;週變化: ${sign1}${(data.change||0).toLocaleString()}張 (${pct >= 0 ? '+' : ''}${pct}%)`;
+  if ((data.run_weeks || 1) >= 3) {
+    const signR = (data.run_change || 0) >= 0 ? '+' : '';
+    tip += `&#10;連${data.run_weeks}週累計: ${signR}${(data.run_change||0).toLocaleString()}張`
+         + ` (${data.run_start_date}~${data.current_date})`;
+  }
+
+  if (isFlat) {
+    return `<span class="muted" style="font-size:11px" title="${tip}">持平</span>`;
+  }
+
+  const runPct = data.run_change_pct ?? pct;
+  const absRunPct = Math.abs(runPct).toFixed(2);
+  const isDown = runPct < 0;
+  const color  = isDown ? 'var(--red)' : 'var(--green)';
+  const label  = isDown ? `減少${absRunPct}%` : `增加${absRunPct}%`;
+  const wkBadge = (data.run_weeks || 1) >= 3
+    ? `<span style="font-size:10px;opacity:.75"> 連${data.run_weeks}週</span>` : '';
+
+  return `<span style="color:${color};font-size:11px;white-space:nowrap" title="${tip}">${label}${wkBadge}</span>`;
 }
 
 async function renderImportantInfo(force = false) {

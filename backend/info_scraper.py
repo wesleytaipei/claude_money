@@ -636,24 +636,66 @@ def fetch_chip_data(symbol: str) -> dict:
         if not row_400 or not row_total:
             return {"error": "rows not found"}
 
-        curr_big = _int(row_400[3])    # 張數 current week
-        prev_big = _int(row_400[7])    # 張數 prev week
-        total    = _int(row_total[3])  # 集保總張數
-
+        total = _int(row_total[3])  # 集保總張數
         if total <= 0:
             return {"error": "total=0"}
 
+        # ── Per-week big-holder data ──────────────────────────────────────────
+        # Column pattern per week k (0=latest): 張數 at index 3 + 4*k
+        weeks = []
+        for k, d in enumerate(dates):
+            col = 3 + 4 * k
+            if col < len(row_400):
+                weeks.append({"date": d, "big": _int(row_400[col])})
+
+        if len(weeks) < 2:
+            return {"error": "not enough week data"}
+
+        curr_big = weeks[0]["big"]
+        prev_big = weeks[1]["big"]
         change = curr_big - prev_big
         change_pct = round(change / total * 100, 2)
 
+        # ── Consecutive run detection ─────────────────────────────────────────
+        # direction based on week0 vs week1
+        if curr_big > prev_big:
+            direction = "up"
+        elif curr_big < prev_big:
+            direction = "down"
+        else:
+            direction = "flat"
+
+        run_start_idx = 1  # run covers at least week0→week1
+        if direction != "flat":
+            for i in range(2, len(weeks)):
+                # For downtrend: older week should have MORE big holders
+                # For uptrend:   older week should have FEWER big holders
+                extends = (
+                    (direction == "down" and weeks[i]["big"] > weeks[i - 1]["big"]) or
+                    (direction == "up"   and weeks[i]["big"] < weeks[i - 1]["big"])
+                )
+                if extends:
+                    run_start_idx = i
+                else:
+                    break
+
+        run_start    = weeks[run_start_idx]
+        run_change   = curr_big - run_start["big"]
+        run_change_pct = round(run_change / total * 100, 2)
+        run_weeks    = run_start_idx + 1   # number of weeks in the run
+
         result = {
-            "total":        total,
-            "current":      curr_big,
-            "prev":         prev_big,
-            "change":       change,
-            "change_pct":   change_pct,
-            "current_date": dates[0] if len(dates) > 0 else "",
-            "prev_date":    dates[1] if len(dates) > 1 else "",
+            "total":          total,
+            "current":        curr_big,
+            "prev":           prev_big,
+            "change":         change,
+            "change_pct":     change_pct,       # week0 vs week1 (flat detection)
+            "run_change":     run_change,
+            "run_change_pct": run_change_pct,   # cumulative across consecutive run
+            "run_weeks":      run_weeks,
+            "current_date":   weeks[0]["date"],
+            "prev_date":      weeks[1]["date"],
+            "run_start_date": run_start["date"],
         }
         _chip_cache[symbol] = {"ts": now, "data": result}
         return result
