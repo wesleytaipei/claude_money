@@ -570,8 +570,46 @@ def _fetch_wtx():
     return {"price": "-", "change": "-", "change_pct": "-"}
 
 
-_chip_cache: dict = {}
-_CHIP_TTL = 3600  # 1 hour — chip data published weekly, but cache for 1h
+import json as _chip_json
+from datetime import date as _date, timedelta as _timedelta
+from pathlib import Path as _Path
+
+_CHIP_FILE = _Path(__file__).parent / "data" / "chip_cache.json"
+_chip_mem:  dict = {}   # in-memory mirror of _CHIP_FILE
+_chip_file_loaded = False
+
+def _last_saturday() -> "_date":
+    """Return the most recent Saturday (today if today IS Saturday)."""
+    today = _date.today()
+    days_since_sat = (today.weekday() - 5) % 7  # Mon=0 … Sat=5 → 0
+    return today - _timedelta(days=days_since_sat)
+
+def _chip_valid(entry: dict) -> bool:
+    """Cache is valid when fetched on or after the most recent Saturday."""
+    try:
+        return _date.fromisoformat(entry["fetch_date"]) >= _last_saturday()
+    except Exception:
+        return False
+
+def _load_chip_file():
+    global _chip_mem, _chip_file_loaded
+    if _chip_file_loaded:
+        return
+    try:
+        if _CHIP_FILE.exists():
+            _chip_mem = _chip_json.loads(_CHIP_FILE.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[chip] load cache error: {e}")
+    _chip_file_loaded = True
+
+def _save_chip_file():
+    try:
+        _CHIP_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _CHIP_FILE.write_text(
+            _chip_json.dumps(_chip_mem, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    except Exception as e:
+        print(f"[chip] save cache error: {e}")
 
 def fetch_chip_data(symbol: str) -> dict:
     """
@@ -590,10 +628,10 @@ def fetch_chip_data(symbol: str) -> dict:
     or {error: "..."} on failure.
     """
     symbol = str(symbol).strip()
-    now = time.time()
-    cached = _chip_cache.get(symbol)
-    if cached and (now - cached["ts"]) < _CHIP_TTL:
-        return cached["data"]
+    _load_chip_file()
+    entry = _chip_mem.get(symbol)
+    if entry and _chip_valid(entry):
+        return entry["data"]
 
     url = f"https://norway.twsthr.info/StockHolders.aspx?stock={symbol}"
     hdrs = {**HEADERS, "Referer": "https://norway.twsthr.info/"}
@@ -697,7 +735,8 @@ def fetch_chip_data(symbol: str) -> dict:
             "prev_date":      weeks[1]["date"],
             "run_start_date": run_start["date"],
         }
-        _chip_cache[symbol] = {"ts": now, "data": result}
+        _chip_mem[symbol] = {"fetch_date": _date.today().isoformat(), "data": result}
+        _save_chip_file()
         return result
 
     except Exception as e:
