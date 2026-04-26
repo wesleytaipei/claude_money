@@ -34,7 +34,7 @@ except ImportError:
     pass
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from info_scraper import scrape_important_info, fetch_chip_data
+from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
@@ -1051,12 +1051,61 @@ async def post_portfolio(request: Request):
     return {"ok": True}
 
 
+def _gist_push_chip_cache():
+    """Push chip_cache.json to Gist in background (called only when new data was scraped)."""
+    if not GIST_ENABLED:
+        return
+    chip_file = DATA_DIR / "chip_cache.json"
+    if not chip_file.exists():
+        return
+    try:
+        content = chip_file.read_text(encoding="utf-8")
+    except Exception as e:
+        logger.error(f"[Gist] chip_cache read error: {e}")
+        return
+
+    def _push():
+        try:
+            r = http_requests.patch(
+                f"https://api.github.com/gists/{GIST_ID}",
+                headers=_gist_headers(),
+                json={"files": {"chip_cache.json": {"content": content}}},
+                timeout=15,
+            )
+            if r.status_code == 200:
+                logger.info("[Gist] chip_cache push OK")
+            else:
+                logger.error(f"[Gist] chip_cache push error: {r.status_code}")
+        except Exception as e:
+            logger.error(f"[Gist] chip_cache push exception: {e}")
+
+    _threading.Thread(target=_push, daemon=True).start()
+
+
 @app.get("/api/chip-data")
 def get_chip_data(symbol: str = ""):
-    """Fetch >400-lot major shareholder weekly change for a given stock code."""
+    """Single-symbol chip data (kept for compatibility)."""
     if not symbol.strip():
         return {"error": "symbol required"}
     return fetch_chip_data(symbol.strip())
+
+
+@app.get("/api/chip-data/batch")
+def get_chip_data_batch(symbols: str = ""):
+    """Fetch chip data for multiple symbols in one request using parallel scraping.
+    symbols: comma-separated list, e.g. '8358,1560,3715'
+    Returns {symbol: data} dict.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+    sym_list = [s.strip() for s in symbols.split(",") if s.strip()]
+    if not sym_list:
+        return {}
+    with ThreadPoolExecutor(max_workers=min(len(sym_list), 8)) as ex:
+        futures = {sym: ex.submit(fetch_chip_data, sym) for sym in sym_list}
+    results = {sym: fut.result() for sym, fut in futures.items()}
+    if chip_cache_pop_dirty():
+        _gist_push_chip_cache()
+    return results
 
 
 @app.get("/api/prices")

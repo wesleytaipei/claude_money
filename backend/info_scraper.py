@@ -602,14 +602,24 @@ def _load_chip_file():
         print(f"[chip] load cache error: {e}")
     _chip_file_loaded = True
 
+_chip_dirty = False   # set True when new data is scraped; cleared by chip_cache_pop_dirty()
+
 def _save_chip_file():
+    global _chip_dirty
     try:
         _CHIP_FILE.parent.mkdir(parents=True, exist_ok=True)
         _CHIP_FILE.write_text(
             _chip_json.dumps(_chip_mem, ensure_ascii=False, indent=2), encoding="utf-8"
         )
+        _chip_dirty = True
     except Exception as e:
         print(f"[chip] save cache error: {e}")
+
+def chip_cache_pop_dirty() -> bool:
+    """Returns True (and resets flag) if chip_cache.json was updated since last call."""
+    global _chip_dirty
+    dirty, _chip_dirty = _chip_dirty, False
+    return dirty
 
 def fetch_chip_data(symbol: str) -> dict:
     """

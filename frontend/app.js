@@ -1019,31 +1019,41 @@ function renderInvestmentsPage() {
   // Map sorted index back to original index for edit/delete ops
   const origIdx = sortedItems.map(item => items.indexOf(item));
 
-  // Async chip data loading — fires after table render, updates cells in-place
+  // Async chip data loading — one batch request for all uncached symbols
   function _loadChips(syms) {
+    // Update cells for already-cached symbols immediately
     for (const sym of syms) {
-      if (_chipCache[sym] !== undefined) {
-        // Already cached (null=loading, object=done/error) — update cells if done
-        if (_chipCache[sym] !== null) {
+      if (_chipCache[sym] != null) {
+        document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
+          td.innerHTML = _chipCellHtml(_chipCache[sym]);
+        });
+      }
+    }
+
+    const toFetch = syms.filter(s => _chipCache[s] === undefined);
+    if (toFetch.length === 0) return;
+
+    // Mark as loading (shows ⋯)
+    toFetch.forEach(s => { _chipCache[s] = null; });
+
+    // Single batch request — backend fetches all in parallel
+    api(`/api/chip-data/batch?symbols=${toFetch.map(encodeURIComponent).join(',')}`)
+      .then(results => {
+        for (const [sym, data] of Object.entries(results)) {
+          _chipCache[sym] = data;
           document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
-            td.innerHTML = _chipCellHtml(_chipCache[sym]);
+            td.innerHTML = _chipCellHtml(data);
           });
         }
-        continue;
-      }
-      _chipCache[sym] = null;  // mark as loading (shows ⋯)
-      api(`/api/chip-data?symbol=${encodeURIComponent(sym)}`).then(data => {
-        _chipCache[sym] = data;
-        document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
-          td.innerHTML = _chipCellHtml(data);
-        });
-      }).catch(() => {
-        _chipCache[sym] = { error: true };
-        document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
-          td.innerHTML = _chipCellHtml({ error: true });
+      })
+      .catch(() => {
+        toFetch.forEach(sym => {
+          _chipCache[sym] = { error: true };
+          document.querySelectorAll(`td[data-chip="${sym}"]`).forEach(td => {
+            td.innerHTML = _chipCellHtml({ error: true });
+          });
         });
       });
-    }
   }
 
   tbody.innerHTML = sortedItems.map((item, si) => {
