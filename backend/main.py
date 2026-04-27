@@ -1051,17 +1051,16 @@ async def post_portfolio(request: Request):
     return {"ok": True}
 
 
-def _gist_push_chip_cache():
-    """Push chip_cache.json to Gist in background (called only when new data was scraped)."""
-    if not GIST_ENABLED:
-        return
-    chip_file = DATA_DIR / "chip_cache.json"
-    if not chip_file.exists():
+def _gist_push_file(path: Path):
+    """Push a single file to Gist in background (no timestamp modification).
+    Used for data files that need cross-environment persistence (chip_cache, ETF history, etc.)
+    """
+    if not GIST_ENABLED or not path.exists():
         return
     try:
-        content = chip_file.read_text(encoding="utf-8")
+        content = path.read_text(encoding="utf-8")
     except Exception as e:
-        logger.error(f"[Gist] chip_cache read error: {e}")
+        logger.error(f"[Gist] push_file read error {path.name}: {e}")
         return
 
     def _push():
@@ -1069,17 +1068,21 @@ def _gist_push_chip_cache():
             r = http_requests.patch(
                 f"https://api.github.com/gists/{GIST_ID}",
                 headers=_gist_headers(),
-                json={"files": {"chip_cache.json": {"content": content}}},
+                json={"files": {path.name: {"content": content}}},
                 timeout=15,
             )
             if r.status_code == 200:
-                logger.info("[Gist] chip_cache push OK")
+                logger.info(f"[Gist] push_file OK: {path.name}")
             else:
-                logger.error(f"[Gist] chip_cache push error: {r.status_code}")
+                logger.error(f"[Gist] push_file error {path.name}: {r.status_code}")
         except Exception as e:
-            logger.error(f"[Gist] chip_cache push exception: {e}")
+            logger.error(f"[Gist] push_file exception {path.name}: {e}")
 
     _threading.Thread(target=_push, daemon=True).start()
+
+
+def _gist_push_chip_cache():
+    _gist_push_file(DATA_DIR / "chip_cache.json")
 
 
 @app.get("/api/chip-data")
@@ -2037,6 +2040,7 @@ def fetch_etf_holdings(fund_code: str) -> dict:
     for old in sorted(history.keys())[:-30]:
         del history[old]
     save_json(history_path, history)
+    _gist_push_file(history_path)   # persist across Railway redeploys
 
     _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
     return data
