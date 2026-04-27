@@ -1,0 +1,59 @@
+[    3593ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://auto-load-balancer.likr.com.tw Data: 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3593ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://auto-load-balancer.likr.com.tw @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3772ms] [LOG] [UUID1] 正在呼叫 uuid.php... @ https://auto-cdn.advividnetwork.com/cm/uuid1.php:73
+[    3776ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://auto-load-balancer.likr.com.tw Data: 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3776ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://auto-load-balancer.likr.com.tw @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3788ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://googleads.g.doubleclick.net Data: {"googMsgType":"pvt","token":"AOrYGsm6pEtuMf5KOv5NcSlJv_aOfJa6gNiP4me5yJoMNu39r6X4hMcN9UgvgPBUlXBbOYiyzM_EyL5SBCBjR2XKPd5MSY9ue3DutoB8DvjVVdmOifw"} @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3788ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://googleads.g.doubleclick.net @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3790ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://googleads.g.doubleclick.net Data: {"msg_type":"adsense-labs","key_value":[{"key":"settings","value":"[\"ca-pub-6240822095534788\",[[1]],null,[[\"ID=6f847d87e49ed473:T=1776497656:RT=1776497656:S=ALNI_MZ7HOQ5iaHZn-Ia6JrAnP5THuWEiw\",1810193656,\"/\",\"wantgoo.com\",1],[\"UID=000012690af252a4:T=1776497656:RT=1776497656:S=ALNI_MYBTipzNgEf2sGkXvkN_ITBpzMyRQ\",1810193656,\"/\",\"wantgoo.com\",2]],[\"ID=5dae35ab5f2e62c6:T=1776497656:RT=1776497656:S=AA-AfjbQFJnp_J2gJtrEI0-jR0S5\",1792049656,\"/\",\"wantgoo.com\"]]"}],"googMsgType":"sth"} @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3790ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://googleads.g.doubleclick.net @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3791ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://googleads.g.doubleclick.net Data: {"key_value":[{"key":"qid","value":"CMTe_L3x9pMDFQaDJAYd_9UWIA"}],"googMsgType":"adpnt"} @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3791ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://googleads.g.doubleclick.net @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3822ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://www.google.com Data: _grecaptcha_ready @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    3822ms] [LOG] [UUID] 忽略非UUID來源的訊息： https://www.google.com @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4819
+[    3874ms] [LOG] preview @ :32
+[    4035ms] [LOG] MessagingService @ :35
+[    4036ms] [LOG] before @ https://avivid.likr.tw/sample/before_page/setting/base/index.js:132
+[    4042ms] [LOG] [UUID] Cookie 寫入完成： 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://auto-cdn.likr.com.tw/cm/uuid.php:39
+[    4044ms] [LOG] [UUID1] ✅ 成功接到 uuid.php 回傳: 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://auto-cdn.advividnetwork.com/cm/uuid1.php:47
+[    4083ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://auto-cdn.advividnetwork.com Data: 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    4084ms] [LOG] [UUID] 從 iframe 繼承成功： 1d77c594-99d2-4f43-932f-a2e4d8c875eb @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4825
+[    4227ms] [ERROR] Attestation check for Attribution Reporting on https://ad.doubleclick.net failed. @ https://www.wantgoo.com/global/stwn&:0
+[    4234ms] [ERROR] Attestation check for Shared Storage on https://www.googleadservices.com failed. @ https://www.googleadservices.com/pagead/managed/js/activeview/current/reach_worklet.html:0
+[    4376ms] [LOG] change header title @ https://avivid.likr.tw/api/youlike_page_v2.js:7479
+[    4635ms] [LOG] [UUID Layer1 Debug]收到訊息: Origin: https://googleads.g.doubleclick.net Data: {type: asmreq, payload: [2551519477]} @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:4809
+[    4841ms] [ERROR] Attestation check for Attribution Reporting on https://ad.doubleclick.net failed. @ https://www.wantgoo.com/global/stwn&:0
+[    7548ms] [LOG] Notification permission granted. @ :42
+[   13599ms] [LOG] FCM Token:  dkcYRRyKjuUmQBw8eEMv1N:APA91bHOh6sPRDsa6WL80ww6PNBTwWAKUcjId4zqiEa5gTnH92pqTBiumuFU9BuA5rdlto_Oi-8WzWAJQ9lasmsjqWmgQTlwLYKwp4w8AaJKZgu5FoODjkg @ :47
+[   13601ms] [LOG] FCM Register send: {web_id: wantgoo, token: dkcYRRyKjuUmQBw8eEMv1N:APA91bHOh6sPRDsa6WL80ww6PNB…_Oi-8WzWAJQ9lasmsjqWmgQTlwLYKwp4w8AaJKZgu5FoODjkg, category_id: 20251226000001, avivid_regid: _, webuserid: a88eb9f3-69ef-5f70-721f-364cbeb216e9} @ https://avivid.likr.tw/api/gtm_ring.js:2406
+[   13729ms] [LOG] FCM Register res: {resText: New User, is_insert_success: 1, is_subscribed: 1, token: dkcYRRyKjuUmQBw8eEMv1N:APA91bHOh6sPRDsa6WL80ww6PNB…_Oi-8WzWAJQ9lasmsjqWmgQTlwLYKwp4w8AaJKZgu5FoODjkg, web_id: wantgoo} @ https://avivid.likr.tw/api/gtm_ring.js:2406
+[   38166ms] [LOG] block AviviD.settings @ https://avivid.likr.tw/api/ios_water_webpush_v21.js:643
+[  539079ms] Uncaught TypeError: Cannot read properties of undefined (reading 'timestamp')
+    at AviviD.LikrEventTrackingLeaveStorage (https://rhea-cache.advividnetwork.com/tracker/event_tracker_gtm_media.js:294:32)
+    at AviviD.LikrEventTrackingLeave (https://rhea-cache.advividnetwork.com/tracker/event_tracker_gtm_media.js:262:11)
+    at <anonymous> (:0:46)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:670:428)
+    at qR (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:672:30)
+    at pR (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:669:91)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:227:186)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:156:465)
+    at fb (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:119:718)
+    at eb (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:119:469)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:180:472)
+    at k.apply (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:156:465)
+    at fb (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:119:718)
+    at k.gr (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:119:1285)
+    at sf (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:191:959)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:592:314)
+    at Oz (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:514:0)
+    at Vz.evaluate (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:518:731)
+    at e (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:536:217)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:124:124)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:537:387)
+    at <anonymous> (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:537:127)
+    at kB (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:537:759)
+    at oB (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:541:385)
+    at GC (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:567:326)
+    at JC.b.push (https://www.googletagmanager.com/gtm.js?id=GTM-W9F4QDN&timestamp=1776497654715:571:142)
+    at JC.b.push (https://www.googletagmanager.com/gtag/js?id=DC-15230196&cx=c&gtm=4e64f1:591:2)
+    at <anonymous> (:0:93)

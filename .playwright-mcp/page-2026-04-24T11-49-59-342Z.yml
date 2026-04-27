@@ -1,0 +1,682 @@
+- generic [ref=e2]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - paragraph [ref=e10]:
+        - text: 【群益投信反詐騙公告】近期各大金融機構接獲各種投資詐騙回報，投資人若遇可疑情事，可撥打
+        - strong [ref=e11]: "165"
+        - text: 警政署反詐騙專線，或與群益投信聯絡。了解更多>>
+        - link "https://www.capitalfund.com.tw/service/news/665" [ref=e12] [cursor=pointer]:
+          - /url: https://www.capitalfund.com.tw/service/news/665
+      - banner [ref=e13]:
+        - generic [ref=e15]:
+          - link [ref=e17] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e19]:
+            - link "ETF首頁" [ref=e20] [cursor=pointer]:
+              - /url: /etf
+            - link "即時預估淨值" [ref=e21] [cursor=pointer]:
+              - /url: /etf/transaction/networth
+            - link "配息專區 配息查詢 ETF配息資料申請變更 ETF年度配息資料申請 配息時程一覽表 Hot" [ref=e22] [cursor=pointer]:
+              - /url: unsafe:javascript:;
+              - text: 配息專區
+              - generic [ref=e23]:
+                - link "配息查詢" [ref=e24]:
+                  - /url: /etf/product/interest
+                - link "ETF配息資料申請變更" [ref=e25]:
+                  - /url: /etfdividend
+                - link "ETF年度配息資料申請" [ref=e26]:
+                  - /url: /etfdividend
+                - link "配息時程一覽表" [ref=e27]:
+                  - /url: /etf/product/cross/schedule
+              - heading "Hot" [level=6] [ref=e28]
+            - link "ETF產品資訊 群益ETF總覽 重要公告 產品特色一覽表 參與券商與流動提供者" [ref=e29] [cursor=pointer]:
+              - /url: unsafe:javascript:;
+              - text: ETF產品資訊
+              - generic [ref=e30]:
+                - link "群益ETF總覽" [ref=e31]:
+                  - /url: /etf/product/overview
+                - link "重要公告" [ref=e32]:
+                  - /url: /etf/product/news
+                - link "產品特色一覽表" [ref=e33]:
+                  - /url: /etf/product/cross/feature
+                - link "參與券商與流動提供者" [ref=e34]:
+                  - /url: /etf/product/cross/supplier
+            - link "ETF交易資訊 申購買回清單 追蹤差距 指數收盤行情 款券交付日程 表單下載" [ref=e35] [cursor=pointer]:
+              - /url: unsafe:javascript:;
+              - text: ETF交易資訊
+              - generic [ref=e36]:
+                - link "申購買回清單" [ref=e37]:
+                  - /url: /etf/transaction/buyback
+                - link "追蹤差距" [ref=e38]:
+                  - /url: /etf/transaction/deviation
+                - link "指數收盤行情" [ref=e39]:
+                  - /url: /etf/transaction/indexclosing
+                - link "款券交付日程" [ref=e40]:
+                  - /url: /etf/transaction/delivery
+                - link "表單下載" [ref=e41]:
+                  - /url: /etf/transaction/download
+            - link "ETF投資學院 市場情報 ETF介紹 ETF Q&A" [ref=e42] [cursor=pointer]:
+              - /url: unsafe:javascript:;
+              - text: ETF投資學院
+              - generic [ref=e43]:
+                - link "市場情報" [ref=e44]:
+                  - /url: /etf/investment/news
+                - link "ETF介紹" [ref=e45]:
+                  - /url: /etf/investment/intro
+                - link "ETF Q&A" [ref=e46]:
+                  - /url: /etf/investment/faq
+          - generic [ref=e50]:
+            - link "search search 搜尋" [ref=e51] [cursor=pointer]:
+              - /url: jacascript:void(0);
+              - img "search" [ref=e52]
+              - generic:
+                - img "search" [ref=e53]
+                - generic [ref=e56]:
+                  - textbox "請輸入關鍵字" [ref=e57]
+                  - button "搜尋" [ref=e58]
+            - link "登入交易" [ref=e59] [cursor=pointer]:
+              - /url: /member/login
+            - link "(EN)" [ref=e60] [cursor=pointer]:
+              - /url: https://www.capitalfund.com.tw/ETF_Area/index_en
+        - text:  搜尋
+        - generic:
+          - text:   搜尋          搜尋
+          - generic [ref=e61]:
+            - link "ETF總覽" [ref=e62] [cursor=pointer]:
+              - /url: /etf/product/overview
+              - paragraph [ref=e63]: ETF總覽
+              - img [ref=e64]
+            - link "配息查詢" [ref=e66] [cursor=pointer]:
+              - /url: /etf/product/interest/list
+              - paragraph [ref=e67]: 配息查詢
+              - img [ref=e68]
+            - link "預估淨值" [ref=e70] [cursor=pointer]:
+              - /url: /etf/transaction/networth
+              - paragraph [ref=e71]: 預估淨值
+              - img [ref=e72]
+            - link "買回清單" [ref=e81] [cursor=pointer]:
+              - /url: /etf/transaction/buyback
+              - paragraph [ref=e82]: 買回清單
+              - img [ref=e83]
+    - main [ref=e85]:
+      - generic [ref=e87]:
+        - generic [ref=e89]:
+          - navigation [ref=e90]:
+            - link "" [ref=e91] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e92]: 
+            - list [ref=e93]:
+              - listitem [ref=e94]:
+                - generic [ref=e95] [cursor=pointer]: ETF產品資訊
+              - listitem [ref=e96]:
+                - link "群益ETF總覽" [ref=e97] [cursor=pointer]:
+                  - /url: /etf/product/overview
+              - listitem [ref=e98]:
+                - generic [ref=e99] [cursor=pointer]: 主動群益科技創新
+          - generic [ref=e101]:
+            - paragraph [ref=e102]:
+              - link " 返回上一頁" [ref=e103] [cursor=pointer]:
+                - /url: javascript:void(0)
+                - generic [ref=e104]: 
+                - text: 返回上一頁
+            - generic [ref=e106]:
+              - heading "00992A 群益台灣科技創新主動式ETF基金" [level=1] [ref=e107]
+              - heading "(本基金之配息來源可能為收益平準金)" [level=6] [ref=e108]
+        - generic [ref=e110]:
+          - generic [ref=e113]:
+            - link [ref=e114] [cursor=pointer]:
+              - /url: javascript:;
+              - img [ref=e115]
+            - link [ref=e117] [cursor=pointer]:
+              - /url: javascript:;
+              - img [ref=e118]
+            - link [ref=e120] [cursor=pointer]:
+              - /url: javascript:;
+              - img [ref=e121]
+          - generic [ref=e124]:
+            - generic: 
+            - combobox [ref=e125]:
+              - option "00919 群益台灣精選高息"
+              - option "00937B 群益ESG投等債20+"
+              - option "00953B 群益優選非投等債"
+              - option "00982A 主動群益台灣強棒"
+              - option "00992A 主動群益科技創新" [selected]
+              - option "00997A 主動群益美國增長"
+              - option "00985B 群益ESG投等債0-5"
+              - option "00923 群益台ESG低碳50"
+              - option "00946 群益科技高息成長"
+              - option "00927 群益半導體收益"
+              - option "00764B 群益25年美債"
+              - option "00643 群益深証中小"
+              - option "00678 群益那斯達克生技"
+              - option "00685L 群益臺灣加權正2"
+              - option "00686R 群益臺灣加權反1"
+              - option "00714 群益道瓊美國地產"
+              - option "00722B 群益投資級電信債"
+              - option "00723B 群益投資級科技債"
+              - option "00724B 群益投資級金融債"
+              - option "00754B 群益AAA-AA公司債"
+              - option "00755B 群益投資級公用債"
+              - option "00756B 群益投等新興公債"
+              - option "00792B 群益A級公司債"
+              - option "00793B 群益AAA-A醫療債"
+              - option "00859B 群益0-1年美債"
+              - option "00860B 群益1-5Y投資級債"
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - heading "最新預估淨值" [level=4] [ref=e129]
+            - heading "16.9" [level=3] [ref=e130]
+            - heading "2026/04/24" [level=6] [ref=e131]
+          - generic [ref=e132]:
+            - heading "相較昨收漲跌幅%" [level=4] [ref=e133]
+            - heading "1.56%" [level=3] [ref=e134]
+            - heading "2026/04/24" [level=6] [ref=e135]
+          - generic [ref=e136]:
+            - heading "配息頻率" [level=4] [ref=e137]
+            - heading "季配" [level=3] [ref=e138]
+        - generic [ref=e140]:
+          - generic [ref=e142]:
+            - text: 
+            - generic [ref=e144]:
+              - generic "基本資料" [ref=e145]:
+                - link "基本資料" [ref=e146] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/basic
+              - generic "投資組合" [ref=e147]:
+                - link "投資組合" [ref=e148] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/portfolio
+              - generic "淨值與績效走勢" [ref=e149]:
+                - link "淨值與績效走勢" [ref=e150] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/trend
+              - generic "歷史配息" [ref=e151]:
+                - link "歷史配息" [ref=e152] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/interest
+              - generic "參與券商與流動量提供者" [ref=e153]:
+                - link "參與券商與流動量提供者" [ref=e154] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/supplier
+              - generic "申購買回清單" [ref=e155]:
+                - link "申購買回清單" [ref=e156] [cursor=pointer]:
+                  - /url: /etf/product/detail/500/buyback
+          - generic [ref=e157]:
+            - generic [ref=e158]:
+              - generic [ref=e159]:
+                - generic [ref=e161]:
+                  - generic [ref=e162]: 最新日期
+                  - textbox [ref=e165] [cursor=pointer]:
+                    - /placeholder: yyyy/mm/dd
+                    - text: 2026/04/27
+                  - button "下載資料" [ref=e166] [cursor=pointer]:
+                    - text: 下載資料
+                    - img [ref=e167]
+                - heading "投資組合" [level=4] [ref=e171]
+                - generic [ref=e173]:
+                  - generic [ref=e174]:
+                    - generic [ref=e175]: 基金淨資產價值(元)
+                    - generic [ref=e176]:
+                      - generic [ref=e177]: TWD
+                      - text: 48,550,452,697
+                  - generic [ref=e178]:
+                    - generic [ref=e179]: 每受益權單位淨資產價值(元)-台幣交易
+                    - generic [ref=e180]:
+                      - generic [ref=e181]: TWD
+                      - text: "16.9"
+                  - generic [ref=e182]:
+                    - generic [ref=e183]: 已發行受益權單位總數-台幣交易
+                    - generic [ref=e184]: 2,872,455,000
+              - generic [ref=e185]:
+                - heading "股票" [level=4] [ref=e188]
+                - generic [ref=e189]:
+                  - generic [ref=e191]:
+                    - generic [ref=e192]: 股票代號
+                    - generic [ref=e193]: 股票名稱
+                    - generic [ref=e194]: 持股權重(%)
+                    - generic [ref=e195]: 股數
+                  - generic [ref=e196]:
+                    - generic [ref=e197]:
+                      - generic [ref=e198]: "2330"
+                      - generic [ref=e199]: 台積電
+                      - generic [ref=e200]: 5.9%
+                      - generic [ref=e201]: 1,311,000
+                    - generic [ref=e202]:
+                      - generic [ref=e203]: "2383"
+                      - generic [ref=e204]: 台光電
+                      - generic [ref=e205]: 4.95%
+                      - generic [ref=e206]: 537,000
+                    - generic [ref=e207]:
+                      - generic [ref=e208]: "6669"
+                      - generic [ref=e209]: 緯穎
+                      - generic [ref=e210]: 4.44%
+                      - generic [ref=e211]: 465,000
+                    - generic [ref=e212]:
+                      - generic [ref=e213]: "8996"
+                      - generic [ref=e214]: 高力
+                      - generic [ref=e215]: 3.91%
+                      - generic [ref=e216]: 1,689,000
+                    - generic [ref=e217]:
+                      - generic [ref=e218]: "3105"
+                      - generic [ref=e219]: 穩懋
+                      - generic [ref=e220]: 3.87%
+                      - generic [ref=e221]: 3,433,000
+                    - generic [ref=e222]:
+                      - generic [ref=e223]: "3665"
+                      - generic [ref=e224]: 貿聯-KY
+                      - generic [ref=e225]: 3.8%
+                      - generic [ref=e226]: 667,000
+                    - generic [ref=e227]:
+                      - generic [ref=e228]: "3037"
+                      - generic [ref=e229]: 欣興
+                      - generic [ref=e230]: 3.76%
+                      - generic [ref=e231]: 2,310,000
+                    - generic [ref=e232]:
+                      - generic [ref=e233]: "3017"
+                      - generic [ref=e234]: 奇鋐
+                      - generic [ref=e235]: 3.65%
+                      - generic [ref=e236]: 601,000
+                    - generic [ref=e237]:
+                      - generic [ref=e238]: "2345"
+                      - generic [ref=e239]: 智邦
+                      - generic [ref=e240]: 3.16%
+                      - generic [ref=e241]: 716,000
+                    - generic [ref=e242]:
+                      - generic [ref=e243]: "6510"
+                      - generic [ref=e244]: 精測
+                      - generic [ref=e245]: 3.16%
+                      - generic [ref=e246]: 422,000
+                    - button "展開全部 " [ref=e248] [cursor=pointer]:
+                      - text: 展開全部
+                      - generic [ref=e249]: 
+              - generic [ref=e250]:
+                - heading "其他資產" [level=4] [ref=e253]
+                - generic [ref=e256]:
+                  - generic [ref=e257]: 應收付證券款
+                  - generic [ref=e258]:
+                    - generic [ref=e259]: TWD
+                    - text: "-2,246,711,546.00"
+                  - generic [ref=e260]: 現金
+                  - generic [ref=e261]:
+                    - generic [ref=e262]: TWD
+                    - text: 3,471,957,831.00
+            - generic:
+              - generic:
+                - generic: 股票代號
+                - generic: 股票名稱
+                - generic: 持股權重(%)
+                - generic: 股數
+    - contentinfo [ref=e264]:
+      - generic [ref=e268]:
+        - generic [ref=e269]:
+          - generic [ref=e270]:
+            - generic [ref=e271]:
+              - heading "群益證券投資信託股份有限公司" [level=3] [ref=e273]
+              - generic [ref=e274]:
+                - link " 群益粉絲團" [ref=e275] [cursor=pointer]:
+                  - /url: https://www.facebook.com/Capitalfund.tw
+                  - generic [ref=e276]: 
+                  - text: 群益粉絲團
+                - link " 群益LINE官方帳號" [ref=e277] [cursor=pointer]:
+                  - /url: https://line.me/R/ti/p/%40bju4741x
+                  - generic [ref=e278]: 
+                  - text: 群益LINE官方帳號
+              - generic [ref=e279]:
+                - paragraph [ref=e280]:
+                  - generic [ref=e281]: 
+                  - text: 106 台北市大安區敦化南路二段69號15樓
+                - generic [ref=e282]:
+                  - generic [ref=e283]: 
+                  - list [ref=e284]:
+                    - listitem [ref=e285]: 台北 (02)2706-7688
+                    - listitem [ref=e286]: "| 台中 (04)2301-2345"
+                    - listitem [ref=e287]: "| 高雄 (07)335-1678"
+            - generic [ref=e288]:
+              - link "網站導覽" [ref=e289] [cursor=pointer]:
+                - /url: /capital/other/sitemap
+              - link "English" [ref=e290] [cursor=pointer]:
+                - /url: /english/capital/about
+              - link "防制洗錢及打擊資恐專區" [ref=e291] [cursor=pointer]:
+                - /url: /capital/other/protect
+              - link "金融友善服務專區" [ref=e292] [cursor=pointer]:
+                - /url: /capital/other/friendly-service
+              - link "金融消費爭議處理專區" [ref=e293] [cursor=pointer]:
+                - /url: /capital/other/consumer-dispute
+              - link "重要事項" [ref=e294] [cursor=pointer]:
+                - /url: /capital/other/statement
+              - link "機構投資人盡職治理揭露" [ref=e295] [cursor=pointer]:
+                - /url: /capital/other/governance
+              - text: 非金管會核准之證券期貨業者及商品警示專區
+              - link "通路報酬揭露專區" [ref=e296] [cursor=pointer]:
+                - /url: /capital/other/salespipeline
+          - generic [ref=e300]:
+            - textbox "輸入 Email 訂閱群益最新訊息" [ref=e301] [cursor=pointer]
+            - button "訂閱" [ref=e302] [cursor=pointer]
+        - generic [ref=e304]:
+          - generic [ref=e305]:
+            - paragraph [ref=e307]: 群益投信獨立經營管理 一百零八金管投信新字第零壹玖號
+            - paragraph [ref=e308]:
+              - strong [ref=e309]: 群益投信獨立經營管理。
+              - strong [ref=e310]: 本網站提供之資料僅供參考。本網站所提供之資訊乃基於或來自於相信為可靠之消息來源。經理公司並不保證其完整性。該等資訊將根據市場情況而隨時更改。經理公司並不對任何人因使用任何本網站提供之資訊所引起之損失而負責。
+              - strong [ref=e311]: 系列基金經金管會或其指定機構核准或同意生效，惟不表示系列基金絕無風險。經理公司以往之經理績效不保證系列基金之最低投資收益；經理公司除盡善良管理人之注意義務外，不負責系列基金之盈虧，亦不保證最低之收益。投資一定有風險，基金投資有賺有賠，申購前應詳閱公開說明書或簡式公開說明書。
+              - strong [ref=e312]: 系列基金並無受存款保險、保險安定基金或其他相關保障機制之保障，基金投資可能發生部分或全部本金之損失，投資人須自負盈虧。
+              - strong [ref=e313]: 有關基金應負擔之費用已揭露於公開說明書或簡式公開說明書中，投資人可向經理公司及基金銷售機構索取，或至公開資訊觀測站(mops.twse.com.tw)及經理公司網站(www.capitalfund.com.tw)中查詢。投資遞延手續費N類型者，其手續費之收取將於買回時支付，且該費用將依持有期間而有所不同，其餘費用之計收與前收手續費類型完全相同，亦不加計分銷費用。
+              - strong [ref=e314]: 本網站提及之相關資產配置比重僅供示意，不代表系列基金之必然投資配置，系列基金之實際配置，經理公司將依實際市場狀況進行調整。
+              - strong [ref=e315]: 投資人申購系列基金係持有基金受益憑證，而非本網站提及之投資資產或標的。本網站提及之經濟走勢預測不必然代表系列基金之績效，此外匯率走勢亦可能影響所投資之海外資產價值變動，系列基金投資風險請詳閱基金公開說明書。本網站涉及新興市場部分，因其波動性與風險程度可能較高，且其政治經濟情勢穩定度可能使資產價值受不同程度之影響。基金配息不代表基金實際報酬，且過去配息不代表未來配息；基金淨值可能因市場因素而上下波動。
+              - strong [ref=e316]: 系列基金淨值/配息組成項目，可於經理公司網站查詢。
+              - strong [ref=e317]: 系列基金配息可能由基金的收益或本金/收益平準金中支付。任何涉及由本金/收益平準金支出的部份，可能導致原始投資金額減少。投資人因不同時間進場，將有不同之投資績效，過去之績效亦不代表未來績效之保證。本網站如涉及系列被動式ETF追蹤指數績效或殖利率之表現，不代表系列被動式ETF之實際報酬率或配息率及未來績效保證，不同時間進場投資，其結果將可能不同，且並未考量交易成本。系列主動式ETF投資目標未追蹤、模擬或複製特定指數之表現，而係經理公司依其所訂投資策略進行投資。
+              - strong [ref=e318]: 查詢系列基金公開說明書或簡式公開說明書之網址，包括金管會指定之資訊申報網站之網址及經理公司揭露公開說明書相關資料之網址。1.「群益投信理財網」（www.capitalfund.com.tw）2.「公開資訊觀測站」（mops.twse.com.tw）。
+            - generic [ref=e319]:
+              - paragraph [ref=e320]:
+                - strong [ref=e321]: 【群益多重資產組合基金】
+              - paragraph [ref=e322]:
+                - strong [ref=e323]: 本基金投資於子基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制， 容易暴漲暴跌，交易風險高，且因監管與稅制多變、託管集中度高及可能受人為操縱，尚有市場波動風險、流動性風險 、稅務風險、監管風險、託管風險及市場操縱風險等。
+              - paragraph [ref=e324]:
+                - strong [ref=e325]
+              - paragraph [ref=e326]:
+                - strong [ref=e327]: 【群益工業國入息基金
+                - strong [ref=e328]: (本基金配息來源可能為本金且基金並無保證收益及配息)
+                - strong [ref=e329]: 】
+              - paragraph [ref=e330]:
+                - strong [ref=e331]: 本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e332]:
+                - strong [ref=e333]
+              - paragraph [ref=e334]:
+                - strong [ref=e335]: 【群益環球金綻雙喜基金
+                - strong [ref=e336]: （本基金有相當比重投資於持有非投資等級高風險債券之基金且配息來源可能為本金）
+                - strong [ref=e337]: 】
+              - paragraph [ref=e338]:
+                - strong [ref=e339]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高， 故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人， 適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、 管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息， 此類證券價格的波動可能較為劇烈。本基金投資於子基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制，容易暴漲暴跌，交易風險高， 且因監管與稅制多變、託管集中度高及可能受人為操縱，尚有市場波動風險、流動性風險、稅務風險、監管風險、託管風險及市場操縱風險等。 本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e340]:
+                - strong [ref=e341]
+              - paragraph [ref=e342]:
+                - strong [ref=e343]: 【群益中國金采平衡基金
+                - strong [ref=e344]: （本基金有相當比例投資於非投資等級之高風險債券且配息來源可能為本金）
+                - strong [ref=e345]: 】
+              - paragraph [ref=e346]:
+                - strong [ref=e347]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e348]:
+                - strong [ref=e349]
+              - paragraph [ref=e350]:
+                - strong [ref=e351]: 【群益全球地產入息證券投資信託基金
+                - strong [ref=e352]: (本基金有相當比例投資於非投資等級之高風險債券及配息來源可能為本金且基金並無保證收益及配息)
+                - strong [ref=e353]: 】
+              - paragraph [ref=e354]:
+                - strong [ref=e355]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e356]:
+                - strong [ref=e357]
+              - paragraph [ref=e358]:
+                - strong [ref=e359]: 【群益金選報酬平衡基金
+                - strong [ref=e360]: （本基金有相當比例投資於非投資等級之高風險債券且配息來源可能為本金）
+                - strong [ref=e361]: 】
+              - paragraph [ref=e362]:
+                - strong [ref=e363]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為本基金淨資產價值百分之二十（20%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e364]:
+                - strong [ref=e365]
+              - paragraph [ref=e366]:
+                - strong [ref=e367]: 【群益全球優先順位非投資等級債券基金
+                - strong [ref=e368]: （本基金配息來源可能為本金）
+                - strong [ref=e369]: 】
+              - paragraph [ref=e370]:
+                - strong [ref=e371]: 本基金主要投資於全球具優先擔保性質之非投資等級債券，發行公司以其全部或部分資產，或者由發行公司之外的第三人對償還債券本息提供擔保而發行的非投資等級之債券。由於具優先擔保性質之非投資等級債券與一般非投資等級債券皆為信用評等未達投資等級或未經信用評等之債券，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人。本基金主要投資於信用評等未達投資等級之非投資等級債券，債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為本基金淨資產價值百分之十（10%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e372]:
+                - strong [ref=e373]
+              - paragraph [ref=e374]:
+                - strong [ref=e375]: 【群益全球特別股收益基金
+                - strong [ref=e376]: （本基金之配息來源可能為本金）
+                - strong [ref=e377]: 】
+              - paragraph [ref=e378]:
+                - strong [ref=e379]: 本基金進行配息前未先扣除應負擔之相關費用。
+              - paragraph [ref=e380]:
+                - strong [ref=e381]
+              - paragraph [ref=e382]:
+                - strong [ref=e383]: 【群益2028 REVERSO美元保本基金
+                - strong [ref=e384]: （保護型保本基金；保本比率為本金之115%，但投資人於基金到期日前提出買回申請，到期前之買回淨值不保證會高於基金保本率或發行價格）
+                - strong [ref=e385]: 】
+              - paragraph [ref=e386]:
+                - strong [ref=e387]: 本基金無提供保證機構保證之機制，係透過投資工具達成保護本金之功能。本基金經金管會同意生效，惟不表示絕無風險。投資人持有本基金至到期日時，始可享有115％的本金保護。投資人於到期日前買回者、投資標的發行人或證券相關商品交易對手發生違約或信用風險、選擇權因市場發生不可抗力因素（如法令變更、戰爭等）而被選擇權發行人提前贖回、或有本基金信託契約第26條或公開說明書所定應提前終止之情事者，不在保護範圍，投資人應承擔整個投資期間之相關費用，並依當時淨值計算買回價格。投資人應了解到期日前本基金之淨值可能因市場因素而波動，因保護並非保證，投資標的發行人或證券相關商品交易對手違約或發生信用風險、選擇權因市場發生不可抗力因素（如法令變更、戰爭等）而被選擇權發行人提前贖回等因素，將無法達到本金保護之效果，投資人在進行交易前，應確定已充分瞭解本基金之風險與特性。
+              - paragraph [ref=e388]:
+                - strong [ref=e389]
+              - paragraph [ref=e390]:
+                - strong [ref=e391]: 【群益潛力收益多重資產基金
+                - strong [ref=e392]: (本基金有相當比重投資於非投資等級之高風險債券且基金之配息來源可能為本金)
+                - strong [ref=e393]: 】
+              - paragraph [ref=e394]:
+                - strong [ref=e395]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、 市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資 人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及 利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券， 該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。轉換公司債兼具債券與股票之性質，因此除利率風險、流動 性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金投 資於基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制，容易暴漲暴跌，交易風險高，且因監管與稅制多變 、託管集中度高及可能受人為操縱，尚有市場波動風險、流動性風險、稅務風險、監管風險、託管風險及市場操縱風險等。
+              - paragraph [ref=e396]:
+                - strong [ref=e397]
+              - paragraph [ref=e398]:
+                - strong [ref=e399]: 【群益全球策略收益金融債券基金
+                - strong [ref=e400]: （本基金有一定比重投資於非投資等級之高風險債券且基金之配息來源可能為本金）
+                - strong [ref=e401]: 】
+              - paragraph [ref=e402]:
+                - strong [ref=e403]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為本基金淨資產價值百分之七十（70%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。
+              - paragraph [ref=e404]:
+                - strong [ref=e405]
+              - paragraph [ref=e406]:
+                - strong [ref=e407]: 【群益全民成長樂退組合基金
+                - strong [ref=e408]: （本基金有相當比重投資於持有非投資等級高風險債券之基金且配息來源可能為本金）
+                - strong [ref=e409]: 】、【群益全民優質樂退組合基金
+                - strong [ref=e410]: （本基金有相當比重投資於持有非投資等級高風險債券之基金且配息來源可能為本金）
+                - strong [ref=e411]: 】及【群益全民安穩樂退組合基金
+                - strong [ref=e412]: （本基金配息來源可能為本金）
+                - strong [ref=e413]: 】
+              - paragraph [ref=e414]:
+                - strong [ref=e415]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、 市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人 投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息 或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金投資於子基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制，容易暴漲暴跌，交易風險高，且因監管與稅制多變、 託管集中度高及可能受人為操縱，尚有市場波動風險、流動性風險、稅務風險、監管風險、託管風險及市場操縱風險等。
+              - paragraph [ref=e416]:
+                - strong [ref=e417]
+              - paragraph [ref=e418]:
+                - strong [ref=e419]: 【群益優化收益成長多重資產證券投資信託基金
+                - strong [ref=e420]: （本基金有相當比重投資於非投資等級之高風險債券且基金之配息來源可能為本金）
+                - strong [ref=e421]: 】
+              - paragraph [ref=e422]:
+                - strong [ref=e423]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為本基金淨資產價值百分之二十（20%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。 轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。 本基金投資於基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制，容易暴漲暴跌，交易風險高，且因監管與稅制多變、託管集中度高及可能受人為操縱， 尚有市場波動風險、流動性風險、稅務風險、監管風險、託管風險及市場操縱風險等。
+              - paragraph [ref=e424]:
+                - strong [ref=e425]
+              - paragraph [ref=e426]:
+                - strong [ref=e427]: 【群益時機對策非投資等級債券證券投資信託基金
+                - strong [ref=e428]: （本基金配息來源可能為本金）
+                - strong [ref=e429]: 】
+              - paragraph [ref=e430]:
+                - strong [ref=e431]: 由於非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。 本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人。由於本基金主要投資於非投資等級債券，故投資人投資本基金不宜占其投資組合過高之比重。本基金主要投資於信用 評等未達投資等級之非投資等級債券，債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景 氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致 波動性較大之風險。本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為 本基金淨資產價值百分之二十（20%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、 債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。 應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外， 還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。
+              - paragraph [ref=e432]:
+                - strong [ref=e433]
+              - paragraph [ref=e434]:
+                - strong [ref=e435]: 【群益印美戰略多重資產證券投資信託基金
+                - strong [ref=e436]: （本基金有相當比重投資於非投資等級之高風險債券且基金之配息來源可能為本金）
+                - strong [ref=e437]: 】
+              - paragraph [ref=e438]:
+                - strong [ref=e439]: 由於本基金有相當比重投資於非投資等級債券，非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降， 或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人，投資人投資本基金不宜占其投資組合過高之比重。 非投資等級債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間， 稍有不利消息，此類證券價格的波動可能較為劇烈。本基金可投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。 本基金得投資應急可轉換債券（CoCo Bond）及具總損失吸收能力債券（TLAC Bond），且投資於CoCo Bond上限為本基金淨資產價值百分之十（10%），投資於TLAC Bond上限為本基金淨資產價值百分之二十（20%）， 是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、 票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。應急可轉換債券（CoCo Bond） 及具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外， 還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。本基金投資於基金受益憑證部份可能涉有重複收取經理費。 本基金可投資虛擬資產指數股票型基金，虛擬資產為具有高度投機性的數位「虛擬商品」，其交易價格無漲跌幅之限制，容易暴漲暴跌，交易風險高，且因監管與稅制多變、託管集中度高及可能受人為操縱， 尚有市場波動風險、流動性風險、稅務風險、監管風險、託管風險及市場操縱風險等。
+              - paragraph [ref=e440]:
+                - strong [ref=e441]
+              - paragraph [ref=e442]:
+                - strong [ref=e443]: 【群益深証中小100基金】
+              - paragraph [ref=e444]:
+                - strong [ref=e445]: 本基金所複製追蹤之標的指數為非客製化之「中小企業100指數（SZSE SME 100 Index）」，係由深圳証券交易所委託深圳証券信息有限公司所編製及計算。深圳証券信息有限公司將採取一切必要措施確保標的指數提供時之即時性、準確性及完整性，但不對此作任何保證，且深圳証券交易所及深圳証券信息有限公司對於標的指數之不準確、延遲或遺漏所引起的損失或損害概不負責，也無義務對受益人、本基金或經理公司等任何主體或任何錯誤提供建議或承擔責任。中小企業100指數之所有權歸深圳証券交易所及深圳証券信息有限公司所有，
+                - img "深圳指數之LOGO" [ref=e446]
+                - strong [ref=e447]: 為深圳指數之LOGO，由深圳証券信息有限公司授權使用。
+              - paragraph [ref=e448]:
+                - strong [ref=e449]
+              - paragraph [ref=e450]:
+                - strong [ref=e451]: 【群益那斯達克生技基金】
+              - paragraph [ref=e452]:
+                - strong [ref=e453]: 本基金所複製追蹤之標的指數為非客製化之「那斯達克生技指數（Nasdaq Biotechnology Index）」，係由Nasdaq,Inc（以下稱指數提供者）所編製及計算，指數提供者並與經理公司簽訂指數授權契約，授權本基金使用標的指數及標的指數之名稱。本基金並非Nasdaq, Inc.及其關係企業（以下稱「Corporations」）所發行、推廣及銷售，Corporations不曾為本基金贊助或背書。Corporations未就本基金之合法性、適當性、資料介紹及相關訊息揭露做出正確性之說明。Corporations概不就本基金之受益人或對一般投資大眾，做出本基金是否值得投資及 Nasdaq Biotechnology Index對股市整體表現之追蹤能力，提供任何明示或隱含之聲明或保證。Corporations與 經理公司之關係僅限於向其授權Nasdaq®、Nasdaq, Inc.、The Nasdaq Stock Market、NASDAQ，以及授權其使用 Nasdaq Biotechnology Index。Nasdaq從事Nasdaq Biotechnology Index之組構、計算及認定時，無義務將經理公司及本基金之需求考慮在內。Corporations概不負責且未參與確定本基金發行之時間、價格或數量，亦不負責且不參與確定或計算本基金轉換為現金之相關公式。Corporations就本基金之管理、行銷或交易概不承擔任何義務或法律責任。Corporations不保證Nasdaq Biotechnology Index及其中所含任何資料之準確性及／或計算絕不間斷。Corporations對經理公司、本基金及任何其他個人或團體使用Nasdaq Biotechnology Index或其中任何資料後將會產生何種結果，一概不作任何明示及隱含之聲明及保證。Corporations一概不對[Nasdaq Biotechnology Index]®及其中所含任何資料之銷售能力及對特定目的或用途的適合度，提供任何明示及隱含保證，並在此一概否認有此保證。（以上聲明不受下述條文所限制）Corporations對任何損失獲利、個案、附帶、間接及衍生損害及懲罰性損賠，一概不予負責，縱然曾經獲得告知發生該等損害之可能性，亦同。
+              - paragraph [ref=e454]:
+                - strong [ref=e455]
+              - paragraph [ref=e456]:
+                - strong [ref=e457]: 【群益臺灣加權指數單日正向2倍基金】及【群益臺灣加權指數單日反向1倍基金】
+              - paragraph [ref=e458]:
+                - strong [ref=e459]: 本基金分別具有槓桿或反向風險，其投資盈虧深受市場波動與複利效果影響，與傳統指數股票型基金不同。本基金不適合追求長期投資且不熟悉本基金以追求單日報酬為投資目標之投資人。投資人交易前，應詳閱本基金公開說明書並確定已充分瞭解本基金之風險及特性。
+              - paragraph [ref=e460]:
+                - strong [ref=e461]: 本基金二檔子基金所追蹤之標的指數為非客製化之「臺指日報酬兩倍指數」及「臺指反向一倍指數」，本基金子基金「群益臺灣加權指數單日正向2倍基金及群益臺灣加權指數單日反向1倍基金」並非由臺灣證券交易所股份有限公司(「證交所」)贊助、認可、銷售或推廣；且證交所不就使用「臺灣證券交易所發行量加權股價日報酬正向兩倍指數」和「臺灣證券交易所發行量加權股價日報酬反向一倍指數」及／或該指數於任何特定日期、時間所代表數字之預期結果提供任何明示或默示之擔保或聲明。「臺灣證券交易所發行量加權股價日報酬正向兩倍指數」及「臺灣證券交易所發行量加權股價日報酬反向一倍指數」係由證交所編製及計算；惟證交所不就「臺灣證券交易所發行量加權股價日報酬正向兩倍指數」及「臺灣證券交易所發行量加權股價日報酬反向一倍指數」之錯誤承擔任何過失或其他賠償責任；且證交所無義務將指數中之任何錯誤告知任何人。
+              - paragraph [ref=e462]:
+                - strong [ref=e463]
+              - paragraph [ref=e464]:
+                - strong [ref=e465]: 【群益道瓊美國地產ETF基金】
+              - paragraph [ref=e466]:
+                - strong [ref=e467]: 指數免責聲明：
+              - paragraph [ref=e468]:
+                - strong [ref=e469]: 道瓊美國地產指數（Dow Jones U.S. Real Estate Index）(以下簡稱「指數」)係 S&P Dow Jones Index LLC或其聯屬公司（「SPDJI」）之產品，且業已授權群益投信使用。Standard & Poor’s®及 S&P® 為 Standard & Poor’s Financial Services LLC（「S&P」） 之註冊商標， Dow Jones® 為 Dow Jones Trademark Holdings LLC（「Dow Jones」）之註冊商標，且此等商標業經 SPDJI 授權使用，並已再授權予群益投信使用於特定目的。群益道瓊美國地產ETF基金(以下簡稱「本基金」)非由 SPDJI、Dow Jones、S&P、其任何相關聯屬公司（以下合稱「S&P Dow Jones Indices」）推薦、承銷、銷售或宣傳。無論 S&P Dow Jones Indices概不就一般投資於證券或特定投資於本基金是否適合或指數追蹤一般市場表現的能力，向本基金之擁有人或公眾之任何成員做出任何明示或暗示的聲明或保證。S&P Dow Jones Indices僅在指數之相關事宜，以及 S&P Dow Jones Indices及／或之指數和特定商標、服務標章及／或商品名稱授權等方面，與群益投信有往來關係。指數係由S&P Dow Jones Indices決定、編製與計算，與群益投信或本基金無關。S&P Dow Jones Indices在決定、編製與計算指數 時，無義務考量群益投信或本基金之需求。S&P Dow Jones Indices皆無須針對決定本基金之價格及數量，或發行或銷售本基金之時點，或決定或計算將本基金轉換成現金、解約或贖回（視情況而定）之公式負責，且未參與前述作業。SS&P Dow Jones Indices無須負擔管理、行銷或買賣 本基金之義務或責任。S&P Dow Jones Indices未保證依據指數設計之投資產品，可精確追蹤指數績效或提供正向投資報酬。S&P Dow Jones Index LLC 非投資顧問，將證券納入指數，不代表S&P Dow Jones Indices建議購買、出售或持有該等證券，亦不應視為投資建議。S&P DOW JONES INDICES概不對指數或任何相關資料或任何往來聯繫資料之適當性、正確性、即時性及／或完整性，提出任何保證，包括但不限於與該等事宜有關的口頭或書面聯繫資料（包括電子通訊）。S&P DOW JONES INDICES無須為該等資料之任何錯誤、疏漏或延誤負任何損害賠償責任或負債。S&P DOW JONES INDICES對群益投信、本基金持有人或任何其他個人或實體因使用指數或任何相關資料獲得之成果，或針對任何特定目的或用途的適銷性或合適性，概不提供任何明示或暗示之保證。在未限制任何前述規定下，無論任何情況，S&P DOW JONES INDICES皆無須為任何間接、特殊、偶發、懲罰性或必然損害負責，包括但不限於損失利潤、交易損失、損失時間或商譽，即使已知會發生該等損害之可能性，或無論因契約、侵權、嚴格責任或其他規定導致者，皆同。除 S&P DOW JONES INDICES授權人外，S&P DOW JONES INDICES與群益投信無任何協議或安排的任何第三方受益人。
+              - paragraph [ref=e470]:
+                - strong [ref=e471]
+              - paragraph [ref=e472]:
+                - strong [ref=e473]: 【群益15年期以上電信業公司債ETF基金
+                - strong [ref=e474]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e475]: 】、【群益15年期以上科技業公司債ETF基金
+                - strong [ref=e476]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e477]: 】及【群益10年期以上金融債ETF基金
+                - strong [ref=e478]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e479]: 】
+              - paragraph [ref=e480]:
+                - strong [ref=e481]: 群益10年期以上金融債ETF基金
+                - strong [ref=e482]: （本基金之配息來源可能為收益平準金）得投資具總損失吸收能力債券（TLAC Bond），且投資於TLAC Bond上限為本基金淨資產價值百分之九十（90%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。
+              - paragraph [ref=e483]:
+                - strong [ref=e484]: 指數免責聲明：
+              - paragraph [ref=e485]:
+                - strong [ref=e486]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。ICE BofA 15年期以上美元電信業公司債指數（ICE BofA 15+ Year US Telecommunications Index）、ICE BofA 15年期以上美元科技業公司債指數(ICE BofA 15+ Year US Technology & Electronics Index) 及ICE BofA 10年期以上美元金融債指數(ICE BofA 10+ Year US Banking and Brokerage Index) SM/®(以下稱「系列指數」)係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對群益產業型投資等級公司債ETF傘型證券投資信託基金(以下稱「本基金」)使用之。群益投信及本基金之各子基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。
+              - paragraph [ref=e487]:
+                - strong [ref=e488]
+              - paragraph [ref=e489]:
+                - strong [ref=e490]: 【群益15年期以上高評等公司債ETF基金】、【群益15年期以上公用事業公司債ETF基金】及【群益15年期以上新興市場主權債ETF基金
+                - strong [ref=e491]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e492]: 】
+              - paragraph [ref=e493]:
+                - strong [ref=e494]: 指數免責聲明：
+              - paragraph [ref=e495]:
+                - strong [ref=e496]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE 15年期以上高評等公司債（排除保險、金融服務次產業）指數（ICE 15+ Year AAA-AA US Corporate Constrained Index）」、ICE 15年期以上公用事業公司債（排除外國企業發行之美元債券）指數ICE 15+ Year US Utility excluding Yankee Index）」及ICE15年期以上新興市場主權債(國際)指數（ICE International 15+ Year US Emerging Markets External Sovereign Index）SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對群益投資等級債券ETF傘型證券投資信託基金(以下稱「本基金」)使用之。群益投信及本基金之各子基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。
+              - paragraph [ref=e497]:
+                - strong [ref=e498]
+              - paragraph [ref=e499]:
+                - strong [ref=e500]: 【群益25年期以上美國政府債券ETF基金
+                - strong [ref=e501]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e502]: 】
+              - paragraph [ref=e503]:
+                - strong [ref=e504]: 指數免責聲明：
+              - paragraph [ref=e505]:
+                - strong [ref=e506]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE 25年期以上美國政府債券指數（ICE 25+ Year US Treasury Index）」SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對「群益25年期以上美國政府債券ETF證券投資信託基金
+                - strong [ref=e507]: （本子基金之配息來源可能為收益平準金）
+                - strong [ref=e508]: 」使用之。群益投信及本基金各子基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。
+              - paragraph [ref=e509]:
+                - strong [ref=e510]
+              - paragraph [ref=e511]:
+                - strong [ref=e512]: 【群益15年期以上A級美元公司債ETF基金
+                - strong [ref=e513]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e514]: 】、【群益15年期以上AAA-A醫療保健業美元公司債ETF基金】及【群益7年期以上中國政策性金融債ETF基金】
+              - paragraph [ref=e515]:
+                - strong [ref=e516]: 群益15年期以上A級美元公司債ETF基金
+                - strong [ref=e517]: （本基金之配息來源可能為收益平準金）得投資具總損失吸收能力債券（TLAC Bond），且投資於TLAC Bond上限為本基金淨資產價值百分之四十（40%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。
+              - paragraph [ref=e518]:
+                - strong [ref=e519]: 指數免責聲明：
+              - paragraph [ref=e520]:
+                - strong [ref=e521]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE 15年期以上A級成熟市場大型美元公司債指數（ICE 15+ Year Single-A Large Cap Developed Markets US Corporate Index）」、ICE 15年期以上AAA-A成熟市場大型醫療保健業美元公司債指數（ICE 15+ Year AAA-A Large Cap Developed Markets US Healthcare Index）」及ICE 7年期以上中國大型政策性金融債(單一券10%上限)指數（ICE 7+ Year Large Cap China Policy Bank Constrained Index）SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對群益特選債券ETF傘型證券投資信託基金(以下稱「本基金」)使用之。群益投信及本基金之各子基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。
+              - paragraph [ref=e522]:
+                - strong [ref=e523]
+              - paragraph [ref=e524]:
+                - strong [ref=e525]: 【群益0-1年期美國政府債券ETF基金】及【群益1-5年期投資等級公司債ETF基金】
+              - paragraph [ref=e526]:
+                - strong [ref=e527]: 指數免責聲明：
+              - paragraph [ref=e528]:
+                - strong [ref=e529]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE BofA 0-1年期美國政府公債指數（ICE BofA 0-1 Year US Treasury Index）」及「ICE 1-5年期成熟市場超大型美元公司債(發行年期6年內)指數（ICE 1-5 Year US Ultra Large Cap Developed Markets Corporate Maximum 6-Year Original Maturity Index）」SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對「群益0-1年期美國政府債券ETF證券投資信託基金」及「群益1-5年期投資等級公司債ETF證券投資信託基金」使用之。群益投信及本基金各子基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。
+              - paragraph [ref=e530]:
+                - strong [ref=e531]
+              - paragraph [ref=e532]:
+                - strong [ref=e533]: 【群益台灣精選高息ETF基金
+                - strong [ref=e534]: （本基金之配息來源可能為收益平準金且基金並無保證收益及配息）
+                - strong [ref=e535]: 】
+              - paragraph [ref=e536]:
+                - strong [ref=e537]: 股票指數股票型基金（股票型被動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以指數近一年息率決定該次配息之參考配息率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，且原則不超過參考配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e538]:
+                - strong [ref=e539]: 指數免責聲明：
+              - paragraph [ref=e540]:
+                - strong [ref=e541]: 臺灣指數公司特選臺灣上市上櫃精選高息指數係由臺灣指數股份有限公司(臺灣指數公司)、財團法人中華民國證券櫃檯買賣中心(櫃檯買賣中心) (以上機構合稱「合作單位」)共同開發，並由臺灣指數公司單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務] ，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e542]:
+                - strong [ref=e543]
+              - paragraph [ref=e544]:
+                - strong [ref=e545]: 【群益台灣ESG低碳50ETF證券投資信託基金
+                - strong [ref=e546]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e547]: 】
+              - paragraph [ref=e548]:
+                - strong [ref=e549]: 本基金為投資環境、社會及治理（ESG）相關主題之基金，可能有ESG評鑑標準之差異風險、ESG評鑑標準之主觀判斷風險、對第三方資料來源之依賴風險、 對特定ESG投資重點之集中度風險以及ESG基金之其他可能風險，定期評估資訊將於經理公司官網首頁之「企業永續專區」（https://www.capitalfund.com.tw/capital/organization）揭露， 投資人應於申購前詳閱基金公開說明書所載之基金所有特色或目標等資訊。 股票指數股票型基金（股票型被動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以指數近一年息率決定該次配息之參考配息率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，且原則不超過參考配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e550]:
+                - strong [ref=e551]: 指數免責聲明：
+              - paragraph [ref=e552]:
+                - strong [ref=e553]: 臺灣指數公司特選臺灣ESG低碳50指數，係由臺灣指數股份有限公司(臺灣指數公司)開發，並由臺灣指數公司單獨授權群益證券投資信託股份有限公司使用。臺灣指數公司並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務] ，且臺灣指數公司亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然臺灣指數公司就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e554]:
+                - strong [ref=e555]
+              - paragraph [ref=e556]:
+                - strong [ref=e557]: 【群益台灣半導體收益ETF證券投資信託基金
+                - strong [ref=e558]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e559]: 】
+              - paragraph [ref=e560]:
+                - strong [ref=e561]: 股票指數股票型基金（股票型被動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。 股利收入轉為各期配息之決定，主要係以指數近一年息率決定該次配息之參考配息率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率， 且原則不超過參考配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。 本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e562]:
+                - strong [ref=e563]: 指數免責聲明：
+              - paragraph [ref=e564]:
+                - strong [ref=e565]: 臺灣指數公司特選臺灣上市上櫃半導體收益指數係由臺灣指數股份有限公司(臺灣指數公司)、財團法人中華民國證券櫃檯買賣中心(櫃檯買賣中心)(以上機構合稱「合作單位」)共同開發，並由臺灣指數公司單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務]，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e566]:
+                - strong [ref=e567]
+              - paragraph [ref=e568]:
+                - strong [ref=e569]: 【群益ESG 20年期以上BBB投資等級公司債ETF基金
+                - strong [ref=e570]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e571]: 】
+              - paragraph [ref=e572]:
+                - strong [ref=e573]: 本基金為投資環境、社會及治理（ESG）相關主題之基金，可能有ESG評鑑標準之差異風險、ESG評鑑標準之主觀判斷風險、對第三方資料來源之依賴風險、對特定ESG投資重點之集中度風險以及ESG基金之其他可能風險，定期評估資訊將於經理公司官網首頁之「企業永續專區」（https://www.capitalfund.com.tw/capital/organization）揭露，投資人應於申購前詳閱基金公開說明書所載之基金所有特色或目標等資訊。本基金得投資具總損失吸收能力債券（TLAC Bond），且投資於TLAC Bond上限為本基金淨資產價值百分之三十（30%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。
+              - paragraph [ref=e574]:
+                - strong [ref=e575]: 指數免責聲明：
+              - paragraph [ref=e576]:
+                - strong [ref=e577]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE ESG 20年期以上BBB級成熟市場大型美元公司債(單一產業10%上限)指數（ICE ESG 20+ Year BBB Large Cap Developed Markets US Corporate Constrained Index）」SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對「群益ESG 20年期以上BBB投資等級公司債ETF證券投資信託基金
+                - strong [ref=e578]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e579]: 」使用之。群益投信及本基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。ICE ESG 20年期以上BBB級成熟市場大型美元公司債(單一產業10%上限)指數，係由ICE Data、Sustainalytics (以上機構合稱「合作單位」)共同開發，並由ICE Data單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務] ，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e580]:
+                - strong [ref=e581]
+              - paragraph [ref=e582]:
+                - strong [ref=e583]: 【群益台灣科技高息成長ETF基金
+                - strong [ref=e584]: （本基金之配息來源可能為收益平準金且基金並無保證收益及配息）
+                - strong [ref=e585]: 】
+              - paragraph [ref=e586]: 股票指數股票型基金（股票型被動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以指數近一年息率決定該次配息之參考配息率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，且原則不超過參考配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e587]:
+                - strong [ref=e588]: 指數免責聲明：
+              - paragraph [ref=e589]:
+                - strong [ref=e590]: 臺灣指數公司特選臺灣上市上櫃科技高息成長指數係由臺灣指數股份有限公司(臺灣指數公司)、財團法人中華民國證券櫃檯買賣中心(櫃檯買賣中心)(以上機構合稱「合作單位」)共同開發，並由臺灣指數公司單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務]，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e591]:
+                - strong [ref=e592]
+              - paragraph [ref=e593]:
+                - strong [ref=e594]: 【群益優選收益非投資等級債券ETF基金
+                - strong [ref=e595]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e596]: 】
+              - paragraph [ref=e597]:
+                - strong [ref=e598]: 由於非投資等級債券之信用評等未達投資等級或未經信用評等，且對利率變動的敏感度甚高，故本基金可能會因利率上升、市場流動性下降，或債券發行機構違約不支付本金、利息或破產而蒙受虧損。本基金不適合無法承擔相關風險之投資人，適合能承受較高風險之非保守型投資人。由於本基金主要投資於非投資等級債券，故投資人投資本基金不宜占其投資組合過高之比重。本基金主要投資於信用評等未達投資等級之非投資等級債券，債券價格可能因發行人實際與預期盈餘、管理階層變動、併購或因政治、經濟不穩定而增加其無法償付本金及利息或企業直接宣告破產的信用風險，尤其於經濟景氣衰退期間，稍有不利消息，此類證券價格的波動可能較為劇烈。本基金為投資於標的指數之成分證券或因應標的指數複製策略所需，得投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。
+              - paragraph [ref=e599]:
+                - strong [ref=e600]: 指數免責聲明：
+              - paragraph [ref=e601]:
+                - strong [ref=e602]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE 1-5年BB-B級成熟市場信用優息美元非投資等級債券指數（ICE 1-5 Year BB-B Developed Market Coupon Enhanced Credit Factor USD High Yield Bond Index）」SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對「群益優選收益非投資等級債券ETF證券投資信託基金
+                - strong [ref=e603]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e604]: 」使用之。群益投信及本基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。ICE 1-5年BB-B級成熟市場信用優息美元非投資等級債券指數，係由ICE Data、Sustainalytics (以上機構合稱「合作單位」)共同開發，並由ICE Data單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務] ，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e605]:
+                - strong [ref=e606]: 【群益台灣精選強棒主動式ETF基金
+                - strong [ref=e607]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e608]: 】
+              - paragraph [ref=e609]:
+                - strong [ref=e610]: 轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。 股票主動式交易所交易基金（股票主動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以本基金配息頻率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e611]:
+                - strong [ref=e612]: 【群益0-5年期ESG投資等級公司債ETF基金
+                - strong [ref=e613]: （本基金之配息來源可能為收益平準金）
+                - strong [ref=e614]: 】
+              - paragraph [ref=e615]:
+                - strong [ref=e616]: 本基金為投資於標的指數之成分證券或因應標的指數複製策略所需，得投資於符合美國Rule144A規定之債券，該債券屬私募性質，較可能發生流動性不足，財務訊息揭露不完整或因價格不透明導致波動性較大之風險。本基金得投資具總損失吸收能力債券（TLAC Bond），且投資於TLAC Bond上限為本基金淨資產價值百分之三十（30%），是類債券發行機構若出現重大營運或破產危機時，得以契約形式或透過法定機制將債券減記面額或轉換股權，故可能導致部分或全部債權減記、利息取消、債權轉換股權、修改債券條件如到期日、票息、付息日、或暫停配息等變動情形，因此除了流動性風險及變現性風險外，還可能有金融領域集中度風險、本金減計風險、轉換風險及未知風險等相關風險。具總損失吸收能力債券（TLAC Bond）之商品特性及詳細投資風險請詳本基金公開說明書。本基金為投資環境、社會及治理（ESG）相關主題之基金，可能有ESG評鑑標準之差異風險、ESG評鑑標準之主觀判斷風險、對第三方資料來源之依賴風險、對特定ESG投資重點之集中度風險以及ESG基金之其他可能風險，定期評估資訊將於經理公司官網首頁之「企業永續專區」（https://www.capitalfund.com.tw/capital/organization）揭露，投資人應於申購前詳閱基金公開說明書所載之基金所有特色或目標等資訊。
+              - paragraph [ref=e617]:
+                - strong [ref=e618]: 指數免責聲明：
+              - paragraph [ref=e619]:
+                - strong [ref=e620]:
+                  - generic [ref=e621]: 經許可使用來源ICE Data Indices, LLC（「以下稱ICE Data」）。「ICE ESG 0-5年期BBB級成熟市場大型美元公司債指數（ICE ESG 0-5 Year BBB Large Cap Developed Markets US Corporate Index）」SM/® (以下稱「系列指數）」係ICE Data或其關係企業之服務／營業標章，且已與系列指數一併授權以供群益投信針對「群益0-5年期ESG投資等級公司債ETF證券投資信託基金(本基金之配息來源可能為收益平準金）」使用之。群益投信及本基金均非由ICE Data Indices, LLC、其關係企業或第三人供應商（「ICE Data和其供應商」）贊助、背書、販售或宣傳。ICE Data和其供應商針對尤其是產品內之證券投資明智性、信託或指數追蹤一般市場績效之能力，不做任何相關聲明或保證。ICE Data對群益投信之惟一關係，僅止於授權特定商標和商號以及指數或指數成分。指數係由ICE Data決定、組成和結算，與群益投信或產品或產品持有人無關。ICE Data無義務於決定、組成或結算指數時，將群益投信或產品持有人之需求納入考量。ICE Data不負責亦未參與決定應發行產品之時機、價格或數量，或產品訂價、銷售、認購或贖回依據之決定或公式結算。除特定慣例指數結算服務以外，ICE Data提供之所有資料均為一般性質資料，非為群益投信或其他任何人、實體或法人團體量身訂作之資料。ICE Data無義務且不負責管理、行銷或交易產品。ICE Data非投資顧問。ICE Data不推薦以納入指數範圍內證券之方式購買、銷售或持有該證券。納入指數範圍內證券亦不得被視為投資建議。ICE ESG 0-5年期BBB級成熟市場大型美元公司債指數，係由ICE Data、Sustainalytics (以上機構合稱「合作單位」)共同開發，並由ICE Data單獨授權群益證券投資信託股份有限公司使用。「合作單位」並未以任何方式贊助、背書、出售或促銷[金融商品或委任投資業務] ，且「合作單位」亦未明示或默示對使用指數之結果及/或指數於任一特定日期之任一特定時間或其他時間之數據提供任何保證或聲明。指數係由臺灣指數公司所計算。然「合作單位」就指數之任何錯誤、不正確、遺漏或指數資料之傳輸中斷對任何人均不負任何責任，且無任何義務將該等錯誤、不正確或遺漏通知任何人。
+              - paragraph [ref=e622]:
+                - strong [ref=e623]: 【群益台灣科技創新主動式ETF基金 （本基金之配息來源可能為收益平準金） 】
+              - paragraph [ref=e624]:
+                - strong [ref=e625]: 轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。 股票主動式交易所交易基金（股票主動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以本基金配息頻率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+              - paragraph [ref=e626]:
+                - strong [ref=e627]: 【群益美國增長主動式ETF基金 （本基金之配息來源可能為收益平準金） 】
+              - paragraph [ref=e628]:
+                - strong [ref=e629]: 轉換公司債兼具債券與股票之性質，因此除利率風險、流動性風險及信用風險外，還可能因投資標的之股票價格波動造成該轉換公司債價格波動，且投資未受信用評等之轉換公司債，所承受之信用風險高於一般債券。 股票主動式交易所交易基金（股票主動式ETF）投資之企業，其股票除息時間、金額及股利配發時間視個別企業決定，該股票除息頻率可能為每季、每半年、或每年配息。股利收入轉為各期配息之決定，主要係以本基金配息頻率，並考量當下實際取得的股利和可能發生之資本損益與相關稅負後，適度調節並決定本基金當期配息類股之配息率，以達成每期配息之頻率。本基金之配息時程僅為預估，如遇連續假期等情形時，實際發放配息日期將可能隨之順延，實際配息時程仍以經理公司公告為主。本基金之配息主要來自於持股企業發放之股利收入累積一段期間後，於每期做成收益分配決定並確認配息金額後進行收益分配，故每次分配之金額並非一定相同。
+          - button "其他各基金專用警語 " [ref=e631] [cursor=pointer]:
+            - text: 其他各基金專用警語
+            - generic [ref=e632]: 
+          - paragraph [ref=e633]: ©2020 by Capital Investment Trust Corporation. All Rights reserved.
+      - generic [ref=e634] [cursor=pointer]:
+        - generic [ref=e635]: 
+        - paragraph [ref=e636]: TOP
+  - img [ref=e639]
