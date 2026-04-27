@@ -11,3 +11,11 @@ ENV/
 
 # 數據資料夾 (選配：如果你不想把本機的歷史紀錄傳上去，就取消註解下面這行)
 # backend/data/*.json
+
+# Runtime / temp files
+.playwright-mcp/
+backend/data/*.bak
+backend/data/test_sync.json
+backend/debug_out.txt
+backend/fsc_tmp.xlsx
+backend/*.py.bak
