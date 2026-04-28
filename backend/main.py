@@ -2153,24 +2153,60 @@ _fsc_last_good_url: dict = {"url": "", "date_str": ""}  # persisted across cache
 
 def _fetch_fsc_excel_url() -> tuple[str, str]:
     """Scrape sfb.gov.tw for the latest FSC Excel URL and its update date.
-    Returns (url, date_str) where date_str is like '115.4.22'."""
+    Returns (url, date_str) where date_str is like '115.4.28'.
+    Prefers the current ROC-year (N年度申報案件) over previous years."""
     import re as _re
+    from datetime import date as _date
     headers = {**_FSC_UA, "Referer": "https://www.sfb.gov.tw/"}
     try:
         r = http_requests.get(FSC_SFB_INDEX, headers=headers, verify=False, timeout=15)
         text = r.text
 
-        # Try specific ROC-year xlsx first, then any xlsx
-        href_m = (_re.search(r'href="([^"]*11[0-9]\d+[^"]*\.xlsx)"', text, _re.IGNORECASE)
-                  or _re.search(r'href="([^"]*\.xlsx)"', text, _re.IGNORECASE))
-        # Date: ROC format like 115.4.22 near the link
-        date_m = (_re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})</td>[^<]{0,200}<td[^>]*>[^<]*<a[^>]*\.xlsx', text)
-                  or _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})', text))
+        # Current ROC year = Gregorian year - 1911
+        roc_year = _date.today().year - 1911
 
-        url = href_m.group(1) if href_m else ""
-        if url and not url.startswith("http"):
-            url = "https://www.sfb.gov.tw" + url
-        date_str = date_m.group(1) if date_m else ""
+        # Collect all (date_str, url) pairs by scanning rows
+        # Each table row typically: <td>date</td>...<td>...<a href="...xlsx">label</a>
+        pairs = []
+        for m in _re.finditer(
+            r'(\d{3}\.\d{1,2}\.\d{1,2})[^<]*</td>.*?href="([^"]*\.xlsx)"',
+            text, _re.IGNORECASE | _re.DOTALL
+        ):
+            d_str = m.group(1)
+            href  = m.group(2)
+            if not href.startswith("http"):
+                href = "https://www.sfb.gov.tw" + href
+            pairs.append((d_str, href))
+
+        if not pairs:
+            # Fallback: first xlsx on the page
+            href_m = _re.search(r'href="([^"]*\.xlsx)"', text, _re.IGNORECASE)
+            date_m = _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})', text)
+            url = href_m.group(1) if href_m else ""
+            if url and not url.startswith("http"):
+                url = "https://www.sfb.gov.tw" + url
+            date_str = date_m.group(1) if date_m else ""
+        else:
+            # Find the snippet around each pair to check for current-year label
+            def _roc_date_sort_key(d):
+                try:
+                    parts = d.split('.')
+                    return (int(parts[0]), int(parts[1]), int(parts[2]))
+                except Exception:
+                    return (0, 0, 0)
+
+            # Prefer rows whose surrounding text contains "{roc_year}年度申報案件"
+            current_year_pairs = []
+            for d_str, href in pairs:
+                # Find position of this href in text, look 300 chars back for label
+                pos = text.find(href.replace("https://www.sfb.gov.tw", ""))
+                context = text[max(0, pos-300):pos+200] if pos >= 0 else ""
+                if f"{roc_year}年度申報案件" in context or f"{roc_year}年申報案件" in context:
+                    current_year_pairs.append((d_str, href))
+
+            chosen = sorted(current_year_pairs or pairs,
+                            key=lambda x: _roc_date_sort_key(x[0]), reverse=True)[0]
+            url, date_str = chosen[1], chosen[0]
 
         if url:
             _fsc_last_good_url["url"] = url
@@ -2178,7 +2214,6 @@ def _fetch_fsc_excel_url() -> tuple[str, str]:
         return url, date_str
     except Exception as e:
         logger.warning(f"[fsc] sfb scrape failed: {e}")
-        # Return last known good URL as fallback
         return _fsc_last_good_url.get("url", ""), _fsc_last_good_url.get("date_str", "")
 
 def _roc_date_to_str(val) -> str:
@@ -2218,9 +2253,10 @@ def get_fsc_offerings():
     """Return approved 現金增資 / 轉換公司債 from FSC annual Excel. Cached per calendar day."""
     global _fsc_cache
     import io, pandas as pd
-    from datetime import date
+    from datetime import datetime, timezone, timedelta
+    from info_scraper import _tw_today
 
-    today = date.today().isoformat()
+    today = _tw_today()
     cached = _fsc_cache["data"]
     if cached is not None and _fsc_cache["date"] == today and cached.get("excel_date"):
         return cached
