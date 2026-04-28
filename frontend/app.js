@@ -2242,7 +2242,8 @@ async function renderImportantInfo(force = false) {
       _importantCache.data = data;
       _importantCache.ts = nowMs;
     }
-    const fetchTime = new Date(_importantCache.ts).toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const _ft = new Date(_importantCache.ts);
+    const fetchTime = `${String(_ft.getMonth()+1).padStart(2,'0')}/${String(_ft.getDate()).padStart(2,'0')} ${String(_ft.getHours()).padStart(2,'0')}:${String(_ft.getMinutes()).padStart(2,'0')}`;
 
     // changeKey: which field to derive arrow color from (null = no coloring)
     const rows = [

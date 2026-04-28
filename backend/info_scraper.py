@@ -47,13 +47,17 @@ def _safe_float(v):
     except (ValueError, TypeError):
         return None
 
+def _tw_today() -> str:
+    """Return today's date in Asia/Taipei timezone (UTC+8) as ISO string."""
+    from datetime import datetime, timezone, timedelta
+    return datetime.now(tz=timezone(timedelta(hours=8))).date().isoformat()
+
 def fetch_twse_margin():
     # Row layout of MI_MARGN tables[0].data:
     #   [0] 融資(交易單位)   cols [4]=前日 [5]=今日  (in 張)
     #   [1] 融券(交易單位)
     #   [2] 融資金額(仟元)   cols [4]=前日 [5]=今日  ← the one we want
-    from datetime import date
-    today_str = date.today().isoformat()
+    today_str = _tw_today()
     if _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
         return _twse_margin_cache["data"]
     try:
@@ -104,9 +108,8 @@ def fetch_tpex_margin():
     summary[1] → value units (仟元)  ← this is what we want
     Cols: [0]=代號 [1]=名稱 [2]=前日餘額 [3]=買進 [4]=賣出 [5]=還款 [6]=今日餘額
     """
-    from datetime import date
     import json as _json
-    today_str = date.today().isoformat()
+    today_str = _tw_today()
     if _tpex_margin_cache["date"] == today_str and _tpex_margin_cache["data"]:
         return _tpex_margin_cache["data"]
     try:
