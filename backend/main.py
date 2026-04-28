@@ -34,7 +34,7 @@ except ImportError:
     pass
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty
+from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty, ratio_history_pop_dirty
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
@@ -2065,7 +2065,10 @@ def get_etf_list():
 def get_important_info(force: bool = False):
     """Return important macro/market info from various sources."""
     try:
-        return scrape_important_info(force)
+        data = scrape_important_info(force)
+        if ratio_history_pop_dirty():
+            _gist_push_file(DATA_DIR / "margin_ratio_history.json")
+        return data
     except Exception as e:
         logger.error(f"[important-info] failed: {e}")
         return {"error": str(e)}

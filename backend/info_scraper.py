@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path as _Path
 
 urllib3.disable_warnings()
 
@@ -15,6 +16,30 @@ _info_cache = {"ts": 0, "data": {}}
 FIRECRAWL_API_KEY = "fc-d6d780def05343a5b032c3d22e89e15d"
 _margin_ratio_cache = {"ts": 0, "data": None}       # daily data — cache 6 hours
 _tpex_margin_ratio_cache = {"ts": 0, "data": None}  # daily data — cache 6 hours
+
+# ── Margin ratio history (persist prev-day values across restarts) ─────────────
+_RATIO_HIST_FILE = _Path(__file__).parent / 'data' / 'margin_ratio_history.json'
+_ratio_hist_dirty = False
+
+def _load_ratio_history() -> dict:
+    try:
+        return json.loads(_RATIO_HIST_FILE.read_text(encoding='utf-8'))
+    except Exception:
+        return {}
+
+def _save_ratio_history(hist: dict):
+    global _ratio_hist_dirty
+    # Keep only last 90 days
+    for old in sorted(hist.keys())[:-90]:
+        del hist[old]
+    _RATIO_HIST_FILE.write_text(json.dumps(hist, ensure_ascii=False, indent=2), encoding='utf-8')
+    _ratio_hist_dirty = True
+
+def ratio_history_pop_dirty() -> bool:
+    global _ratio_hist_dirty
+    v = _ratio_hist_dirty
+    _ratio_hist_dirty = False
+    return v
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
@@ -440,7 +465,18 @@ def fetch_taiex_margin_ratio():
 
         # ── 5. Ratio ──────────────────────────────────────────────────────────
         ratio = collateral_kt / total_debt_kt * 100.0
-        result = {"current": round(ratio, 2), "prev": None}
+        from datetime import datetime, timezone, timedelta as _td
+        tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
+        tw_yesterday = (tw_today - _td(days=1)).isoformat()
+        hist = _load_ratio_history()
+        prev_val = hist.get(tw_yesterday, {}).get("tse")
+        result = {"current": round(ratio, 2), "prev": prev_val}
+        # Persist today's value
+        today_key = tw_today.isoformat()
+        entry = hist.get(today_key, {})
+        entry["tse"] = result["current"]
+        hist[today_key] = entry
+        _save_ratio_history(hist)
         _margin_ratio_cache = {"ts": now, "data": result}
         return result
 
@@ -537,7 +573,18 @@ def fetch_tpex_margin_ratio():
 
         # ── 4. Ratio ──────────────────────────────────────────────────────────
         ratio = collateral_kt / total_debt_kt * 100.0
-        result = {"current": round(ratio, 2), "prev": None}
+        from datetime import datetime, timezone, timedelta as _td
+        tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
+        tw_yesterday = (tw_today - _td(days=1)).isoformat()
+        hist = _load_ratio_history()
+        prev_val = hist.get(tw_yesterday, {}).get("tpex")
+        result = {"current": round(ratio, 2), "prev": prev_val}
+        # Persist today's value
+        today_key = tw_today.isoformat()
+        entry = hist.get(today_key, {})
+        entry["tpex"] = result["current"]
+        hist[today_key] = entry
+        _save_ratio_history(hist)
         _tpex_margin_ratio_cache = {"ts": now, "data": result}
         return result
 
