@@ -2253,7 +2253,7 @@ def get_fsc_offerings():
     """Return approved 現金增資 / 轉換公司債 from FSC annual Excel. Cached per calendar day."""
     global _fsc_cache
     import io, pandas as pd
-    from datetime import datetime, timezone, timedelta
+    from datetime import datetime, timezone, timedelta, date
     from info_scraper import _tw_today
 
     today = _tw_today()
