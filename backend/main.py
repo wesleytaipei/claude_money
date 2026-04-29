@@ -626,6 +626,9 @@ _cbas_cache: dict = {"ts": 0, "data": {}}  # bond_code -> full CB info
 _cb_suspension_cache: dict = {"ts": 0, "data": {}}
 CB_SUSPENSION_TTL = 3600  # 1 hour
 
+# ── TWSE Punish / Disposition (處置股票) ──────────────────────────────────────
+_punish_cache: dict = {"date": "", "data": None}  # daily
+
 # ── TDCC Remaining Registration (剩餘張數, authoritative source) ──────────────
 # TDCC open-data CSV id=1-16 "發行公司無實體發行登記統計" (daily-updated).
 # Format: 資料日,證券代號,證券名稱,市場別,證券種類,登記數額
@@ -1661,6 +1664,92 @@ def cb_suspension_reload():
     _cb_suspension_cache["ts"] = 0
     suspended = load_cb_suspensions()
     return {"ok": True, "count": len(suspended), "suspended": suspended}
+
+
+# ── TWSE Punish / Disposition ─────────────────────────────────────────────────
+
+def fetch_punish_stocks() -> dict:
+    """Fetch currently active TWSE disposition stocks (處置股票).
+    Queries last 30 days; filters to only active periods (end_date >= today).
+    Returns {code: {name, condition, period, measure, announce_date}}.
+    """
+    import csv as _csv
+    from datetime import datetime as _dt, timezone as _tz, timedelta as _td, date as _date
+    from info_scraper import _tw_today
+
+    today_str = _tw_today()
+    if _punish_cache["date"] == today_str and _punish_cache["data"] is not None:
+        return _punish_cache["data"]
+
+    try:
+        tw_today = _dt.now(tz=_tz(_td(hours=8))).date()
+        start = (tw_today - _td(days=30)).strftime("%Y%m%d")
+        end = tw_today.strftime("%Y%m%d")
+        url = (
+            f"https://www.twse.com.tw/rwd/zh/announcement/punish"
+            f"?startDate={start}&endDate={end}&querytype=3"
+            f"&stockNo=&selectType=&proceType=&remarkType=&sortKind=STKNO&response=csv"
+        )
+        r = http_requests.get(url, verify=False, timeout=20,
+                              headers={"User-Agent": "Mozilla/5.0"})
+        r.raise_for_status()
+        text = r.content.decode("cp950", errors="replace")
+
+        result: dict = {}
+        reader = _csv.reader(text.splitlines())
+        for row in reader:
+            if len(row) < 8:
+                continue
+            # Data rows have an integer in col 0 (序號)
+            try:
+                int(row[0].strip())
+            except ValueError:
+                continue
+
+            # col 2 may be ="XXXXX" format (Excel formula to preserve leading zeros)
+            code_raw = row[2].strip().lstrip("=").strip('"')
+            name     = row[3].strip()
+            condition= row[5].strip()   # 處置條件 e.g. 連續三次
+            period   = row[6].strip()   # 處置起迄時間 e.g. 115/04/17~115/04/30
+            measure  = row[7].strip()   # 處置措施 e.g. 第一次處置
+            ann_date = row[1].strip()   # 公布日期
+
+            # Filter: only include if end date >= today (still active)
+            try:
+                end_roc = period.split("~")[1].strip()
+                parts = end_roc.split("/")
+                end_d = _date(int(parts[0]) + 1911, int(parts[1]), int(parts[2]))
+                if end_d < tw_today:
+                    continue
+            except Exception:
+                pass  # can't parse → include
+
+            # Skip if already have a more recent entry (keep latest announce_date)
+            if code_raw in result:
+                continue
+
+            result[code_raw] = {
+                "name":          name,
+                "condition":     condition,
+                "period":        period,
+                "measure":       measure,
+                "announce_date": ann_date,
+            }
+
+        _punish_cache["date"] = today_str
+        _punish_cache["data"] = result
+        logger.info(f"[punish] {len(result)} active dispositions")
+        return result
+    except Exception as e:
+        logger.error(f"[punish] fetch failed: {e}")
+        return _punish_cache["data"] or {}
+
+
+@app.get("/api/punish/status")
+def punish_status():
+    """Return currently active TWSE disposition stocks."""
+    data = fetch_punish_stocks()
+    return {"count": len(data), "punished": data}
 
 
 @app.get("/api/stock-table/status")

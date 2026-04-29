@@ -902,6 +902,19 @@ function renderInvestmentsPage() {
     }).catch(() => {});
   }
 
+  // Auto-load TWSE disposition list (stock + CB tabs); refresh once per calendar day
+  if (state.currentInv === 'stock' || state.currentInv === 'cb') {
+    const today = new Date().toISOString().slice(0, 10);
+    if (!_punishCache.data || _punishCache.date !== today) {
+      _punishCache.date = today;  // prevent repeated concurrent fetches
+      api('/api/punish/status').then(d => {
+        _punishCache.data = d.punished || {};
+        _punishCache.date = today;
+        renderInvestmentsPage();
+      }).catch(() => {});
+    }
+  }
+
   document.getElementById('inv-title').textContent = groupName;
 
   // Summary — use Σ _pnl_twd so margin doesn't inflate the figure
@@ -995,6 +1008,16 @@ function renderInvestmentsPage() {
         const dir = String(tsm.change || '').startsWith('+') ? '▲' : '▼';
         if (!alertMap['2330']) alertMap['2330'] = [];
         alertMap['2330'].push(`TSM ADR ${dir} ${tsm.change_pct}`);
+      }
+    }
+
+    // ── TWSE 處置股票 ──────────────────────────────────────────────────────
+    if (_punishCache.data) {
+      for (const [code, info] of Object.entries(_punishCache.data)) {
+        // Normalize: strip leading zeros for 4-digit codes, keep as-is otherwise
+        const sc = code.replace(/^0+/, '') || code;
+        if (!alertMap[sc]) alertMap[sc] = [];
+        alertMap[sc].push(`🚨 處置中: ${info.name} | ${info.period} | ${info.measure}`);
       }
     }
   }
@@ -1133,7 +1156,13 @@ function renderInvestmentsPage() {
       `;
     }
 
-    const autoReasons = showStar && item.symbol ? (alertMap[String(item.symbol).slice(0, 4)] || []) : [];
+    const _symStr = String(item.symbol || '');
+    const autoReasons = showStar && _symStr
+      ? [
+          ...(alertMap[_symStr.slice(0, 4)] || []),
+          ...(isCB && _symStr.length > 4 ? (alertMap[_symStr] || []) : []),
+        ]
+      : [];
     const isAutoHit = autoReasons.length > 0;
     const showFilled = item.highlighted || isAutoHit;
     const starCls = item.highlighted ? 'on' : (isAutoHit ? 'on auto' : '');
@@ -1500,6 +1529,7 @@ async function refreshAll() {
   txtEl.textContent = '更新中...';
 
   state._cbSuspensionLoaded = false;
+  _punishCache.data = null;   // force re-fetch on next render
   // parallelize independent network fetches (previously sequential = sum of all three)
   await Promise.all([
     loadIndices(),
@@ -2443,6 +2473,9 @@ function _renderCbTable(data) {
 
 // ── FSC Offerings ──────────────────────────────────────────────────────────
 const _fscCache = { date: '', data: null };
+
+// ── TWSE Punish / Disposition (處置股票) ────────────────────────────────────
+const _punishCache = { date: '', data: null };
 let _fscSortKey = 'date';   // 'date' | 'code'
 let _fscSortAsc = true;     // true = oldest first (default)
 
