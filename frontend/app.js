@@ -72,6 +72,93 @@ const doughnutLabelPlugin = {
 };
 Chart.register(doughnutLabelPlugin);
 
+// Chart.js plugin: draw min/max value labels on line datasets
+// Each dataset may set _minMaxFmt: (v) => string for custom formatting.
+const minMaxPlugin = {
+  id: 'minMaxLabels',
+  afterDraw(chart) {
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return;
+    ctx.save();
+
+    chart.data.datasets.forEach((dataset, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (meta.type !== 'line' || meta.hidden) return;
+
+      const pts = dataset.data;
+      let maxIdx = -1, minIdx = -1, maxVal = -Infinity, minVal = Infinity;
+      pts.forEach((v, i) => {
+        if (v == null || isNaN(v)) return;
+        if (v > maxVal) { maxVal = v; maxIdx = i; }
+        if (v < minVal) { minVal = v; minIdx = i; }
+      });
+      if (maxIdx < 0) return;
+
+      const fmt = dataset._minMaxFmt || (v => v.toFixed(1));
+      const color = dataset.borderColor || '#fff';
+
+      const drawLabel = (idx, val, above) => {
+        const pt = meta.data[idx];
+        if (!pt) return;
+        const px = pt.x, py = pt.y;
+        const txt = fmt(val);
+
+        ctx.font = 'bold 10px Inter,sans-serif';
+        const tw = ctx.measureText(txt).width;
+        const pw = tw + 8, ph = 16;
+        const bx = Math.min(Math.max(px - pw / 2, chartArea.left), chartArea.right - pw);
+        const by = above
+          ? Math.max(py - ph - 8, chartArea.top)
+          : Math.min(py + 8, chartArea.bottom - ph);
+
+        // Background pill
+        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, pw, ph, 4);
+        ctx.fill();
+
+        // Text
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#0a1628';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(txt, bx + pw / 2, by + ph / 2);
+
+        // Dot
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = '#0a1628';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      };
+
+      drawLabel(maxIdx, maxVal, true);
+      if (minIdx !== maxIdx) drawLabel(minIdx, minVal, false);
+    });
+
+    ctx.restore();
+  }
+};
+// roundRect polyfill for older browsers
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    this.beginPath();
+    this.moveTo(x + r, y);
+    this.lineTo(x + w - r, y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r);
+    this.lineTo(x + w, y + h - r);
+    this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    this.lineTo(x + r, y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r);
+    this.lineTo(x, y + r);
+    this.quadraticCurveTo(x, y, x + r, y);
+    this.closePath();
+  };
+}
+
 const INV_GROUP_MAP = {
   stock: '股票',
   cb:    '可轉債',
@@ -1701,6 +1788,7 @@ async function renderGrowthChart() {
     fill: false,
     yAxisID: 'y',
     order: 0,
+    _minMaxFmt: v => (v * 1e4 / 1e4).toLocaleString('zh-TW', {maximumFractionDigits: 0}) + ' 萬',
   };
 
   // Liabilities line — distinct magenta/pink, thick
@@ -1718,6 +1806,7 @@ async function renderGrowthChart() {
     fill: false,
     yAxisID: 'y',
     order: 0,
+    _minMaxFmt: v => (v * 1e4 / 1e4).toLocaleString('zh-TW', {maximumFractionDigits: 0}) + ' 萬',
   };
 
   // Summary stats
@@ -1755,11 +1844,13 @@ async function renderGrowthChart() {
       labels: filtered,
       datasets: [netWorthLine, liabLine, ...stackedDatasets],
     },
+    plugins: [minMaxPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
+        minMaxLabels: {},
         legend: {
           position: 'top',
           labels: { color: '#e8ecf6', padding: 14, usePointStyle: true, font: { size: 12 } },
@@ -1872,6 +1963,7 @@ async function renderTrendChart() {
       pointRadius: filtered.length > 60 ? 0 : 3,
       pointHoverRadius: 5,
       spanGaps: true,
+      _minMaxFmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%',
     };
   });
 
@@ -1881,11 +1973,13 @@ async function renderTrendChart() {
   charts.trend = new Chart(ctx, {
     type: 'line',
     data: { labels, datasets },
+    plugins: [minMaxPlugin],
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
+        minMaxLabels: {},
         legend: {
           labels: { color: '#e8ecf6', padding: 14, usePointStyle: true, font: { size: 12 } },
         },
