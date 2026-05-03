@@ -1698,10 +1698,21 @@ function _setChartRange(prefix, type) {
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
   const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const start = type === 'month' ? `${y}-${m}-01` : `${y}-01-01`;
+  const mo = now.getMonth(); // 0-based
+  let start, end = today;
+  if (type === 'month') {
+    start = `${y}-${String(mo + 1).padStart(2, '0')}-01`;
+  } else if (type === 'prevmonth') {
+    const pm = new Date(y, mo, 0);           // last day of prev month
+    const pmy = pm.getFullYear();
+    const pmm = String(pm.getMonth() + 1).padStart(2, '0');
+    start = `${pmy}-${pmm}-01`;
+    end   = `${pmy}-${pmm}-${String(pm.getDate()).padStart(2, '0')}`;
+  } else { // year
+    start = `${y}-01-01`;
+  }
   document.getElementById(prefix + '-start').value = start;
-  document.getElementById(prefix + '-end').value = today;
+  document.getElementById(prefix + '-end').value = end;
   if (prefix === 'growth') renderGrowthChart();
   else renderTrendChart();
 }
