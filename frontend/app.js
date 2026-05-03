@@ -1693,6 +1693,19 @@ function goPage(name) {
   if (bd) bd.classList.remove('visible');
 }
 
+// ── Date range shortcuts for Growth / Trend charts ──────────────────────────
+function _setChartRange(prefix, type) {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const start = type === 'month' ? `${y}-${m}-01` : `${y}-01-01`;
+  document.getElementById(prefix + '-start').value = start;
+  document.getElementById(prefix + '-end').value = today;
+  if (prefix === 'growth') renderGrowthChart();
+  else renderTrendChart();
+}
+
 // ══ Growth Chart ════════════════════════════════════════════════════════
 async function renderGrowthChart() {
   // Load history if empty

@@ -320,7 +320,9 @@
           <div class="panel-head">
             <h3>資產組成堆疊圖</h3>
             <div class="trend-controls">
-              <label>起始：</label>
+              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','month')">當月</button>
+              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','year')">當年</button>
+              <label style="margin-left:4px">起始：</label>
               <input type="date" id="growth-start" />
               <label>結束：</label>
               <input type="date" id="growth-end" />
@@ -347,7 +349,9 @@
           <div class="panel-head">
             <h3>報酬率比較</h3>
             <div class="trend-controls">
-              <label>起始：</label>
+              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','month')">當月</button>
+              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','year')">當年</button>
+              <label style="margin-left:4px">起始：</label>
               <input type="date" id="trend-start" />
               <label>結束：</label>
               <input type="date" id="trend-end" />
