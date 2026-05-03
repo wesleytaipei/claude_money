@@ -1195,7 +1195,9 @@ function renderInvestmentsPage() {
 
     const baseCells = `
       <td><span class="symbol-badge">${item.symbol || '—'}</span></td>
-      <td>${item.name || '—'}</td>
+      <td>${item.note
+        ? `<span title="${escapeAttr(item.note)}" style="cursor:help;border-bottom:1px dotted var(--muted)">${item.name || '—'}</span>`
+        : (item.name || '—')}</td>
       <td class="num">${(Number(item.shares) || 0).toLocaleString()}</td>
       <td class="num">${priceCell(item.entry_price)}</td>
       <td class="num">${priceCell(item.current_price)}</td>
@@ -1369,6 +1371,10 @@ function showPositionModal(idx, item = null) {
       </div>
     </div>` : ''}
     ${cbFields}
+    <div class="form-group" style="margin-top:14px">
+      <label>備註 <span style="color:var(--muted);font-weight:400">（選填，滑鼠移到名稱顯示）</span></label>
+      <input id="f-note" value="${escapeAttr(v('note'))}" placeholder="例：低溢價、觀察中..." />
+    </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">取消</button>
       <button class="btn-primary" onclick="savePosition(${idx})">儲存</button>
@@ -1499,6 +1505,7 @@ async function savePosition(idx) {
     entry_price: num('f-entry'),
     current_price: num('f-cur'),
     cost: num('f-cost'),
+    note: val('f-note').trim() || undefined,
     ...(isStock ? { margin_amount: num('f-margin') || 0 } : {}),
   };
 
