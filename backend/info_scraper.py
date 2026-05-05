@@ -77,21 +77,20 @@ def _tw_today() -> str:
     from datetime import datetime, timezone, timedelta
     return datetime.now(tz=timezone(timedelta(hours=8))).date().isoformat()
 
-def fetch_twse_margin():
+def fetch_twse_margin(force=False):
     # Row layout of MI_MARGN tables[0].data:
     #   [0] 融資(交易單位)   cols [4]=前日 [5]=今日  (in 張)
     #   [1] 融券(交易單位)
     #   [2] 融資金額(仟元)   cols [4]=前日 [5]=今日  ← the one we want
     today_str = _tw_today()
-    if _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
+    if not force and _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
         return _twse_margin_cache["data"]
     try:
-        r = requests.get(
+        resp_json = requests.get(
             "https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json",
             headers=HEADERS, verify=False, timeout=15
-        )
-        r.raise_for_status()
-        tables = r.json().get("tables", [])
+        ).json()
+        tables = resp_json.get("tables", [])
         if not tables:
             print("[TWSE margin] empty tables — market closed or pre-data")
             return {"balance": None, "increase": None}
@@ -117,8 +116,15 @@ def fetch_twse_margin():
             "balance":  round(today_val / 100000, 2),   # 仟元 → 億
             "increase": round(increase  / 100000, 2),
         }
-        _twse_margin_cache["date"] = today_str
-        _twse_margin_cache["data"] = result
+        # Only cache if the response date matches today (TWSE may serve yesterday's data before market close)
+        resp_date_raw = resp_json.get("date", "")  # e.g. "20260505"
+        resp_date_str = f"{resp_date_raw[:4]}-{resp_date_raw[4:6]}-{resp_date_raw[6:8]}" if len(resp_date_raw) == 8 else ""
+        if resp_date_str == today_str:
+            _twse_margin_cache["date"] = today_str
+            _twse_margin_cache["data"] = result
+            print(f"[TWSE margin] cached for {today_str}")
+        else:
+            print(f"[TWSE margin] response date {resp_date_str} ≠ today {today_str}, not caching")
         return result
     except Exception as e:
         print(f"[TWSE margin] error: {type(e).__name__}: {e}")
@@ -126,7 +132,7 @@ def fetch_twse_margin():
 
 _tpex_margin_cache = {"date": "", "data": None}   # daily
 
-def fetch_tpex_margin():
+def fetch_tpex_margin(force=False):
     """
     Fetch TPEX total margin balance (融資餘額).
     summary[0] → lot-count units (仟張)
@@ -135,14 +141,13 @@ def fetch_tpex_margin():
     """
     import json as _json
     today_str = _tw_today()
-    if _tpex_margin_cache["date"] == today_str and _tpex_margin_cache["data"]:
+    if not force and _tpex_margin_cache["date"] == today_str and _tpex_margin_cache["data"]:
         return _tpex_margin_cache["data"]
     try:
         url = ("https://www.tpex.org.tw/web/stock/margin_trading/margin_balance"
                "/margin_bal_result.php?l=zh-tw&o=json")
         r = requests.get(url, headers=HEADERS, verify=False, timeout=15)
         r.raise_for_status()
-        # TPEX responds in cp950; fall back to utf-8 if decode fails
         try:
             raw = r.content.decode("cp950", errors="replace")
         except Exception:
@@ -158,9 +163,6 @@ def fetch_tpex_margin():
             print(f"[TPEX margin] no summary in table; keys={list(tables[0].keys())}")
             return {"balance": None, "increase": None}
 
-        # summary[0] = 合計(仟張) — lot count
-        # summary[1] = 合計金額(仟元) — TWD value  ← the one we want
-        # cols: [2]=前日餘額 [6]=今日餘額
         if len(summary) < 2:
             print(f"[TPEX margin] only {len(summary)} summary rows, expected 2")
             return {"balance": None, "increase": None}
@@ -181,8 +183,15 @@ def fetch_tpex_margin():
             "balance":  round(today_val / 100000, 2),   # 仟元 → 億
             "increase": round(increase  / 100000, 2),
         }
-        _tpex_margin_cache["date"] = today_str
-        _tpex_margin_cache["data"] = result
+        # Only cache if response date matches today
+        resp_date_raw = data.get("date", "")  # e.g. "20260505"
+        resp_date_str = f"{resp_date_raw[:4]}-{resp_date_raw[4:6]}-{resp_date_raw[6:8]}" if len(resp_date_raw) == 8 else ""
+        if resp_date_str == today_str:
+            _tpex_margin_cache["date"] = today_str
+            _tpex_margin_cache["data"] = result
+            print(f"[TPEX margin] cached for {today_str}")
+        else:
+            print(f"[TPEX margin] response date {resp_date_str} ≠ today {today_str}, not caching")
         return result
     except Exception as e:
         print(f"[TPEX margin] error: {type(e).__name__}: {e}")
@@ -820,8 +829,8 @@ def scrape_important_info(force=False):
         f_wtx         = executor.submit(_fetch_wtx)
         f_twncon      = executor.submit(fetch_cnyes_twncon)
         f_tsm         = executor.submit(fetch_tsm_adr)
-        f_margin_tse  = executor.submit(fetch_twse_margin)
-        f_margin_otc  = executor.submit(fetch_tpex_margin)
+        f_margin_tse  = executor.submit(fetch_twse_margin, force)
+        f_margin_otc  = executor.submit(fetch_tpex_margin, force)
 
         data = {
             "us_10y_bond":        f_us10y.result(),
