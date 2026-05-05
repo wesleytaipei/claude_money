@@ -1707,7 +1707,9 @@ function _setChartRange(prefix, type) {
   const y = now.getFullYear();
   const mo = now.getMonth(); // 0-based
   let start, end = today;
-  if (type === 'month') {
+  if (type === 'day') {
+    start = today;
+  } else if (type === 'month') {
     start = `${y}-${String(mo + 1).padStart(2, '0')}-01`;
   } else if (type === 'prevmonth') {
     const pm = new Date(y, mo, 0);           // last day of prev month
