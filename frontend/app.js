@@ -1958,8 +1958,8 @@ async function renderTrendChart() {
   const end   = endEl.value;
 
   const filtered = allDates.filter(d => d >= start && d <= end);
-  if (filtered.length < 2) {
-    _showEmpty('所選範圍內資料不足 (至少需要 2 筆)');
+  if (filtered.length === 0) {
+    _showEmpty('所選範圍內無資料');
     return;
   }
 
