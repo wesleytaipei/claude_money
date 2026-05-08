@@ -1599,8 +1599,26 @@ _scheduler.add_job(
     id="tw_table_rebuild",
     replace_existing=True,
 )
+def _run_daily_etf_fetch():
+    """Warm up all tracked ETFs every day at 21:00 Taiwan time."""
+    logger.info("[scheduler] ETF daily fetch start")
+    for code in list(ETF_CONFIG.keys()):
+        try:
+            _etf_tracking_cache.pop(code, None)
+            fetch_etf_holdings(code)
+            logger.info(f"[scheduler] ETF {code} fetched OK")
+        except Exception as e:
+            logger.warning(f"[scheduler] ETF {code} fetch failed: {e}")
+    logger.info("[scheduler] ETF daily fetch done")
+
+_scheduler.add_job(
+    _run_daily_etf_fetch,
+    CronTrigger(hour=21, minute=0, timezone="Asia/Taipei"),
+    id="daily_etf_fetch",
+    replace_existing=True,
+)
 _scheduler.start()
-logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ Sun 15:00")
+logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ Sun 15:00 | ETF fetch @ 21:00")
 
 # On startup: sync newer files from Gist (timestamp-based, both envs).
 def _startup():
