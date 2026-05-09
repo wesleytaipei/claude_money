@@ -2723,6 +2723,7 @@ const _etfState = {
   code: '00981A', list: [], cache: {},
   filterOps: new Set(),   // empty = 全部
   filterTop: 0,
+  sort: 'op',             // 'op'|'weight_desc'|'weight_asc'|'price_desc'|'price_asc'|'shares_desc'|'shares_asc'
   view: 'focus',          // 'focus' | 'detail'
 };
 
@@ -2911,6 +2912,9 @@ function _etfRender(data) {
       <div style="width:1px;height:18px;background:var(--border);margin:0 2px"></div>
       <span style="font-size:11px;color:var(--text-muted);font-weight:600">權重排名</span>
       <div id="etf-top-btns" style="display:flex;gap:5px"></div>
+      <div style="width:1px;height:18px;background:var(--border);margin:0 2px"></div>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:600">排序</span>
+      <div id="etf-sort-btns" style="display:flex;gap:5px;flex-wrap:wrap"></div>
       <span id="etf-filter-count" style="margin-left:auto;font-size:11px;color:var(--text-muted)"></span>
     </div>
     ${holdings.length === 0 ? '<div class="empty-state">尚無持股資料</div>' : `
@@ -2982,6 +2986,28 @@ function _etfRenderFilters() {
              color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
       ${o.label}</button>`;
   }).join('');
+
+  // Sort buttons
+  const sortBtns = document.getElementById('etf-sort-btns');
+  if (!sortBtns) return;
+  const sortOptions = [
+    { key: 'op',          label: '操作優先' },
+    { key: 'weight_desc', label: '權重 ↓' },
+    { key: 'weight_asc',  label: '權重 ↑' },
+    { key: 'price_desc',  label: '漲跌幅 ↓' },
+    { key: 'price_asc',   label: '漲跌幅 ↑' },
+    { key: 'shares_desc', label: '股數增減 ↓' },
+    { key: 'shares_asc',  label: '股數增減 ↑' },
+  ];
+  sortBtns.innerHTML = sortOptions.map(o => {
+    const active = _etfState.sort === o.key;
+    return `<button onclick="_etfSetSort('${o.key}')"
+      style="padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;
+             border:1px solid ${active ? 'var(--primary-2)' : 'rgba(148,163,184,.3)'};
+             background:${active ? 'rgba(99,102,241,.18)' : 'transparent'};
+             color:${active ? 'var(--primary-2)' : 'var(--text-muted)'}">
+      ${o.label}</button>`;
+  }).join('');
 }
 
 function _etfClearOpFilter() {
@@ -2999,6 +3025,12 @@ function _etfSetOpFilter(op) {
 
 function _etfSetTopFilter(n) {
   _etfState.filterTop = _etfState.filterTop === n ? 0 : n;
+  _etfRenderFilters();
+  _etfApplyFilters();
+}
+
+function _etfSetSort(key) {
+  _etfState.sort = key;
   _etfRenderFilters();
   _etfApplyFilters();
 }
@@ -3045,7 +3077,7 @@ function _etfApplyFilters() {
     _etfState.filterTop > 0 ? ranked.slice(0, _etfState.filterTop).map(h => h.symbol) : []
   );
 
-  let visible = _etfState._allSorted;
+  let visible = [..._etfState._allSorted];
 
   // Apply op filter (multi-select, empty = all)
   if (_etfState.filterOps.size > 0) {
@@ -3055,6 +3087,31 @@ function _etfApplyFilters() {
   // Apply top-N filter (intersect)
   if (_etfState.filterTop > 0) {
     visible = visible.filter(h => topSyms.has(h.symbol));
+  }
+
+  // Apply sort
+  const opOrder = ['新增建倉', '股數加碼', '股數減碼', '全數清倉', '持有'];
+  switch (_etfState.sort) {
+    case 'weight_desc':
+      visible.sort((a, b) => (b.currentWeightPercent || 0) - (a.currentWeightPercent || 0));
+      break;
+    case 'weight_asc':
+      visible.sort((a, b) => (a.currentWeightPercent || 0) - (b.currentWeightPercent || 0));
+      break;
+    case 'price_desc':
+      visible.sort((a, b) => (b.priceChangePercent || 0) - (a.priceChangePercent || 0));
+      break;
+    case 'price_asc':
+      visible.sort((a, b) => (a.priceChangePercent || 0) - (b.priceChangePercent || 0));
+      break;
+    case 'shares_desc':
+      visible.sort((a, b) => (b.sharesChangePercent || 0) - (a.sharesChangePercent || 0));
+      break;
+    case 'shares_asc':
+      visible.sort((a, b) => (a.sharesChangePercent || 0) - (b.sharesChangePercent || 0));
+      break;
+    default: // 'op': operation priority → weight desc (already the order of _allSorted)
+      break;
   }
 
   // Rank label: weight rank among all current holdings
