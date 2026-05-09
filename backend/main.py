@@ -2104,6 +2104,14 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
             logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
         return raw_sym, {}
 
+    # Check _tw_mis_cache for foreign syms already fetched this session
+    now_ts = time.time()
+    for s in live_syms:
+        if not _is_tw_sym(s) and s not in mis_prices:
+            cached_foreign = _tw_mis_cache.get(s)
+            if cached_foreign and (now_ts - cached_foreign.get("ts", 0)) < CACHE_TTL:
+                mis_prices[s] = cached_foreign
+
     foreign_syms = [
         s for s in live_syms
         if not _is_tw_sym(s) and (s not in mis_prices or mis_prices[s].get("price") is None)
@@ -2113,7 +2121,9 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
             for fut in as_completed([ex.submit(_fetch_yahoo_foreign, s) for s in foreign_syms]):
                 raw_sym, entry = fut.result()
                 if entry.get("price") is not None:
+                    entry["ts"] = time.time()
                     mis_prices[raw_sym] = entry
+                    _tw_mis_cache[raw_sym] = entry  # reuse on next call within CACHE_TTL
 
     for h in holdings:
         mp = mis_prices.get(h["symbol"], {})

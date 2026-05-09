@@ -2788,12 +2788,12 @@ async function renderEtfPage(force = false) {
   try {
     const qs = `code=${encodeURIComponent(fetchCode)}${force ? '&force=true' : ''}`;
     const data = await api(`/api/etf-tracking?${qs}`);
-    if (_etfState.code !== fetchCode) return;  // tab switched mid-flight, discard
+    if (!data.error) _etfState.cache[fetchCode] = data;  // cache regardless of current tab
+    if (_etfState.code !== fetchCode) return;  // tab switched mid-flight, don't render
     if (data.error) {
       body.innerHTML = `<div class="empty-state">❌ 載入失敗：${data.error}</div>`;
       return;
     }
-    _etfState.cache[fetchCode] = data;
     _etfRender(data);
   } catch (e) {
     if (_etfState.code !== fetchCode) return;
