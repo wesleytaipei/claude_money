@@ -2059,31 +2059,61 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
     except Exception:
         mis_prices = {}
 
-    # yfinance fallback for foreign symbols that MIS can't resolve
+    # Yahoo TW fallback for foreign symbols (e.g. "SNDK US", "AAPL US")
+    # ezmoney stores symbols with exchange suffix: strip it to get bare ticker
+    _EXCH_SUFFIX_RE = re.compile(r'\s+[A-Z]{2,3}$')  # " US", " HK", " JP", " TT" …
+
     def _is_tw_sym(s: str) -> bool:
-        return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
+        return bool(re.match(r'^\d{4,6}[A-Z]?$', s.split()[0]))
+
+    def _clean_foreign_sym(s: str) -> str:
+        return _EXCH_SUFFIX_RE.sub('', s).strip()
+
+    def _fetch_yahoo_foreign(raw_sym: str) -> tuple[str, dict]:
+        """Scrape tw.stock.yahoo.com for a foreign ticker (no .TW suffix)."""
+        ticker = _clean_foreign_sym(raw_sym)
+        url = f"https://tw.stock.yahoo.com/quote/{ticker}"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        try:
+            r = http_requests.get(url, headers=headers, timeout=10)
+            html = r.text
+            price_m = re.search(r'"regularMarketPrice":([0-9]+\.?[0-9]*)', html)
+            if not price_m:
+                price_m = re.search(r'"regularMarketPrice":\{"raw":([0-9]+\.?[0-9]*)', html)
+            if not price_m:
+                return raw_sym, {}
+            price = float(price_m.group(1))
+            # Change pct + sign
+            pct = None
+            pct_matches = re.findall(r'>\s*\(?([-+0-9.]+%)\)?\s*<', html)
+            if pct_matches:
+                pct_str = pct_matches[0].replace('%', '').replace('(', '').replace(')', '').replace('+', '').strip()
+                try:
+                    pct = float(pct_str)
+                    idx = html.find(pct_matches[0])
+                    area = html[max(0, idx - 1000):idx + 200]
+                    if 'c-trend-down' in area:
+                        pct = -abs(pct)
+                    elif 'c-trend-up' in area:
+                        pct = abs(pct)
+                except Exception:
+                    pass
+            if price:
+                return raw_sym, {"price": price, "change_pct": pct, "currency": "TWD"}
+        except Exception as e:
+            logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
+        return raw_sym, {}
 
     foreign_syms = [
         s for s in live_syms
         if not _is_tw_sym(s) and (s not in mis_prices or mis_prices[s].get("price") is None)
     ]
     if foreign_syms:
-        def _yf_foreign(sym: str) -> tuple[str, dict]:
-            try:
-                fi = yf.Ticker(sym).fast_info
-                price = getattr(fi, "last_price", None)
-                prev  = getattr(fi, "previous_close", None)
-                if price:
-                    chg = round((price - prev) / prev * 100, 2) if prev else None
-                    return sym, {"price": round(float(price), 4), "change_pct": chg, "currency": getattr(fi, "currency", "")}
-            except Exception:
-                pass
-            return sym, {}
         with ThreadPoolExecutor(max_workers=min(8, len(foreign_syms))) as ex:
-            for fut in as_completed([ex.submit(_yf_foreign, s) for s in foreign_syms]):
-                sym, entry = fut.result()
+            for fut in as_completed([ex.submit(_fetch_yahoo_foreign, s) for s in foreign_syms]):
+                raw_sym, entry = fut.result()
                 if entry.get("price") is not None:
-                    mis_prices[sym] = entry
+                    mis_prices[raw_sym] = entry
 
     for h in holdings:
         mp = mis_prices.get(h["symbol"], {})
