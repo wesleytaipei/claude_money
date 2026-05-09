@@ -2124,8 +2124,11 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                         pct = abs(pct)
                 except Exception:
                     pass
+            # Prefer currency from page itself (e.g. "currency":"USD")
+            curr_m = re.search(r'"currency":"([A-Z]+)"', html)
+            actual_currency = curr_m.group(1) if curr_m else currency
             if price:
-                return raw_sym, {"price": price, "change_pct": pct, "currency": currency}
+                return raw_sym, {"price": price, "change_pct": pct, "currency": actual_currency}
         except Exception as e:
             logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
         return raw_sym, {}
@@ -2200,9 +2203,16 @@ def fetch_etf_holdings(fund_code: str) -> dict:
     _hist_pre = load_json(history_path, {})
     if today_str in _hist_pre and _hist_pre[today_str].get("_full_data"):
         data = _hist_pre[today_str]["_full_data"]
-        _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
-        logger.info(f"[etf] {fund_code}: loaded today's data from history JSON (no re-fetch)")
-        return data
+        # Validate: reject stale _full_data where prices are mostly missing
+        _hlds = data.get("holdings", [])
+        _with_price = sum(1 for h in _hlds if h.get("closingPrice") is not None)
+        _has_foreign = any(not _is_tw_sym(h.get("symbol", "")) for h in _hlds)
+        _price_ok = (not _has_foreign) or (_with_price > 0)
+        if _price_ok:
+            _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
+            logger.info(f"[etf] {fund_code}: loaded today's data from history JSON (no re-fetch)")
+            return data
+        logger.info(f"[etf] {fund_code}: _full_data has no foreign prices, re-fetching")
 
     # 3. Fetch raw data from source ───────────────────────────────────────────
     try:
