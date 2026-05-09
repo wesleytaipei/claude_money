@@ -2817,13 +2817,28 @@ function _etfRender(data) {
   if (!body) return;
 
   const {
-    fundName = '—', aum, aumChange, prevAum, nav, date = '—', prevDate,
-    holdings = [], summaryCounts = {}, _stale, _cached_date
+    fundName = '—', aum, aumChange, prevAum, nav, estimatedNav, assetInfo,
+    date = '—', prevDate, holdings = [], summaryCounts = {}, _stale, _cached_date
   } = data;
 
   // ── Meta bar ──────────────────────────────────────────────────────────────
   const aumFmt  = aum ? `${(aum / 1e8).toFixed(2)} 億` : '—';
   const navFmt  = nav != null ? nav.toFixed(2) : '—';
+
+  // Estimated NAV card
+  let estNavHtml = '';
+  if (estimatedNav != null) {
+    const diff = nav != null ? estimatedNav - nav : null;
+    const diffHtml = diff != null
+      ? `<div style="font-size:11px;color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}; margin-top:1px">${diff >= 0 ? '+' : ''}${diff.toFixed(4)}</div>`
+      : '';
+    estNavHtml = `<div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
+                      padding:8px 14px;min-width:90px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">預估淨值</div>
+      <div style="font-size:14px;font-weight:700">${estimatedNav.toFixed(4)}</div>
+      ${diffHtml}
+    </div>`;
+  }
 
   let aumChgHtml = '';
   if (aumChange != null) {
@@ -2894,6 +2909,7 @@ function _etfRender(data) {
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">淨值</div>
             <div style="font-size:14px;font-weight:700">${navFmt}</div>
           </div>
+          ${estNavHtml}
           <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
                       padding:8px 14px;min-width:80px">
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">資料日期</div>
