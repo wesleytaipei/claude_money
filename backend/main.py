@@ -1998,6 +1998,102 @@ def _is_tw_sym(s: str) -> bool:
     return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
 
 
+_EXCH_TO_YAHOO: dict[str, tuple[str, str]] = {
+    "US": ("",    "USD"),
+    "KS": (".KS", "KRW"),
+    "KQ": (".KQ", "KRW"),
+    "HK": (".HK", "HKD"),
+    "JP": (".T",  "JPY"),
+    "LN": (".L",  "GBp"),
+    "FP": (".PA", "EUR"),
+    "GY": (".DE", "EUR"),
+    "SP": (".SI", "SGD"),
+    "AU": (".AX", "AUD"),
+}
+
+
+def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
+    """Return (yahoo_ticker, currency) for a raw ezmoney symbol like '009150 KS'."""
+    parts = raw_sym.rsplit(' ', 1)
+    if len(parts) == 2:
+        base, exch = parts
+        if exch in _EXCH_TO_YAHOO:
+            suffix, currency = _EXCH_TO_YAHOO[exch]
+            return f"{base}{suffix}", currency
+    return raw_sym.replace(' ', '-'), "USD"
+
+
+def _fetch_yahoo_foreign(raw_sym: str) -> tuple[str, dict]:
+    """Scrape tw.stock.yahoo.com for a foreign ticker. Returns (raw_sym, price_dict)."""
+    ticker, fallback_currency = _resolve_foreign_sym(raw_sym)
+    url = f"https://tw.stock.yahoo.com/quote/{ticker}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = http_requests.get(url, headers=headers, timeout=10)
+        html = r.text
+        price_m = re.search(r'"regularMarketPrice":([0-9]+\.?[0-9]*)', html)
+        if not price_m:
+            price_m = re.search(r'"regularMarketPrice":\{"raw":([0-9]+\.?[0-9]*)', html)
+        if not price_m:
+            return raw_sym, {}
+        price = float(price_m.group(1))
+        pct = None
+        pct_matches = re.findall(r'>\s*\(?([-+0-9.]+%)\)?\s*<', html)
+        if pct_matches:
+            try:
+                pct = float(pct_matches[0].replace('%','').replace('(','').replace(')','').replace('+','').strip())
+                idx  = html.find(pct_matches[0])
+                area = html[max(0, idx - 1000):idx + 200]
+                if 'c-trend-down' in area:   pct = -abs(pct)
+                elif 'c-trend-up' in area:   pct =  abs(pct)
+            except Exception:
+                pass
+        curr_m = re.search(r'"currency":"([A-Z]+)"', html)
+        currency = curr_m.group(1) if curr_m else fallback_currency
+        if price:
+            return raw_sym, {"price": price, "change_pct": pct, "currency": currency, "ts": time.time()}
+    except Exception as e:
+        logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
+    return raw_sym, {}
+
+
+def _etf_enrich_prices(holdings: list) -> None:
+    """Fill closingPrice/priceChangePercent/currency in-place. Uses _tw_mis_cache; re-fetches if expired."""
+    now_ts = time.time()
+    tw_syms      = [h["symbol"] for h in holdings if _is_tw_sym(h["symbol"])]
+    foreign_syms = [h["symbol"] for h in holdings if not _is_tw_sym(h["symbol"])]
+
+    # TW stocks via MIS
+    prices: dict = {}
+    try:
+        prices.update(fetch_tw_prices_mis(tw_syms) if tw_syms else {})
+    except Exception:
+        pass
+
+    # Foreign: check cache first, re-fetch misses
+    need_fetch = []
+    for s in foreign_syms:
+        cached = _tw_mis_cache.get(s)
+        if cached and (now_ts - cached.get("ts", 0)) < CACHE_TTL:
+            prices[s] = cached
+        else:
+            need_fetch.append(s)
+
+    if need_fetch:
+        with ThreadPoolExecutor(max_workers=min(8, len(need_fetch))) as ex:
+            for fut in as_completed([ex.submit(_fetch_yahoo_foreign, s) for s in need_fetch]):
+                sym, entry = fut.result()
+                if entry.get("price") is not None:
+                    _tw_mis_cache[sym] = entry
+                    prices[sym] = entry
+
+    for h in holdings:
+        mp = prices.get(h["symbol"], {})
+        h["closingPrice"]       = mp.get("price")
+        h["priceChangePercent"] = mp.get("change_pct")
+        h["currency"]           = mp.get("currency", "TWD") or "TWD"
+
+
 def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                          history: dict) -> dict:
     """Compare today vs previous day, enrich with prices, return full data dict."""
@@ -2059,105 +2155,7 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                 "weightChangePercent": -prev.get("weight", 0.0),
             })
 
-    # Fetch live prices — split TW vs foreign upfront to avoid polluting MIS with invalid URLs
-    live_syms = [s for s in today_holdings]
-    tw_syms      = [s for s in live_syms if _is_tw_sym(s)]
-    pre_foreign  = [s for s in live_syms if not _is_tw_sym(s)]
-    try:
-        mis_prices = fetch_tw_prices_mis(tw_syms) if tw_syms else {}
-    except Exception:
-        mis_prices = {}
-
-    # Yahoo TW fallback for foreign symbols (e.g. "SNDK US", "009150 KS")
-    # ezmoney stores symbols with exchange suffix; map to Yahoo ticker + currency
-    # US stocks: Yahoo TW shows TWD-converted price → currency = TWD (no label)
-    # All others: Yahoo TW shows local currency
-    _EXCH_TO_YAHOO: dict[str, tuple[str, str]] = {
-        "US": ("",    "TWD"),   # SNDK US  → SNDK      (Yahoo TW converts to TWD)
-        "KS": (".KS", "KRW"),   # 009150 KS→ 009150.KS
-        "KQ": (".KQ", "KRW"),   # KOSDAQ
-        "HK": (".HK", "HKD"),   # 0700 HK  → 0700.HK
-        "JP": (".T",  "JPY"),   # 7203 JP  → 7203.T
-        "LN": (".L",  "GBp"),   # London
-        "FP": (".PA", "EUR"),   # Paris
-        "GY": (".DE", "EUR"),   # Germany (XETRA)
-        "SP": (".SI", "SGD"),   # Singapore
-        "AU": (".AX", "AUD"),   # Australia
-    }
-
-    def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
-        """Return (yahoo_ticker, currency) for a raw ezmoney symbol like '009150 KS'."""
-        parts = raw_sym.rsplit(' ', 1)
-        if len(parts) == 2:
-            base, exch = parts
-            if exch in _EXCH_TO_YAHOO:
-                suffix, currency = _EXCH_TO_YAHOO[exch]
-                return f"{base}{suffix}", currency
-        # Unknown exchange → try bare symbol, assume USD/TWD
-        return raw_sym.replace(' ', '-'), "TWD"
-
-    def _fetch_yahoo_foreign(raw_sym: str) -> tuple[str, dict]:
-        """Scrape tw.stock.yahoo.com for a foreign ticker."""
-        ticker, currency = _resolve_foreign_sym(raw_sym)
-        url = f"https://tw.stock.yahoo.com/quote/{ticker}"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        try:
-            r = http_requests.get(url, headers=headers, timeout=10)
-            html = r.text
-            price_m = re.search(r'"regularMarketPrice":([0-9]+\.?[0-9]*)', html)
-            if not price_m:
-                price_m = re.search(r'"regularMarketPrice":\{"raw":([0-9]+\.?[0-9]*)', html)
-            if not price_m:
-                return raw_sym, {}
-            price = float(price_m.group(1))
-            pct = None
-            pct_matches = re.findall(r'>\s*\(?([-+0-9.]+%)\)?\s*<', html)
-            if pct_matches:
-                pct_str = pct_matches[0].replace('%', '').replace('(', '').replace(')', '').replace('+', '').strip()
-                try:
-                    pct = float(pct_str)
-                    idx = html.find(pct_matches[0])
-                    area = html[max(0, idx - 1000):idx + 200]
-                    if 'c-trend-down' in area:
-                        pct = -abs(pct)
-                    elif 'c-trend-up' in area:
-                        pct = abs(pct)
-                except Exception:
-                    pass
-            # Prefer currency from page itself (e.g. "currency":"USD")
-            curr_m = re.search(r'"currency":"([A-Z]+)"', html)
-            actual_currency = curr_m.group(1) if curr_m else currency
-            if price:
-                return raw_sym, {"price": price, "change_pct": pct, "currency": actual_currency}
-        except Exception as e:
-            logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
-        return raw_sym, {}
-
-    # Check _tw_mis_cache for foreign syms already fetched this session
-    now_ts = time.time()
-    for s in pre_foreign:
-        cached_foreign = _tw_mis_cache.get(s)
-        if cached_foreign and (now_ts - cached_foreign.get("ts", 0)) < CACHE_TTL:
-            mis_prices[s] = cached_foreign
-
-    foreign_syms = [
-        s for s in pre_foreign
-        if s not in mis_prices or mis_prices[s].get("price") is None
-    ]
-    if foreign_syms:
-        with ThreadPoolExecutor(max_workers=min(8, len(foreign_syms))) as ex:
-            for fut in as_completed([ex.submit(_fetch_yahoo_foreign, s) for s in foreign_syms]):
-                raw_sym, entry = fut.result()
-                if entry.get("price") is not None:
-                    entry["ts"] = time.time()
-                    mis_prices[raw_sym] = entry
-                    _tw_mis_cache[raw_sym] = entry  # reuse on next call within CACHE_TTL
-
-    for h in holdings:
-        mp = mis_prices.get(h["symbol"], {})
-        h["closingPrice"]       = mp.get("price")
-        h["priceChangePercent"] = mp.get("change_pct")
-        h["currency"]           = mp.get("currency", "TWD") or "TWD"
+    _etf_enrich_prices(holdings)
 
     # Summary counts
     op_counts = {"新增建倉": 0, "股數加碼": 0, "股數減碼": 0, "全數清倉": 0}
@@ -2203,16 +2201,11 @@ def fetch_etf_holdings(fund_code: str) -> dict:
     _hist_pre = load_json(history_path, {})
     if today_str in _hist_pre and _hist_pre[today_str].get("_full_data"):
         data = _hist_pre[today_str]["_full_data"]
-        # Validate: reject stale _full_data where prices are mostly missing
-        _hlds = data.get("holdings", [])
-        _with_price = sum(1 for h in _hlds if h.get("closingPrice") is not None)
-        _has_foreign = any(not _is_tw_sym(h.get("symbol", "")) for h in _hlds)
-        _price_ok = (not _has_foreign) or (_with_price > 0)
-        if _price_ok:
-            _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
-            logger.info(f"[etf] {fund_code}: loaded today's data from history JSON (no re-fetch)")
-            return data
-        logger.info(f"[etf] {fund_code}: _full_data has no foreign prices, re-fetching")
+        # Always re-enrich prices (uses _tw_mis_cache when warm; re-fetches only on miss)
+        _etf_enrich_prices(data.get("holdings", []))
+        _etf_tracking_cache[fund_code] = {"date": today_str, "data": data}
+        logger.info(f"[etf] {fund_code}: loaded today's data from history JSON, prices refreshed")
+        return data
 
     # 3. Fetch raw data from source ───────────────────────────────────────────
     try:
