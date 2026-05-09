@@ -2058,10 +2058,38 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
         mis_prices = fetch_tw_prices_mis(live_syms) if live_syms else {}
     except Exception:
         mis_prices = {}
+
+    # yfinance fallback for foreign symbols that MIS can't resolve
+    def _is_tw_sym(s: str) -> bool:
+        return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
+
+    foreign_syms = [
+        s for s in live_syms
+        if not _is_tw_sym(s) and (s not in mis_prices or mis_prices[s].get("price") is None)
+    ]
+    if foreign_syms:
+        def _yf_foreign(sym: str) -> tuple[str, dict]:
+            try:
+                fi = yf.Ticker(sym).fast_info
+                price = getattr(fi, "last_price", None)
+                prev  = getattr(fi, "previous_close", None)
+                if price:
+                    chg = round((price - prev) / prev * 100, 2) if prev else None
+                    return sym, {"price": round(float(price), 4), "change_pct": chg, "currency": getattr(fi, "currency", "")}
+            except Exception:
+                pass
+            return sym, {}
+        with ThreadPoolExecutor(max_workers=min(8, len(foreign_syms))) as ex:
+            for fut in as_completed([ex.submit(_yf_foreign, s) for s in foreign_syms]):
+                sym, entry = fut.result()
+                if entry.get("price") is not None:
+                    mis_prices[sym] = entry
+
     for h in holdings:
         mp = mis_prices.get(h["symbol"], {})
         h["closingPrice"]       = mp.get("price")
         h["priceChangePercent"] = mp.get("change_pct")
+        h["currency"]           = mp.get("currency", "TWD") or "TWD"
 
     # Summary counts
     op_counts = {"新增建倉": 0, "股數加碼": 0, "股數減碼": 0, "全數清倉": 0}

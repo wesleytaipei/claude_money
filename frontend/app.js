@@ -3159,7 +3159,11 @@ function _etfApplyFilters() {
         <div>${sharesStr}</div>${prevSharesNote}
       </td>
       <td class="mono" style="text-align:right">${fmtPct(h.sharesChangePercent)}</td>
-      <td class="mono" style="text-align:right;font-weight:600">${fmtPrice(h.closingPrice)}</td>
+      <td class="mono" style="text-align:right;font-weight:600">
+        ${h.closingPrice != null
+          ? `${fmtPrice(h.closingPrice)}${h.currency && h.currency !== 'TWD' ? `<div style="font-size:10px;color:var(--text-muted)">${h.currency}</div>` : ''}`
+          : '—'}
+      </td>
       <td class="mono" style="text-align:right">${_fmtPctLimit(h.priceChangePercent)}</td>
     </tr>`;
   }).join('') || `<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted)">無符合條件的持股</td></tr>`;
