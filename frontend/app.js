@@ -3066,7 +3066,13 @@ function _etfApplyFilters() {
     const color = v > 0 ? 'var(--green)' : 'var(--red)';
     return `<span style="color:${color}">${sign}${Number(v).toFixed(2)}%</span>`;
   };
-  const fmtPrice = (v) => v != null ? Number(v).toFixed(2) : '—';
+  const _NO_DECIMAL_CURRENCIES = new Set(['KRW', 'JPY', 'IDR', 'VND']);
+  const fmtPrice = (v, currency = 'TWD') => {
+    if (v == null) return '—';
+    const n = Number(v);
+    if (_NO_DECIMAL_CURRENCIES.has(currency)) return n.toLocaleString('en', { maximumFractionDigits: 0 });
+    return n.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
 
   // Top-N filter operates on weight rank (position in allSorted, within 持有+all)
   // Rank is based on currentWeightPercent among current holdings (全數清倉 = 0 weight)
@@ -3161,7 +3167,7 @@ function _etfApplyFilters() {
       <td class="mono" style="text-align:right">${fmtPct(h.sharesChangePercent)}</td>
       <td class="mono" style="text-align:right;font-weight:600">
         ${h.closingPrice != null
-          ? `${fmtPrice(h.closingPrice)}${h.currency && h.currency !== 'TWD' ? `<div style="font-size:10px;color:var(--text-muted)">${h.currency}</div>` : ''}`
+          ? `${fmtPrice(h.closingPrice, h.currency)}${h.currency && h.currency !== 'TWD' ? `<div style="font-size:10px;color:var(--text-muted)">${h.currency}</div>` : ''}`
           : '—'}
       </td>
       <td class="mono" style="text-align:right">${_fmtPctLimit(h.priceChangePercent)}</td>

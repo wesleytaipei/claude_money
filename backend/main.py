@@ -2059,19 +2059,40 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
     except Exception:
         mis_prices = {}
 
-    # Yahoo TW fallback for foreign symbols (e.g. "SNDK US", "AAPL US")
-    # ezmoney stores symbols with exchange suffix: strip it to get bare ticker
-    _EXCH_SUFFIX_RE = re.compile(r'\s+[A-Z]{2,3}$')  # " US", " HK", " JP", " TT" …
+    # Yahoo TW fallback for foreign symbols (e.g. "SNDK US", "009150 KS")
+    # ezmoney stores symbols with exchange suffix; map to Yahoo ticker + currency
+    # US stocks: Yahoo TW shows TWD-converted price → currency = TWD (no label)
+    # All others: Yahoo TW shows local currency
+    _EXCH_TO_YAHOO: dict[str, tuple[str, str]] = {
+        "US": ("",    "TWD"),   # SNDK US  → SNDK      (Yahoo TW converts to TWD)
+        "KS": (".KS", "KRW"),   # 009150 KS→ 009150.KS
+        "KQ": (".KQ", "KRW"),   # KOSDAQ
+        "HK": (".HK", "HKD"),   # 0700 HK  → 0700.HK
+        "JP": (".T",  "JPY"),   # 7203 JP  → 7203.T
+        "LN": (".L",  "GBp"),   # London
+        "FP": (".PA", "EUR"),   # Paris
+        "GY": (".DE", "EUR"),   # Germany (XETRA)
+        "SP": (".SI", "SGD"),   # Singapore
+        "AU": (".AX", "AUD"),   # Australia
+    }
 
     def _is_tw_sym(s: str) -> bool:
         return bool(re.match(r'^\d{4,6}[A-Z]?$', s.split()[0]))
 
-    def _clean_foreign_sym(s: str) -> str:
-        return _EXCH_SUFFIX_RE.sub('', s).strip()
+    def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
+        """Return (yahoo_ticker, currency) for a raw ezmoney symbol like '009150 KS'."""
+        parts = raw_sym.rsplit(' ', 1)
+        if len(parts) == 2:
+            base, exch = parts
+            if exch in _EXCH_TO_YAHOO:
+                suffix, currency = _EXCH_TO_YAHOO[exch]
+                return f"{base}{suffix}", currency
+        # Unknown exchange → try bare symbol, assume USD/TWD
+        return raw_sym.replace(' ', '-'), "TWD"
 
     def _fetch_yahoo_foreign(raw_sym: str) -> tuple[str, dict]:
-        """Scrape tw.stock.yahoo.com for a foreign ticker (no .TW suffix)."""
-        ticker = _clean_foreign_sym(raw_sym)
+        """Scrape tw.stock.yahoo.com for a foreign ticker."""
+        ticker, currency = _resolve_foreign_sym(raw_sym)
         url = f"https://tw.stock.yahoo.com/quote/{ticker}"
         headers = {"User-Agent": "Mozilla/5.0"}
         try:
@@ -2083,7 +2104,6 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
             if not price_m:
                 return raw_sym, {}
             price = float(price_m.group(1))
-            # Change pct + sign
             pct = None
             pct_matches = re.findall(r'>\s*\(?([-+0-9.]+%)\)?\s*<', html)
             if pct_matches:
@@ -2099,7 +2119,7 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                 except Exception:
                     pass
             if price:
-                return raw_sym, {"price": price, "change_pct": pct, "currency": "TWD"}
+                return raw_sym, {"price": price, "change_pct": pct, "currency": currency}
         except Exception as e:
             logger.debug(f"[etf-foreign-price] {raw_sym} → {ticker} failed: {e}")
         return raw_sym, {}
