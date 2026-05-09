@@ -1991,6 +1991,13 @@ def _etf_raw_from_capitalfund(cf_fund_id: str) -> tuple[dict, dict]:
     return {"date": date_str, "aum": aum, "nav": nav}, holdings
 
 
+def _is_tw_sym(s: str) -> bool:
+    """Return True if symbol is a Taiwan-listed stock (no exchange suffix space)."""
+    if ' ' in s:
+        return False
+    return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
+
+
 def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                          history: dict) -> dict:
     """Compare today vs previous day, enrich with prices, return full data dict."""
@@ -2077,12 +2084,6 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
         "SP": (".SI", "SGD"),   # Singapore
         "AU": (".AX", "AUD"),   # Australia
     }
-
-    def _is_tw_sym(s: str) -> bool:
-        # Foreign symbols from ezmoney contain a space (e.g. "SNDK US", "009150 KS")
-        if ' ' in s:
-            return False
-        return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
 
     def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
         """Return (yahoo_ticker, currency) for a raw ezmoney symbol like '009150 KS'."""
