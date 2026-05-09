@@ -2052,10 +2052,12 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
                 "weightChangePercent": -prev.get("weight", 0.0),
             })
 
-    # Fetch live prices from MIS (current holdings only)
+    # Fetch live prices — split TW vs foreign upfront to avoid polluting MIS with invalid URLs
     live_syms = [s for s in today_holdings]
+    tw_syms      = [s for s in live_syms if _is_tw_sym(s)]
+    pre_foreign  = [s for s in live_syms if not _is_tw_sym(s)]
     try:
-        mis_prices = fetch_tw_prices_mis(live_syms) if live_syms else {}
+        mis_prices = fetch_tw_prices_mis(tw_syms) if tw_syms else {}
     except Exception:
         mis_prices = {}
 
@@ -2077,7 +2079,10 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
     }
 
     def _is_tw_sym(s: str) -> bool:
-        return bool(re.match(r'^\d{4,6}[A-Z]?$', s.split()[0]))
+        # Foreign symbols from ezmoney contain a space (e.g. "SNDK US", "009150 KS")
+        if ' ' in s:
+            return False
+        return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
 
     def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
         """Return (yahoo_ticker, currency) for a raw ezmoney symbol like '009150 KS'."""
@@ -2126,15 +2131,14 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
 
     # Check _tw_mis_cache for foreign syms already fetched this session
     now_ts = time.time()
-    for s in live_syms:
-        if not _is_tw_sym(s) and s not in mis_prices:
-            cached_foreign = _tw_mis_cache.get(s)
-            if cached_foreign and (now_ts - cached_foreign.get("ts", 0)) < CACHE_TTL:
-                mis_prices[s] = cached_foreign
+    for s in pre_foreign:
+        cached_foreign = _tw_mis_cache.get(s)
+        if cached_foreign and (now_ts - cached_foreign.get("ts", 0)) < CACHE_TTL:
+            mis_prices[s] = cached_foreign
 
     foreign_syms = [
-        s for s in live_syms
-        if not _is_tw_sym(s) and (s not in mis_prices or mis_prices[s].get("price") is None)
+        s for s in pre_foreign
+        if s not in mis_prices or mis_prices[s].get("price") is None
     ]
     if foreign_syms:
         with ThreadPoolExecutor(max_workers=min(8, len(foreign_syms))) as ex:
@@ -2177,7 +2181,7 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
 def fetch_etf_holdings(fund_code: str) -> dict:
     """Fetch ETF holdings from the appropriate source. Cached per calendar day."""
     from datetime import date as _date
-    today_str = _date.today().isoformat()
+    today_str = _tw_today()   # UTC+8 Taiwan date — must match ezmoney data date
 
     # 1. In-memory cache (fastest, lost on restart)
     cached = _etf_tracking_cache.get(fund_code)
