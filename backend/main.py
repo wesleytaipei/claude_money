@@ -2182,6 +2182,7 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
 def fetch_etf_holdings(fund_code: str) -> dict:
     """Fetch ETF holdings from the appropriate source. Cached per calendar day."""
     from datetime import date as _date
+    from info_scraper import _tw_today
     today_str = _tw_today()   # UTC+8 Taiwan date — must match ezmoney data date
 
     # 1. In-memory cache (fastest, lost on restart)
