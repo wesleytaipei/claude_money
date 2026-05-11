@@ -2727,7 +2727,7 @@ const _etfState = {
   view: 'focus',          // 'focus' | 'detail'
 };
 
-const _etfFocusCodes = ['00981A', '00988A', '00403A', '00991A', '00992A'];
+const _etfFocusCodes = ['00981A', '00403A', '00991A', '00992A'];
 
 async function renderEtfPage(force = false) {
   const body  = document.getElementById('etf-body');
