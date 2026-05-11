@@ -471,15 +471,15 @@ async function refreshPrices() {
   const usTickers = [];   // US stock symbols
   const cbSymbols = [];   // CB symbols
 
+  const _isTwSym = s => /^\d{4,6}[A-Z]?$/i.test(s.trim());
   for (const g of state.portfolio.investments) {
-    const isUS    = g.group === '美國股市';
-    const isCB    = g.group === '可轉債';
-    const isStock = g.group === '股票';
+    const isCB = g.group === '可轉債';
     for (const item of g.items) {
       if (!item.symbol) continue;
-      if (isUS)    usTickers.push(item.symbol);
-      else if (isCB)    cbSymbols.push(item.symbol);
-      else if (isStock) twStocks.push(item.symbol);
+      const sym = item.symbol.trim();
+      if (isCB)             cbSymbols.push(sym);
+      else if (_isTwSym(sym)) twStocks.push(sym);
+      else                  usTickers.push(sym);
     }
   }
 
@@ -2817,28 +2817,13 @@ function _etfRender(data) {
   if (!body) return;
 
   const {
-    fundName = '—', aum, aumChange, prevAum, nav, estimatedNav, assetInfo,
+    fundName = '—', aum, aumChange, prevAum, nav,
     date = '—', prevDate, holdings = [], summaryCounts = {}, _stale, _cached_date
   } = data;
 
   // ── Meta bar ──────────────────────────────────────────────────────────────
   const aumFmt  = aum ? `${(aum / 1e8).toFixed(2)} 億` : '—';
   const navFmt  = nav != null ? nav.toFixed(2) : '—';
-
-  // Estimated NAV card
-  let estNavHtml = '';
-  if (estimatedNav != null) {
-    const diff = nav != null ? estimatedNav - nav : null;
-    const diffHtml = diff != null
-      ? `<div style="font-size:11px;color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}; margin-top:1px">${diff >= 0 ? '+' : ''}${diff.toFixed(4)}</div>`
-      : '';
-    estNavHtml = `<div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
-                      padding:8px 14px;min-width:90px">
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">預估淨值</div>
-      <div style="font-size:14px;font-weight:700">${estimatedNav.toFixed(4)}</div>
-      ${diffHtml}
-    </div>`;
-  }
 
   let aumChgHtml = '';
   if (aumChange != null) {
@@ -2909,7 +2894,6 @@ function _etfRender(data) {
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">淨值</div>
             <div style="font-size:14px;font-weight:700">${navFmt}</div>
           </div>
-          ${estNavHtml}
           <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
                       padding:8px 14px;min-width:80px">
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">資料日期</div>
