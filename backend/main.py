@@ -1815,6 +1815,7 @@ _etf_tracking_cache: dict = {}   # fund_code → {"date": "YYYY-MM-DD", "data": 
 ETF_CONFIG: dict[str, dict] = {
     "00981A": {"source": "ezmoney",     "ezmoney_code": "49YTW",  "name": "00981A 主動統一台股增長"},
     "00988A": {"source": "ezmoney",     "ezmoney_code": "61YTW",  "name": "00988A 主動統一全球增長"},
+    "00403A": {"source": "ezmoney",     "ezmoney_code": "63YTW",  "name": "00403A 主動統一時代50"},
     "00991A": {"source": "fhtrust",     "fhtrust_code": "ETF23",  "name": "00991A 復華台灣未來50"},
     "00992A": {"source": "capitalfund", "cf_fund_id":   "500",    "name": "00992A 群益台灣科技創新"},
 }
@@ -1998,82 +1999,6 @@ def _is_tw_sym(s: str) -> bool:
     return bool(re.match(r'^\d{4,6}[A-Z]?$', s))
 
 
-# ── ezmoney Asset Info (cash / liabilities / outstanding units) ───────────────
-import html as _html_lib
-
-_ezmoney_asset_cache: dict = {}   # ezmoney_code → {"ts": float, "data": dict}
-
-def _fetch_ezmoney_asset_info(ezmoney_code: str) -> dict:
-    """Scrape ezmoney Fund Info page for cash, liabilities, outstanding units."""
-    now = time.time()
-    cached = _ezmoney_asset_cache.get(ezmoney_code)
-    if cached and (now - cached["ts"]) < 3600:   # 1-hr cache (data updates once/day)
-        return cached["data"]
-    url = f"https://www.ezmoney.com.tw/ETF/Fund/Info?fundCode={ezmoney_code}&tabName=basic"
-    try:
-        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=15, verify=False)
-        text = _html_lib.unescape(_html_lib.unescape(r.text))
-        assets: dict = {}
-        for m in re.findall(r'\{[^{}]*"AssetCode"[^{}]*\}', text):
-            try:
-                obj = json.loads(m)
-                code = obj.get("AssetCode")
-                if code:
-                    assets[code] = obj
-            except Exception:
-                pass
-        data = {
-            "nav_ntd":  assets.get("NAV",      {}).get("Value"),
-            "out_unit": assets.get("OUT_UNIT",  {}).get("Value"),
-            "p_unit":   assets.get("P_UNIT",    {}).get("Value"),
-            "cash_ntd": assets.get("CASH",      {}).get("Value"),
-            "gdm_usd":  assets.get("GDM",       {}).get("Value"),
-            "gdm_rate": assets.get("GDM",       {}).get("USD_EXRATE") or 31.0,
-            "pay_ntd":  assets.get("PAY",       {}).get("Value") or 0.0,   # negative
-            "apar_ntd": assets.get("APAR",      {}).get("Value") or 0.0,   # negative
-        }
-        _ezmoney_asset_cache[ezmoney_code] = {"ts": now, "data": data}
-        logger.info(f"[ezmoney-asset] {ezmoney_code}: out_unit={data.get('out_unit')}, cash={data.get('cash_ntd')}")
-        return data
-    except Exception as e:
-        logger.warning(f"[ezmoney-asset] {ezmoney_code} failed: {e}")
-        return {}
-
-
-# ── FX rates → NTD ───────────────────────────────────────────────────────────
-_fx_cache: dict = {"ts": 0.0, "rates": {"TWD": 1.0}}
-
-def _fetch_fx_rates() -> dict:
-    """Return dict of currency → TWD rate. Cached 5 min."""
-    now = time.time()
-    if (now - _fx_cache["ts"]) < CACHE_TTL:
-        return _fx_cache["rates"]
-    pairs = {
-        "USD": "USDTWD=X",
-        "KRW": "KRWTWD=X",
-        "JPY": "JPYTWD=X",
-        "EUR": "EURTWD=X",
-        "HKD": "HKDTWD=X",
-        "SGD": "SGDTWD=X",
-        "AUD": "AUDTWD=X",
-        "GBP": "GBPTWD=X",
-    }
-    rates: dict = {"TWD": 1.0}
-    try:
-        tkrs = yf.Tickers(" ".join(pairs.values()))
-        for ccy, sym in pairs.items():
-            try:
-                rate = tkrs.tickers[sym].fast_info.last_price
-                if rate:
-                    rates[ccy] = float(rate)
-            except Exception:
-                pass
-    except Exception as e:
-        logger.warning(f"[fx-rates] fetch failed: {e}")
-    if len(rates) > 1:
-        _fx_cache["ts"] = now
-        _fx_cache["rates"] = rates
-    return rates
 
 
 _EXCH_TO_YAHOO: dict[str, tuple[str, str]] = {
@@ -2245,51 +2170,12 @@ def _etf_build_enriched(fund_code: str, meta: dict, today_holdings: dict,
     aum = meta.get("aum")
     aum_change = round(aum - prev_aum, 0) if (aum and prev_aum) else None
 
-    # Estimated NAV (ezmoney source only — has cash/liability detail)
-    estimated_nav = None
-    asset_info: dict = {}
-    cfg_src = ETF_CONFIG.get(fund_code, {}).get("source")
-    if cfg_src == "ezmoney":
-        ezmoney_code = ETF_CONFIG[fund_code]["ezmoney_code"]
-        asset_info = _fetch_ezmoney_asset_info(ezmoney_code)
-        out_unit = asset_info.get("out_unit")
-        if out_unit:
-            fx = _fetch_fx_rates()
-            total_ntd = 0.0
-            priced_count = 0
-            for h in holdings:
-                if h.get("operationType") == "全數清倉":
-                    continue
-                price  = h.get("closingPrice")
-                ccy    = h.get("currency", "TWD") or "TWD"
-                shares = h.get("shares") or 0
-                if price is None or shares == 0:
-                    continue
-                # GBp (pence) = 1/100 GBP
-                if ccy == "GBp":
-                    rate = fx.get("GBP", 1.0) / 100
-                else:
-                    rate = fx.get(ccy, 1.0)
-                total_ntd   += price * rate * shares
-                priced_count += 1
-            # Add other assets (cash + futures margin − payables)
-            cash  = asset_info.get("cash_ntd") or 0
-            gdm   = (asset_info.get("gdm_usd") or 0) * (asset_info.get("gdm_rate") or 1)
-            pay   = asset_info.get("pay_ntd")  or 0   # already negative
-            apar  = asset_info.get("apar_ntd") or 0   # already negative
-            total_ntd += cash + gdm + pay + apar
-            estimated_nav = round(total_ntd / out_unit, 4)
-            logger.info(f"[etf-nav] {fund_code}: stocks_ntd={total_ntd-cash-gdm-pay-apar:.0f} "
-                        f"cash={cash:.0f} estimated_nav={estimated_nav} (priced {priced_count}/{len(holdings)} holdings)")
-
     return {
         "fundName":      ETF_CONFIG.get(fund_code, {}).get("name", fund_code),
         "aum":           aum,
         "aumChange":     aum_change,
         "prevAum":       prev_aum,
         "nav":           meta.get("nav"),
-        "estimatedNav":  estimated_nav,
-        "assetInfo":     asset_info if asset_info else None,
         "date":          date_str,
         "prevDate":      prev_date,
         "holdings":      holdings,
