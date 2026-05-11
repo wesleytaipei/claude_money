@@ -2727,7 +2727,7 @@ const _etfState = {
   view: 'focus',          // 'focus' | 'detail'
 };
 
-const _etfFocusCodes = ['00981A', '00991A', '00992A'];
+const _etfFocusCodes = ['00981A', '00988A', '00403A', '00991A', '00992A'];
 
 async function renderEtfPage(force = false) {
   const body  = document.getElementById('etf-body');
@@ -3181,7 +3181,7 @@ async function _etfRenderFocusView() {
   const subEl = document.getElementById('etf-sub');
   if (!body) return;
 
-  if (subEl) subEl.textContent = '00981A · 00991A · 00992A 重點標的彙整';
+  if (subEl) subEl.textContent = _etfFocusCodes.join(' · ') + ' 重點標的彙整';
   body.innerHTML = '<div class="empty-state" style="padding:40px">⏳ 彙整各ETF重點標的…</div>';
 
   const opCfg = {
@@ -3190,7 +3190,7 @@ async function _etfRenderFocusView() {
     '股數減碼': { color: '#f59e0b', bg: 'rgba(245,158,11,.10)', icon: '➖', short: '減碼' },
     '全數清倉': { color: '#f43f5e', bg: 'rgba(244,63,94,.10)',  icon: '🔴', short: '清倉' },
   };
-  const etfColor = { '00981A': '#6366f1', '00991A': '#10b981', '00992A': '#f59e0b' };
+  const etfColor = { '00981A': '#6366f1', '00988A': '#ec4899', '00403A': '#14b8a6', '00991A': '#10b981', '00992A': '#f59e0b' };
 
   // Parallel fetch; use cache when available
   const settled = await Promise.allSettled(_etfFocusCodes.map(async code => {
