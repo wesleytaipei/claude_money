@@ -205,52 +205,55 @@ def fetch_yahoo_future(symbol_encoded):
         r = requests.get(url, headers=HEADERS, verify=False, timeout=10)
         soup = BeautifulSoup(r.text, "html.parser")
 
-        # Try multiple potential selectors for Yahoo's new layout
         price_el = (soup.select_one('span[class*="Fz(32px)"]')
                     or soup.select_one('[class*="Fw(b)"][class*="Fz(32px)"]'))
         change_el = (soup.select_one('span[class*="Fz(20px)"]')
                      or soup.select_one('span[class*="C($"]'))
 
-        if price_el:
-            price_str = price_el.text.strip()
-            change_text = change_el.text.strip() if change_el else "-"
+        if not price_el:
+            return {"price": "-", "change": "-", "change_pct": "-"}
 
-            change_val = "-"
-            change_pct = "-"
-            if "(" in change_text:
-                parts = change_text.split("(")
-                change_val = parts[0].strip()
-                change_pct = parts[1].replace(")", "").strip()
+        price_str = price_el.text.strip()
+
+        # Direction from CSS class — Yahoo uses C($c-trend-down) / C($c-trend-up)
+        el_class = " ".join((change_el or price_el).get("class", []))
+        is_neg = "trend-down" in el_class
+
+        # change_el contains an inner <span> arrow glyph with no text + the number
+        change_text = change_el.get_text(separator="", strip=True) if change_el else "-"
+
+        # Strip any parenthesised pct that Yahoo sometimes appends
+        change_val = "-"
+        change_pct = "-"
+        if "(" in change_text:
+            raw_val, raw_pct = change_text.split("(", 1)
+            change_val = raw_val.strip()
+            change_pct = raw_pct.replace(")", "").strip()
+        else:
+            change_val = change_text
+
+        # Apply sign from CSS class (strip any existing sign first, then re-apply)
+        try:
+            price_num  = float(price_str.replace(",", ""))
+            change_abs = float(str(change_val).replace(",", "").replace("+", "").replace("-", ""))
+            sign       = -1 if is_neg else 1
+            change_signed = sign * change_abs
+
+            change_val = f"{'-' if is_neg else '+'}{change_abs}"
+
+            if change_pct == "-":
+                prev = price_num - change_signed
+                if prev > 0:
+                    pct_calc = round(abs(change_signed) / prev * 100, 2)
+                    change_pct = f"{'-' if is_neg else '+'}{pct_calc}%"
             else:
-                change_val = change_text
+                # Ensure sign on existing pct string
+                pct_clean = change_pct.replace("+", "").replace("-", "").replace("%", "")
+                change_pct = f"{'-' if is_neg else '+'}{pct_clean}%"
+        except Exception:
+            pass
 
-            # Try to compute pct if missing, and ensure sign on change
-            try:
-                price_num = float(price_str.replace(",", ""))
-                change_num = float(str(change_val).replace(",", "").replace("+", "").replace("-", ""))
-                # Detect sign from text; if none and value is near 0 skip
-                is_neg = change_text.startswith("-") or (change_val.startswith("-") if change_val != "-" else False)
-                if not change_val.startswith("+") and not change_val.startswith("-"):
-                    prev = price_num - change_num
-                    if prev > 0:
-                        pct_calc = round((change_num / prev) * 100, 2)
-                        # Can't determine sign from HTML alone; omit sign prefix for safety
-                        change_val = str(round(change_num, 2))
-                        if change_pct == "-":
-                            change_pct = f"{pct_calc}%"
-                elif change_pct == "-":
-                    prev = price_num - change_num * (-1 if is_neg else 1)
-                    if prev > 0:
-                        pct_calc = round((change_num / prev) * 100, 2)
-                        change_pct = f"{pct_calc}%"
-            except:
-                pass
-
-            return {
-                "price": price_str,
-                "change": change_val,
-                "change_pct": change_pct
-            }
+        return {"price": price_str, "change": change_val, "change_pct": change_pct}
     except Exception as e:
         print(f"Error fetching Yahoo future {symbol_encoded}: {e}")
     return {"price": "-", "change": "-", "change_pct": "-"}

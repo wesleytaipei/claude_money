@@ -489,12 +489,13 @@ async function refreshPrices() {
   if (twStocks.length > 0) {
     const q = [...new Set(twStocks)].join(',');
     promises.push(
-      api('/api/tw-prices?symbols=' + encodeURIComponent(q))
+      api('/api/tw-prices?symbols=' + encodeURIComponent(q) + '&force=true')
         .then(data => {
           for (const g of state.portfolio.investments) {
-            if (g.group !== '股票') continue;
+            if (g.group === '可轉債') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
+              if (!_isTwSym(item.symbol)) continue;
               const d = data[item.symbol.toUpperCase()];   // normalize: 00988a → 00988A
               if (d && d.price != null) item.current_price = d.price;
               if (d && d.change_pct != null) item._change_pct = d.change_pct;
@@ -513,9 +514,10 @@ async function refreshPrices() {
         .then(data => {
           Object.assign(state.prices, data);
           for (const g of state.portfolio.investments) {
-            if (g.group !== '美國股市') continue;
+            if (g.group === '可轉債') continue;
             for (const item of g.items) {
               if (!item.symbol) continue;
+              if (_isTwSym(item.symbol)) continue;
               const d = data[item.symbol.toUpperCase()];
               if (d && d.price != null) item.current_price = d.price;
               if (d && d.change_pct != null) item._change_pct = d.change_pct;

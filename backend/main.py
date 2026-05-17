@@ -842,56 +842,104 @@ def load_cbas_data() -> dict:
         return _cbas_cache.get("data", {})
 
 
+def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
+    """Fetch real-time CB prices from MIS API. Tries OTC first, then TSE for any misses."""
+    now = time.time()
+    prices: dict[str, dict] = {}
+
+    def _flt(v):
+        try: return float(v) if v and v not in ("-", "") else None
+        except (ValueError, TypeError): return None
+
+    def _parse_mis_items(items):
+        for item in items:
+            code = item.get("c", "")
+            if not code:
+                continue
+
+            z_f = _flt(item.get("z"))
+            h_f = _flt(item.get("h"))
+            u_f = _flt(item.get("u"))
+            y_f = _flt(item.get("y"))
+            v_f = _flt(item.get("v")) or 0
+
+            w_f = _flt(item.get("w"))
+            l_f = _flt(item.get("l"))
+
+            # Only trust MIS price when there is a real trade:
+            # 1. z field (latest/closing trade price)
+            # 2. h == u with volume (hit 漲停 — last trade was at upper limit)
+            # 3. l == w with volume (hit 跌停 — last trade was at lower limit)
+            # Do NOT use bid (b) — it's a resting order, not a trade price.
+            price = None
+            if z_f is not None:
+                price = z_f
+            elif h_f is not None and u_f is not None and abs(h_f - u_f) < 0.01 and v_f > 0:
+                price = u_f
+            elif l_f is not None and w_f is not None and abs(l_f - w_f) < 0.01 and v_f > 0:
+                price = w_f
+
+            # change_pct only when we have a real trade price
+            change_pct = None
+            if price is not None and y_f and y_f > 0:
+                change_pct = round((price - y_f) / y_f * 100, 2)
+
+            prices[code] = {
+                "price":      round(price, 4) if price is not None else None,
+                "change_pct": change_pct,
+                "prev_close": y_f,   # kept for CBAS fallback change_pct calc
+                "ts":         now,
+            }
+
+    # Try OTC first (most CBs are listed on TPEX/OTC)
+    try:
+        ex_ch = "|".join(f"otc_{s}.tw" for s in symbols)
+        r = http_requests.get(
+            f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}",
+            timeout=10, verify=False)
+        _parse_mis_items(r.json().get("msgArray", []))
+    except Exception:
+        pass
+
+    # TSE fallback for any symbol not returned by OTC query
+    need_tse = [s for s in symbols if s not in prices or prices[s]["price"] is None]
+    if need_tse:
+        try:
+            ex_ch = "|".join(f"tse_{s}.tw" for s in need_tse)
+            r = http_requests.get(
+                f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}",
+                timeout=10, verify=False)
+            _parse_mis_items(r.json().get("msgArray", []))
+        except Exception:
+            pass
+
+    return prices
+
+
 def fetch_cb_prices(symbols: list[str]) -> dict:
-    """Fetch CB data. Primary: CBAS API (full data). Fallback: TWSE mis API (price only)."""
+    """Fetch CB data. CBAS → metadata; MIS → real-time price/change_pct (always)."""
     cbas = load_cbas_data()
     now = time.time()
     result = {}
 
-    # Symbols not found in CBAS — try mis API for price
-    missing = [s for s in symbols if s not in cbas]
-
-    if missing:
-        ex_ch = "|".join(f"otc_{s}.tw" for s in missing)
-        url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}"
-        try:
-            r = http_requests.get(url, timeout=10, verify=False)
-            for item in r.json().get("msgArray", []):
-                code = item.get("c", "")
-                price = None
-                for field in ["z", None, "y"]:
-                    if field is None:
-                        b = item.get("b", "")
-                        if b and b != "-":
-                            try: price = float(b.split("_")[0])
-                            except: pass
-                        if price: break
-                        continue
-                    val = item.get(field, "-")
-                    if val and val != "-":
-                        try: price = float(val)
-                        except: pass
-                    if price: break
-                # Compute day change % from z (current) vs y (prev close)
-                change_pct = None
-                try:
-                    z = float(item.get("z", "-") or "-")
-                    y = float(item.get("y", "-") or "-")
-                    if z and y and y > 0:
-                        change_pct = round((z - y) / y * 100, 2)
-                except (ValueError, TypeError):
-                    pass
-                cbas[code] = {
-                    "name":       item.get("n", ""),
-                    "price":      round(price, 4) if price else None,
-                    "change_pct": change_pct,
-                    "ts":         now,
-                }
-        except Exception:
-            pass
+    # Always fetch real-time prices from MIS for all requested symbols
+    mis_prices = _fetch_mis_cb_prices(symbols)
 
     for s in symbols:
-        result[s] = cbas.get(s, {"price": None, "name": "", "ts": now})
+        # Start from CBAS metadata (conversion_price, due_date, etc.)
+        entry = dict(cbas.get(s, {"price": None, "name": "", "ts": now}))
+        mis = mis_prices.get(s, {})
+        if mis.get("price") is not None:
+            # Real trade from MIS (z or 漲停) — authoritative
+            entry["price"]      = mis["price"]
+            entry["change_pct"] = mis.get("change_pct")
+        else:
+            # No real MIS trade — keep CBAS closing price, compute change_pct from MIS y
+            prev = mis.get("prev_close")
+            cbas_p = entry.get("price")
+            if cbas_p is not None and prev and prev > 0:
+                entry["change_pct"] = round((cbas_p - prev) / prev * 100, 2)
+        result[s] = entry
 
     # ── Mark suspended CBs ─────────────────────────────────────────────────
     suspensions = load_cb_suspensions()  # {code: "start - end"}
@@ -921,34 +969,6 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
             target = s[:4]
         if target:
             target_map[s] = target
-
-    # ── Supplement price + change_pct from MIS for ALL CB symbols ─────────
-    # CBAS's convertible_bond_market_price is the previous close and can be
-    # stale for suspended / low-volume CBs. MIS gives live last-trade / best-bid.
-    # IMPORTANT: do NOT use _tw_table[by_sym] here — that table catalogues the
-    # underlying stock's market (which may be TSE), while the CB itself always
-    # trades on OTC/TPEX. Always query both exchanges.
-    cb_parts = []
-    for s in symbols:
-        cb_parts += [f"otc_{s.lower()}.tw", f"tse_{s.lower()}.tw"]
-    try:
-        mis_url = ("https://mis.twse.com.tw/stock/api/getStockInfo.jsp"
-                   f"?ex_ch={'|'.join(cb_parts)}")
-        mis_r = http_requests.get(mis_url, headers={"User-Agent": "Mozilla/5.0"},
-                                  timeout=10, verify=False)
-        for item in mis_r.json().get("msgArray", []):
-            code = (item.get("c") or "").strip()
-            if code in result:
-                mis_price, change_pct = _mis_parse_price(item)
-                # MIS is the authoritative live source (z > best bid > prev close).
-                # CBAS's convertible_bond_market_price is often stale (esp. for
-                # suspended / low-volume CBs), so override with MIS when present.
-                if mis_price is not None:
-                    result[code]["price"] = mis_price
-                if change_pct is not None:
-                    result[code]["change_pct"] = change_pct
-    except Exception:
-        pass
 
     # ── Fetch underlying stock change_pct (for CB table display) ───────────
     if target_map:
@@ -1123,11 +1143,14 @@ def get_prices(tickers: str = ""):
 
 
 @app.get("/api/tw-prices")
-def get_tw_prices(symbols: str = ""):
+def get_tw_prices(symbols: str = "", force: bool = False):
     """MIS-based TW stock prices (TSE + OTC) with day-change%."""
     if not symbols.strip():
         return {}
     syms = [s.strip().upper() for s in symbols.split(",") if s.strip()]
+    if force:
+        for s in syms:
+            _tw_mis_cache.pop(s, None)
     return fetch_tw_prices_mis(syms)
 
 
