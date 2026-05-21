@@ -76,9 +76,10 @@ def ensure_data_seeded():
                     curr_data = json.load(target_f)
                 
                 if isinstance(source_data, dict) and isinstance(curr_data, dict):
-                    # For dicts, let Git (source) override existing keys to allow "Push to Update"
-                    # but keep keys that only exist in Production (e.g. dynamic state)
-                    merged = {**curr_data, **source_data}
+                    # curr_data (production) takes priority over source_data (git seed).
+                    # User-edited fields (investments, assets, liabilities) must never be
+                    # overwritten by stale initial_data on redeploy — Gist sync handles updates.
+                    merged = {**source_data, **curr_data}
                     with open(target, "w", encoding="utf-8") as target_f:
                         json.dump(merged, target_f, ensure_ascii=False, indent=2)
                 elif isinstance(source_data, list) and isinstance(curr_data, list):
