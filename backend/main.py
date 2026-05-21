@@ -14,7 +14,11 @@ import requests as http_requests
 import yfinance as yf
 from fastapi import FastAPI, Request
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# TW government/exchange APIs have incomplete SSL cert chains on some endpoints.
+# Set TW_VERIFY=true in .env to enable strict SSL (may break some TWSE/TPEX fetches).
+_TW_VERIFY = os.getenv("TW_VERIFY", "false").lower() == "true"
+if not _TW_VERIFY:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -100,6 +104,7 @@ MANUAL_HISTORY_FILE = DATA_DIR / "manual_history.json"
 
 _price_cache: dict = {}
 _tw_mis_cache: dict = {}   # symbol → {price, change_pct, name, ts}
+_tw_mis_lock  = _threading.Lock()
 _indices_cache: dict = {"ts": 0, "data": {}}
 CACHE_TTL = 300  # 5 minutes
 
@@ -256,6 +261,20 @@ def _gist_push_confirmed():
 
 
 # ── Price fetching ───────────────────────────────────────────────────────────
+def _is_tw_market_open() -> bool:
+    """True if current Taipei time is within continuous trading session (Mon-Fri 9:00-13:30)."""
+    try:
+        from zoneinfo import ZoneInfo
+    except ImportError:
+        from backports.zoneinfo import ZoneInfo
+    from datetime import time as dt_time
+    now_tw = datetime.now(ZoneInfo("Asia/Taipei"))
+    if now_tw.weekday() >= 5:
+        return False
+    t = now_tw.time()
+    return dt_time(9, 0) <= t <= dt_time(13, 30)
+
+
 def _resolve_ticker(symbol: str, market: str) -> str:
     """Convert a raw symbol to a yfinance ticker."""
     s = symbol.strip().upper()
@@ -308,38 +327,46 @@ def fetch_prices(tickers: list[str]) -> dict:
 
 
 def _mis_parse_price(item: dict) -> tuple[float | None, float | None]:
-    """Extract (price, change_pct) from a single MIS msgArray item."""
-    z_raw = item.get("z", "-") or "-"
-    y_raw = item.get("y", "-") or "-"
-    b_raw = item.get("b", "") or ""
+    """Extract (price, change_pct) from a single MIS msgArray item.
+
+    Priority:
+      1. z  — latest/closing trade price
+      2. h==u with volume — 漲停，last trade = upper limit
+      3. l==w with volume — 跌停，last trade = lower limit
+      4. b  — best bid (盤中委買，proxy when no recent trade)
+      5. y  — previous close (last resort, change_pct = 0)
+    change_pct always computed against y (previous close).
+    """
+    def _flt(v):
+        try: return float(v) if v and v not in ("-", "") else None
+        except (ValueError, TypeError): return None
+
+    z_f = _flt(item.get("z"))
+    h_f = _flt(item.get("h"))
+    u_f = _flt(item.get("u"))
+    l_f = _flt(item.get("l"))
+    w_f = _flt(item.get("w"))
+    y_f = _flt(item.get("y"))
+    b_f = _flt((item.get("b") or "").split("_")[0])
+    v_f = _flt(item.get("v")) or 0
 
     price = None
-    for raw in [z_raw, b_raw.split("_")[0], y_raw]:
-        try:
-            v = float(raw)
-            if v > 0:
-                price = round(v, 2)
-                break
-        except (ValueError, TypeError):
-            pass
+    price_is_prev_close = False
+    if z_f is not None:
+        price = z_f
+    elif h_f is not None and u_f is not None and abs(h_f - u_f) < 0.01 and v_f > 0:
+        price = u_f   # 漲停
+    elif l_f is not None and w_f is not None and abs(l_f - w_f) < 0.01 and v_f > 0:
+        price = w_f   # 跌停
+    elif b_f is not None:
+        price = b_f   # bid (盤中近似)
+    elif y_f is not None:
+        price = y_f   # prev close (無盤中資料)
+        price_is_prev_close = True
 
     change_pct = None
-    try:
-        z = float(z_raw)
-        y = float(y_raw)
-        if z > 0 and y > 0:
-            change_pct = round((z - y) / y * 100, 2)
-    except (ValueError, TypeError):
-        pass
-
-    # Fallback: if z was unavailable but we resolved a price from b/y, use that
-    if change_pct is None and price is not None:
-        try:
-            y = float(y_raw)
-            if y > 0:
-                change_pct = round((price - y) / y * 100, 2)
-        except (ValueError, TypeError):
-            pass
+    if price is not None and not price_is_prev_close and y_f and y_f > 0:
+        change_pct = round((price - y_f) / y_f * 100, 2)
 
     return price, change_pct
 
@@ -404,13 +431,17 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
     is resolved via _tw_table; unknown symbols are tried as TSE first.
     """
     now = time.time()
+    # Shorter TTL during market hours so opening price movement is caught quickly
+    effective_ttl = 60 if _is_tw_market_open() else CACHE_TTL
     result: dict = {}
     to_fetch: list[str] = []
 
+    with _tw_mis_lock:
+        snapshot = dict(_tw_mis_cache)
     for sym in symbols:
-        cached = _tw_mis_cache.get(sym)
+        cached = snapshot.get(sym)
         # Only use cache if it has both price AND change_pct; otherwise retry fallbacks
-        if cached and (now - cached["ts"]) < CACHE_TTL and cached.get("change_pct") is not None:
+        if cached and (now - cached["ts"]) < effective_ttl and cached.get("change_pct") is not None:
             result[sym] = cached
         else:
             to_fetch.append(sym)
@@ -437,8 +468,9 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
     headers = {"User-Agent": "Mozilla/5.0"}
 
     try:
-        r = http_requests.get(url, headers=headers, timeout=10, verify=False)
+        r = http_requests.get(url, headers=headers, timeout=10, verify=_TW_VERIFY)
         found: set[str] = set()
+        batch_entries: dict = {}
         for item in r.json().get("msgArray", []):
             code = (item.get("c") or "").strip().upper()
             if not code:
@@ -450,15 +482,17 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
                 "name":       item.get("n", ""),
                 "ts":         now,
             }
-            _tw_mis_cache[code] = entry
+            batch_entries[code] = entry
             result[code] = entry
             found.add(code)
+        with _tw_mis_lock:
+            _tw_mis_cache.update(batch_entries)
 
-        # Symbols with null data or not found or missing change_pct → fallback
-        # (MIS often reports price but '-' for z during off-hours, missing the % change)
+        # Fallback only when price is completely missing (not found or None)
+        # change_pct=None is acceptable — _mis_parse_price now covers most cases via bid/limit
         need_fallback = [
             sym for sym in to_fetch
-            if sym not in found or result[sym].get("price") is None or result[sym].get("change_pct") is None
+            if sym not in found or result[sym].get("price") is None
         ]
 
         def _tw_fallback(sym: str) -> tuple[str, dict]:
@@ -492,7 +526,8 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
             with ThreadPoolExecutor(max_workers=min(8, len(need_fallback))) as ex:
                 for fut in as_completed([ex.submit(_tw_fallback, s) for s in need_fallback]):
                     sym, hit = fut.result()
-                    _tw_mis_cache[sym] = hit
+                    with _tw_mis_lock:
+                        _tw_mis_cache[sym] = hit
                     result[sym] = hit
 
     except Exception as e:
@@ -510,7 +545,7 @@ def _fetch_tw_indices_mis() -> dict:
     key_map = {"t00": "taiex", "o00": "otc"}
     result = {}
     try:
-        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8, verify=False)
+        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=8, verify=_TW_VERIFY)
         for item in r.json().get("msgArray", []):
             code = (item.get("c") or "").strip()
             key = key_map.get(code)
@@ -648,7 +683,7 @@ def load_tdcc_remain() -> dict:
     result: dict = {}
     try:
         r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"},
-                              timeout=30, verify=False)
+                              timeout=30, verify=_TW_VERIFY)
         # CSV is UTF-8 with BOM. Header: 資料日,證券代號,證券名稱,市場別,證券種類,登記數額
         text = r.content.decode("utf-8-sig", errors="ignore")
         lines = text.split("\n")
@@ -697,7 +732,7 @@ def load_cb_suspensions() -> dict:
     try:
         api_r = http_requests.get(
             "https://www.tpex.org.tw/www/zh-tw/bond/cbSuspend?response=json&limit=100&offset=0",
-            timeout=10, verify=False,
+            timeout=10, verify=_TW_VERIFY,
             headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"},
         )
         data = api_r.json()
@@ -723,7 +758,7 @@ def load_cb_suspensions() -> dict:
             url = (f"https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/"
                    f"{yyyy}/{yyyymm}/RSdrs002.{yyyymmdd}-C.csv")
             try:
-                r = http_requests.head(url, timeout=5, verify=False,
+                r = http_requests.head(url, timeout=5, verify=_TW_VERIFY,
                                        headers={"User-Agent": "Mozilla/5.0"})
                 if r.status_code == 200:
                     csv_url = url
@@ -739,7 +774,7 @@ def load_cb_suspensions() -> dict:
 
     # Step 3: Fetch and parse
     try:
-        r = http_requests.get(csv_url, timeout=15, verify=False,
+        r = http_requests.get(csv_url, timeout=15, verify=_TW_VERIFY,
                               headers={"User-Agent": "Mozilla/5.0"})
         r.raise_for_status()
 
@@ -802,7 +837,7 @@ def load_cbas_data() -> dict:
 
     url = "https://cbas16889.pscnet.com.tw/api/CbasQuote/GetIssuedCBSchedule"
     try:
-        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False)
+        r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY)
         raw = r.json()
         cb_list = raw.get("result", raw) if isinstance(raw, dict) else raw
         result = {}
@@ -896,7 +931,7 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
         ex_ch = "|".join(f"otc_{s}.tw" for s in symbols)
         r = http_requests.get(
             f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}",
-            timeout=10, verify=False)
+            timeout=10, verify=_TW_VERIFY)
         _parse_mis_items(r.json().get("msgArray", []))
     except Exception:
         pass
@@ -908,7 +943,7 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
             ex_ch = "|".join(f"tse_{s}.tw" for s in need_tse)
             r = http_requests.get(
                 f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex_ch}",
-                timeout=10, verify=False)
+                timeout=10, verify=_TW_VERIFY)
             _parse_mis_items(r.json().get("msgArray", []))
         except Exception:
             pass
@@ -1266,7 +1301,7 @@ def _build_tw_stock_table() -> dict:
 
     for url, market in _ISIN_SOURCES:
         try:
-            r = http_requests.get(url, headers=_ISIN_HEADERS, timeout=30, verify=False)
+            r = http_requests.get(url, headers=_ISIN_HEADERS, timeout=30, verify=_TW_VERIFY)
             pairs = _parse_isin_page(r.content)
             for sym, name in pairs:
                 if sym not in by_symbol:
@@ -1322,7 +1357,7 @@ def _tw_price_for_symbol(symbol: str) -> tuple[str, float | None]:
     for ex in ["tse", "otc"]:
         try:
             url = f"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={ex}_{symbol.lower()}.tw"
-            r = http_requests.get(url, timeout=5, verify=False)
+            r = http_requests.get(url, timeout=5, verify=_TW_VERIFY)
             items = r.json().get("msgArray", [])
             if items:
                 item = items[0]
@@ -1640,8 +1675,21 @@ _scheduler.add_job(
     id="daily_etf_fetch",
     replace_existing=True,
 )
+
+def _clear_tw_price_cache_for_open():
+    """Clear TW price cache at market open so stale pre-open data is never served."""
+    with _tw_mis_lock:
+        _tw_mis_cache.clear()
+    logger.info("[scheduler] TW price cache cleared for market open")
+
+_scheduler.add_job(
+    _clear_tw_price_cache_for_open,
+    CronTrigger(day_of_week="mon-fri", hour=9, minute=1, timezone="Asia/Taipei"),
+    id="clear_tw_cache_open",
+    replace_existing=True,
+)
 _scheduler.start()
-logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW stock table rebuild @ Sun 15:00 | ETF fetch @ 21:00")
+logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01")
 
 # On startup: sync newer files from Gist (timestamp-based, both envs).
 def _startup():
@@ -1731,7 +1779,7 @@ def fetch_punish_stocks() -> dict:
             f"?startDate={start}&endDate={end}&querytype=3"
             f"&stockNo=&selectType=&proceType=&remarkType=&sortKind=STKNO&response=csv"
         )
-        r = http_requests.get(url, verify=False, timeout=20,
+        r = http_requests.get(url, verify=_TW_VERIFY, timeout=20,
                               headers={"User-Agent": "Mozilla/5.0"})
         r.raise_for_status()
         text = r.content.decode("cp950", errors="replace")
@@ -1885,7 +1933,7 @@ def _etf_raw_from_ezmoney(ezmoney_code: str) -> tuple[dict, dict]:
     """Download & parse ezmoney Excel. Returns (meta, today_holdings dict)."""
     import io as _io, pandas as _pd
     url = f"https://www.ezmoney.com.tw/ETF/Fund/AssetExcelNPOI?fundCode={ezmoney_code}"
-    r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=False)
+    r = http_requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY)
     r.raise_for_status()
     df = _pd.read_excel(_io.BytesIO(r.content), sheet_name=0, header=None)
 
@@ -1926,7 +1974,7 @@ def _etf_raw_from_fhtrust(fhtrust_code: str) -> tuple[dict, dict]:
         if d.weekday() >= 5: continue   # skip weekends
         url = f"https://www.fhtrust.com.tw/api/assetsExcel/{fhtrust_code}/{d.strftime('%Y%m%d')}"
         try:
-            r = http_requests.get(url, headers=headers, timeout=20, verify=False)
+            r = http_requests.get(url, headers=headers, timeout=20, verify=_TW_VERIFY)
             if r.status_code == 200 and len(r.content) > 1000:
                 content = r.content; used_date = d.isoformat(); break
         except Exception:
@@ -1982,7 +2030,7 @@ def _etf_raw_from_capitalfund(cf_fund_id: str) -> tuple[dict, dict]:
         "Referer": f"https://www.capitalfund.com.tw/etf/product/detail/{cf_fund_id}/portfolio",
     }
     r = http_requests.post(url, json={"fundId": cf_fund_id, "type": "portfolio"},
-                           headers=headers, timeout=20, verify=False)
+                           headers=headers, timeout=20, verify=_TW_VERIFY)
     r.raise_for_status()
     body = r.json()
     if body.get("code") != 200:
@@ -2319,7 +2367,7 @@ def get_cb_listed():
         return _cb_listed_cache["data"]
 
     try:
-        resp = http_requests.get(CB_LISTED_URL, verify=False, timeout=15)
+        resp = http_requests.get(CB_LISTED_URL, verify=_TW_VERIFY, timeout=15)
         resp.raise_for_status()
         df = pd.read_excel(io.BytesIO(resp.content))
 
@@ -2389,7 +2437,7 @@ def _fetch_fsc_excel_url() -> tuple[str, str]:
     from datetime import date as _date
     headers = {**_FSC_UA, "Referer": "https://www.sfb.gov.tw/"}
     try:
-        r = http_requests.get(FSC_SFB_INDEX, headers=headers, verify=False, timeout=15)
+        r = http_requests.get(FSC_SFB_INDEX, headers=headers, verify=_TW_VERIFY, timeout=15)
         text = r.text
 
         # Current ROC year = Gregorian year - 1911
@@ -2496,7 +2544,7 @@ def get_fsc_offerings():
         if not excel_url:
             raise ValueError("Could not resolve FSC Excel URL from sfb.gov.tw")
         logger.info(f"[fsc] fetching {excel_url} (date: {excel_date})")
-        resp = http_requests.get(excel_url, verify=False, timeout=30,
+        resp = http_requests.get(excel_url, verify=_TW_VERIFY, timeout=30,
                                   headers=_FSC_UA)
         resp.raise_for_status()
         df = pd.read_excel(io.BytesIO(resp.content), header=2)

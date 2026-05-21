@@ -176,16 +176,43 @@ async function api(path, opts = {}) {
 }
 
 // ══ Expression evaluator ═════════════════════════════════════════════════
+// Safe recursive-descent parser — no eval/Function(), handles +−*/() only
+function _arithmetic(s) {
+  let i = 0;
+  function expr() {
+    let v = term();
+    while (i < s.length && (s[i] === '+' || s[i] === '-')) {
+      const op = s[i++]; v = op === '+' ? v + term() : v - term();
+    }
+    return v;
+  }
+  function term() {
+    let v = factor();
+    while (i < s.length && (s[i] === '*' || s[i] === '/')) {
+      const op = s[i++]; v = op === '*' ? v * factor() : v / factor();
+    }
+    return v;
+  }
+  function factor() {
+    if (s[i] === '(') { i++; const v = expr(); if (s[i] !== ')') throw 0; i++; return v; }
+    if (s[i] === '-') { i++; return -factor(); }
+    const start = i;
+    while (i < s.length && /[\d.]/.test(s[i])) i++;
+    if (i === start) throw 0;
+    return parseFloat(s.slice(start, i));
+  }
+  const result = expr();
+  if (i !== s.length) throw 0;
+  return result;
+}
+
 function evalExpr(str) {
   const s = String(str).trim();
   if (!s) return '';
-  // Only allow: digits, operators +−*/%, dot, parentheses, spaces
-  if (!/^[\d\s+\-*/.()%]+$/.test(s)) return s;
-  // Skip if it's already a plain number
+  if (!/^[\d\s+\-*/.()]+$/.test(s)) return s;
   if (/^-?\d+(\.\d+)?$/.test(s)) return s;
   try {
-    // eslint-disable-next-line no-new-func
-    const result = Function('"use strict"; return (' + s + ')')();
+    const result = _arithmetic(s.replace(/\s+/g, ''));
     if (typeof result === 'number' && isFinite(result)) {
       return (+result.toFixed(10)).toString();
     }
@@ -1122,11 +1149,7 @@ function renderInvestmentsPage() {
   const sortedItems = [...items].sort((a, b) => {
     const sa = (a.symbol || a.name || '').toUpperCase();
     const sb = (b.symbol || b.name || '').toUpperCase();
-    const aNum = /^\d/.test(sa), bNum = /^\d/.test(sb);
-    if (aNum && !bNum) return -1;
-    if (!aNum && bNum) return 1;
-    if (aNum && bNum) return sa.localeCompare(sb, undefined, { numeric: true });
-    return sa.localeCompare(sb);
+    return sa.localeCompare(sb, undefined, { numeric: true, sensitivity: 'base' });
   });
   // Map sorted index back to original index for edit/delete ops
   const origIdx = sortedItems.map(item => items.indexOf(item));
@@ -1618,12 +1641,18 @@ async function syncFromGist(force = false) {
   }
 }
 
+let _refreshLock = false;
+
 async function refreshAll() {
+  if (_refreshLock) return;
+  _refreshLock = true;
+
   const icoEl = document.getElementById('refresh-ico');
   const txtEl = document.getElementById('refresh-txt');
   icoEl.innerHTML = '<span class="spinner"></span>';
   txtEl.textContent = '更新中...';
 
+  try {
   state._cbSuspensionLoaded = false;
   _punishCache.data = null;   // force re-fetch on next render
   // parallelize independent network fetches (previously sequential = sum of all three)
@@ -1641,8 +1670,11 @@ async function refreshAll() {
   else if (page === 'investments') renderInvestmentsPage();
   else if (page === 'assets') renderAssetsPage();
 
-  icoEl.textContent = '🔄';
-  txtEl.textContent = '更新數據';
+  } finally {
+    _refreshLock = false;
+    icoEl.textContent = '🔄';
+    txtEl.textContent = '更新數據';
+  }
   toast('✅ 已更新');
 }
 
@@ -2362,13 +2394,13 @@ function _chipCellHtml(data) {
   // Build tooltip (共用)
   const sign1 = (data.change || 0) >= 0 ? '+' : '';
   let tip = `集保總張數: ${(data.total||0).toLocaleString()}`
-    + `&#10;大戶本週: ${(data.current||0).toLocaleString()}張 (${data.current_date})`
-    + `&#10;大戶前週: ${(data.prev||0).toLocaleString()}張 (${data.prev_date})`
+    + `&#10;大戶本週: ${(data.current||0).toLocaleString()}張 (${data.current_date ?? '—'})`
+    + `&#10;大戶前週: ${(data.prev||0).toLocaleString()}張 (${data.prev_date ?? '—'})`
     + `&#10;週變化: ${sign1}${(data.change||0).toLocaleString()}張 (${pct >= 0 ? '+' : ''}${pct}%)`;
   if ((data.run_weeks || 1) >= 3) {
     const signR = (data.run_change || 0) >= 0 ? '+' : '';
     tip += `&#10;連${data.run_weeks}週累計: ${signR}${(data.run_change||0).toLocaleString()}張`
-         + ` (${data.run_start_date}~${data.current_date})`;
+         + ` (${data.run_start_date ?? '—'}~${data.current_date ?? '—'})`;
   }
 
   if (isFlat) {
