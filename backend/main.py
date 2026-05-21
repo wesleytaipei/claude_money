@@ -11,6 +11,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib3
 import requests as http_requests
 
+import sys
+import os
+
+try:
+    from dotenv import load_dotenv
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    load_dotenv(env_path)
+except ImportError:
+    pass
+
 import yfinance as yf
 from fastapi import FastAPI, Request
 
@@ -25,17 +35,6 @@ from fastapi.staticfiles import StaticFiles
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-
-import sys
-import os
-
-try:
-    from dotenv import load_dotenv
-    # Use absolute path for .env file to ensure it's found regardless of where the app starts
-    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
-    load_dotenv(env_path)
-except ImportError:
-    pass
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty, ratio_history_pop_dirty

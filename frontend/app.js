@@ -1649,33 +1649,34 @@ async function refreshAll() {
 
   const icoEl = document.getElementById('refresh-ico');
   const txtEl = document.getElementById('refresh-txt');
-  icoEl.innerHTML = '<span class="spinner"></span>';
-  txtEl.textContent = '更新中...';
 
   try {
-  state._cbSuspensionLoaded = false;
-  _punishCache.data = null;   // force re-fetch on next render
-  // parallelize independent network fetches (previously sequential = sum of all three)
-  await Promise.all([
-    loadIndices(),
-    refreshPrices(),
-    refreshCbSuspensions(),
-  ]);
-  calcTotals();
-  // fire-and-forget the save — Gist PATCH shouldn't block UI render
-  savePortfolio();
+    if (icoEl) icoEl.innerHTML = '<span class="spinner"></span>';
+    if (txtEl) txtEl.textContent = '更新中...';
 
-  const page = currentPage();
-  if (page === 'dashboard') renderDashboard();
-  else if (page === 'investments') renderInvestmentsPage();
-  else if (page === 'assets') renderAssetsPage();
+    state._cbSuspensionLoaded = false;
+    _punishCache.data = null;
+    await Promise.all([
+      loadIndices(),
+      refreshPrices(),
+      refreshCbSuspensions(),
+    ]);
+    calcTotals();
+    savePortfolio();
 
+    const page = currentPage();
+    if (page === 'dashboard') renderDashboard();
+    else if (page === 'investments') renderInvestmentsPage();
+    else if (page === 'assets') renderAssetsPage();
+
+    toast('✅ 已更新');
+  } catch (e) {
+    toast('❌ 更新失敗: ' + (e?.message || e), 'error');
   } finally {
     _refreshLock = false;
-    icoEl.textContent = '🔄';
-    txtEl.textContent = '更新數據';
+    if (icoEl) icoEl.textContent = '🔄';
+    if (txtEl) txtEl.textContent = '更新數據';
   }
-  toast('✅ 已更新');
 }
 
 // ══ Privacy ═════════════════════════════════════════════════════════════
