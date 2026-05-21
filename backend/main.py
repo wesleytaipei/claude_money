@@ -1695,11 +1695,12 @@ logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15
 def _startup():
     if GIST_ENABLED:
         try:
-            # Force pull on startup — Gist always holds the last confirmed version
-            # (儲存資料), so every deploy/restart should start from that clean state.
-            results = sync_from_gist(force=True)
+            # Timestamp-based pull: only overwrite local if Gist is newer.
+            # force=True would ignore the _last_modified stamp we commit to git,
+            # causing Railway to revert to stale Gist data after every deploy.
+            results = sync_from_gist(force=False)
             pulled = [r["name"] for r in results if r.get("action") == "pulled"]
-            logger.info(f"[startup] force-pulled from Gist: {pulled or 'nothing changed'}")
+            logger.info(f"[startup] synced from Gist: {pulled or 'nothing newer'}")
         except Exception as e:
             logger.warning(f"[startup] Gist sync error: {e}")
     try:
