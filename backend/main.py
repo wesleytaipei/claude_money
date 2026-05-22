@@ -1001,6 +1001,34 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
     return prices
 
 
+def _fetch_yahoo_cb_prices(codes: list[str]) -> dict:
+    """Fallback: scrape tw.stock.yahoo.com for CB closing prices (post-market, pre-CBAS).
+    CBs are listed on TPEX → .TWO suffix. Returns {code: {"price": float, "change_pct": float}}."""
+    headers = {"User-Agent": "Mozilla/5.0"}
+    result: dict[str, dict] = {}
+
+    def _scrape_one(code: str):
+        try:
+            url = f"https://tw.stock.yahoo.com/quote/{code}.TWO"
+            r = http_requests.get(url, headers=headers, timeout=10, verify=_TW_VERIFY)
+            html = r.text
+            pm = re.search(r'"regularMarketPrice":([\d.]+)', html)
+            pc = re.search(r'"regularMarketPreviousClose":([\d.]+)', html)
+            if not pm:
+                return
+            price = float(pm.group(1))
+            prev  = float(pc.group(1)) if pc else None
+            change_pct = round((price - prev) / prev * 100, 2) if prev and prev > 0 else None
+            result[code] = {"price": price, "change_pct": change_pct}
+        except Exception:
+            pass
+
+    with ThreadPoolExecutor(max_workers=min(8, len(codes))) as pool:
+        list(pool.map(_scrape_one, codes))
+
+    return result
+
+
 def fetch_cb_prices(symbols: list[str]) -> dict:
     """Fetch CB data. CBAS → metadata; MIS → real-time price/change_pct (always)."""
     cbas = load_cbas_data()
@@ -1010,6 +1038,12 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
     # Always fetch real-time prices from MIS for all requested symbols
     mis_prices = _fetch_mis_cb_prices(symbols)
 
+    # Yahoo fallback for CBs where MIS has no price (post-market 13:30–18:00 window)
+    no_price = [s for s in symbols if mis_prices.get(s, {}).get("price") is None]
+    yahoo_prices: dict[str, dict] = {}
+    if no_price:
+        yahoo_prices = _fetch_yahoo_cb_prices(no_price)
+
     for s in symbols:
         # Start from CBAS metadata (conversion_price, due_date, etc.)
         entry = dict(cbas.get(s, {"price": None, "name": "", "ts": now}))
@@ -1018,8 +1052,20 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
             # Real trade from MIS (z or 漲停) — authoritative
             entry["price"]      = mis["price"]
             entry["change_pct"] = mis.get("change_pct")
+        elif yahoo_prices.get(s, {}).get("price") is not None:
+            # Yahoo Finance has today's closing price (available right after 13:30)
+            yp    = yahoo_prices[s]
+            yp_p  = yp["price"]
+            entry["price"] = yp_p
+            # Prefer Yahoo change_pct; fall back to MIS prev_close (y field)
+            if yp.get("change_pct") is not None:
+                entry["change_pct"] = yp["change_pct"]
+            else:
+                prev = mis.get("prev_close")
+                if prev and prev > 0:
+                    entry["change_pct"] = round((yp_p - prev) / prev * 100, 2)
         else:
-            # No real MIS trade — keep CBAS closing price, compute change_pct from MIS y
+            # No real MIS trade, no Yahoo — keep CBAS closing price, compute change_pct from MIS y
             prev = mis.get("prev_close")
             cbas_p = entry.get("price")
             if cbas_p is not None and prev and prev > 0:
