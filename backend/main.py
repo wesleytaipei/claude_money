@@ -652,6 +652,29 @@ def fetch_indices() -> dict:
 
 _cb_cache: dict = {"ts": 0, "data": {}}
 
+# Intraday closing price cache: persists the last valid MIS z-price seen during trading hours.
+# Keys: bond_code → {"price": float, "date": "YYYYMMDD"}
+# After 13:30, z="-" for most OTC CBs; this cache supplies today's closing price until
+# CBAS updates at ~18:00 with official data. Written to disk so Railway redeploys don't lose
+# the day's prices.
+_CB_INTRADAY_FILE = DATA_DIR / "cb_intraday_prices.json"
+_cb_intraday_lock = _threading.Lock()
+
+def _load_cb_intraday() -> dict:
+    try:
+        if _CB_INTRADAY_FILE.exists():
+            return json.loads(_CB_INTRADAY_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {}
+
+def _save_cb_intraday(cache: dict):
+    try:
+        _CB_INTRADAY_FILE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+_cb_intraday_cache: dict = _load_cb_intraday()
 
 CBAS_CACHE_TTL = 300  # 5 min
 _cbas_cache: dict = {"ts": 0, "data": {}}  # bond_code -> full CB info
@@ -886,7 +909,16 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
         try: return float(v) if v and v not in ("-", "") else None
         except (ValueError, TypeError): return None
 
+    try:
+        from zoneinfo import ZoneInfo
+    except ImportError:
+        from backports.zoneinfo import ZoneInfo
+    today_str = datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y%m%d")
+
+    _intraday_updated = False
+
     def _parse_mis_items(items):
+        nonlocal _intraday_updated
         for item in items:
             code = item.get("c", "")
             if not code:
@@ -913,6 +945,19 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
                 price = u_f
             elif l_f is not None and w_f is not None and abs(l_f - w_f) < 0.01 and v_f > 0:
                 price = w_f
+
+            # Persist valid z prices as intraday cache (survives post-market z="-" period).
+            # After 13:30, most OTC CBs lose z; we replay the last known trade from today.
+            if price is not None:
+                with _cb_intraday_lock:
+                    _cb_intraday_cache[code] = {"price": price, "date": today_str}
+                _intraday_updated = True
+            elif v_f > 0:
+                # z="-" but stock traded today — try intraday cache from this session
+                with _cb_intraday_lock:
+                    cached = _cb_intraday_cache.get(code)
+                if cached and cached.get("date") == today_str:
+                    price = cached["price"]
 
             # change_pct only when we have a real trade price
             change_pct = None
@@ -947,6 +992,11 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
             _parse_mis_items(r.json().get("msgArray", []))
         except Exception:
             pass
+
+    # Batch-save intraday cache once after all MIS fetches complete
+    if _intraday_updated:
+        with _cb_intraday_lock:
+            _save_cb_intraday(_cb_intraday_cache)
 
     return prices
 
