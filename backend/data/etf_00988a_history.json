@@ -9635,5 +9635,972 @@
         "全數清倉": 4
       }
     }
+  },
+  "2026-05-21": {
+    "aum": 38859928248.0,
+    "holdings_raw": [
+      {
+        "symbol": "MU US",
+        "name": "MICRON TECHNOLOGY INC",
+        "shares": 78500,
+        "weight": 4.86
+      },
+      {
+        "symbol": "SNDK US",
+        "name": "SANDISK CORP",
+        "shares": 38000,
+        "weight": 4.77
+      },
+      {
+        "symbol": "AMD US",
+        "name": "ADVANCED MICRO DEVICES.amd us(超微半導體公司)",
+        "shares": 122000,
+        "weight": 4.46
+      },
+      {
+        "symbol": "LITE US",
+        "name": "LUMENTUM HOLDINGS INC",
+        "shares": 55000,
+        "weight": 4.31
+      },
+      {
+        "symbol": "BE US",
+        "name": "BLOOM ENERGY CORP- A",
+        "shares": 170000,
+        "weight": 4.26
+      },
+      {
+        "symbol": "009150 KS",
+        "name": "Samsung Electro-Mechanics co(009150 ks)",
+        "shares": 60000,
+        "weight": 3.93
+      },
+      {
+        "symbol": "6787 JP",
+        "name": "MEIKO ELECTRONICS CO LTD",
+        "shares": 175000,
+        "weight": 3.58
+      },
+      {
+        "symbol": "3037",
+        "name": "欣興",
+        "shares": 1500000,
+        "weight": 3.49
+      },
+      {
+        "symbol": "2383",
+        "name": "台光電",
+        "shares": 248000,
+        "weight": 2.99
+      },
+      {
+        "symbol": "2454",
+        "name": "聯發科",
+        "shares": 315000,
+        "weight": 2.88
+      },
+      {
+        "symbol": "285A JP",
+        "name": "KIOXIA HOLDINGS CORP",
+        "shares": 95000,
+        "weight": 2.69
+      },
+      {
+        "symbol": "5706 JP",
+        "name": "Mitsui Mining ＆ Smelting Co",
+        "shares": 110000,
+        "weight": 2.62
+      },
+      {
+        "symbol": "5801 JP",
+        "name": "FURUKAWA ELECTRIC CO LTD",
+        "shares": 100000,
+        "weight": 2.52
+      },
+      {
+        "symbol": "CIEN US",
+        "name": "CIENA CORP",
+        "shares": 52000,
+        "weight": 2.48
+      },
+      {
+        "symbol": "MRVL US",
+        "name": "MARVELL TECHNOLOGY INC",
+        "shares": 160000,
+        "weight": 2.48
+      },
+      {
+        "symbol": "4062 JP",
+        "name": "IBIDEN CO LTD",
+        "shares": 275000,
+        "weight": 2.48
+      },
+      {
+        "symbol": "2330",
+        "name": "台積電",
+        "shares": 400000,
+        "weight": 2.3
+      },
+      {
+        "symbol": "WDC US",
+        "name": "WESTERN DIGITAL CORP",
+        "shares": 57000,
+        "weight": 2.25
+      },
+      {
+        "symbol": "COHR US",
+        "name": "COHERENT INC",
+        "shares": 68000,
+        "weight": 2.09
+      },
+      {
+        "symbol": "6515",
+        "name": "穎崴",
+        "shares": 80000,
+        "weight": 1.96
+      },
+      {
+        "symbol": "5274",
+        "name": "信驊",
+        "shares": 46000,
+        "weight": 1.95
+      },
+      {
+        "symbol": "IFX GY",
+        "name": "INFINEON TECHNOLOGIES AG",
+        "shares": 300000,
+        "weight": 1.93
+      },
+      {
+        "symbol": "7826 JP",
+        "name": "FURUYA METAL CO LTD",
+        "shares": 374300,
+        "weight": 1.8
+      },
+      {
+        "symbol": "6997 JP",
+        "name": "NIPPON CHEMI-CON CORP",
+        "shares": 1200000,
+        "weight": 1.79
+      },
+      {
+        "symbol": "GLW US",
+        "name": "CORNING INC",
+        "shares": 112500,
+        "weight": 1.76
+      },
+      {
+        "symbol": "6981 JP",
+        "name": "MURATA MANUFACTURING CO LTD",
+        "shares": 500000,
+        "weight": 1.72
+      },
+      {
+        "symbol": "GEV US",
+        "name": "GE VERNOVA INC",
+        "shares": 19000,
+        "weight": 1.61
+      },
+      {
+        "symbol": "2308",
+        "name": "台達電",
+        "shares": 307000,
+        "weight": 1.6
+      },
+      {
+        "symbol": "AIXA GY",
+        "name": "AIXTRON SE",
+        "shares": 305000,
+        "weight": 1.51
+      },
+      {
+        "symbol": "3711",
+        "name": "日月光投控",
+        "shares": 1100000,
+        "weight": 1.44
+      },
+      {
+        "symbol": "GOOGL US",
+        "name": "ALPHABET INC-CL A(Alphabet公司)",
+        "shares": 44000,
+        "weight": 1.39
+      },
+      {
+        "symbol": "3017",
+        "name": "奇鋐",
+        "shares": 215000,
+        "weight": 1.38
+      },
+      {
+        "symbol": "VSH US",
+        "name": "VISHAY INTERTECHNOLOGY INC",
+        "shares": 400000,
+        "weight": 1.37
+      },
+      {
+        "symbol": "NVDA US",
+        "name": "NVIDIA CORP(輝達公司)",
+        "shares": 75000,
+        "weight": 1.34
+      },
+      {
+        "symbol": "6223",
+        "name": "旺矽",
+        "shares": 90000,
+        "weight": 1.31
+      },
+      {
+        "symbol": "ENR GY",
+        "name": "SIEMENS ENERGY AG",
+        "shares": 75000,
+        "weight": 1.23
+      },
+      {
+        "symbol": "SOI FP",
+        "name": "S.O.I.T.E.C.",
+        "shares": 72000,
+        "weight": 1.13
+      },
+      {
+        "symbol": "AXTI US",
+        "name": "AXT INC",
+        "shares": 90000,
+        "weight": 0.89
+      },
+      {
+        "symbol": "HOT GY",
+        "name": "HOCHTIEF AG",
+        "shares": 20000,
+        "weight": 0.89
+      },
+      {
+        "symbol": "NOK US",
+        "name": "NOKIA CORP-SPON ADR",
+        "shares": 750000,
+        "weight": 0.86
+      },
+      {
+        "symbol": "AVGO US",
+        "name": "BROADCOM LTD",
+        "shares": 25000,
+        "weight": 0.84
+      },
+      {
+        "symbol": "603256 CH",
+        "name": "GRACE FABRIC TECHNOLOGY CO-A",
+        "shares": 450000,
+        "weight": 0.78
+      },
+      {
+        "symbol": "6274",
+        "name": "台燿",
+        "shares": 230000,
+        "weight": 0.78
+      },
+      {
+        "symbol": "7769",
+        "name": "鴻勁",
+        "shares": 36000,
+        "weight": 0.71
+      },
+      {
+        "symbol": "2360",
+        "name": "致茂",
+        "shares": 110000,
+        "weight": 0.64
+      },
+      {
+        "symbol": "6869 HK",
+        "name": "YANGTZE OPTICAL FIBRE AND-H",
+        "shares": 260000,
+        "weight": 0.58
+      },
+      {
+        "symbol": "ARM US",
+        "name": "ARM HOLDINGS PLC",
+        "shares": 18518,
+        "weight": 0.45
+      }
+    ],
+    "_full_data": {
+      "fundName": "00988A 主動統一全球增長",
+      "aum": 38859928248.0,
+      "aumChange": 2358369883.0,
+      "prevAum": 36501558365.0,
+      "nav": 19.43,
+      "date": "2026-05-21",
+      "prevDate": "2026-05-15",
+      "holdings": [
+        {
+          "symbol": "009150 KS",
+          "name": "Samsung Electro-Mechanics co(009150 ks)",
+          "operationType": "股數加碼",
+          "shares": 60000,
+          "prevShares": 50000,
+          "sharesChangePercent": 20.0,
+          "currentWeightPercent": 3.93,
+          "weightChangePercent": 0.95,
+          "closingPrice": 1340000.0,
+          "priceChangePercent": 11.3,
+          "currency": "KRW"
+        },
+        {
+          "symbol": "2308",
+          "name": "台達電",
+          "operationType": "持有",
+          "shares": 307000,
+          "prevShares": 307000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.6,
+          "weightChangePercent": -0.15,
+          "closingPrice": 2095.0,
+          "priceChangePercent": 3.2,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "CIEN US",
+          "name": "CIENA CORP",
+          "operationType": "持有",
+          "shares": 52000,
+          "prevShares": 52000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.48,
+          "weightChangePercent": -0.01,
+          "closingPrice": 579.595,
+          "priceChangePercent": -1.3,
+          "currency": "USD"
+        },
+        {
+          "symbol": "5274",
+          "name": "信驊",
+          "operationType": "持有",
+          "shares": 46000,
+          "prevShares": 46000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.95,
+          "weightChangePercent": -0.22,
+          "closingPrice": 17780.0,
+          "priceChangePercent": 8.15,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "GLW US",
+          "name": "CORNING INC",
+          "operationType": "股數減碼",
+          "shares": 112500,
+          "prevShares": 150000,
+          "sharesChangePercent": -25.0,
+          "currentWeightPercent": 1.76,
+          "weightChangePercent": -0.73,
+          "closingPrice": 191.52,
+          "priceChangePercent": -0.19,
+          "currency": "USD"
+        },
+        {
+          "symbol": "5801 JP",
+          "name": "FURUKAWA ELECTRIC CO LTD",
+          "operationType": "股數加碼",
+          "shares": 100000,
+          "prevShares": 90000,
+          "sharesChangePercent": 11.11,
+          "currentWeightPercent": 2.52,
+          "weightChangePercent": -0.15,
+          "closingPrice": 53650.0,
+          "priceChangePercent": 8.87,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "7826 JP",
+          "name": "FURUYA METAL CO LTD",
+          "operationType": "持有",
+          "shares": 374300,
+          "prevShares": 374300,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.8,
+          "weightChangePercent": -0.26,
+          "closingPrice": 10080.0,
+          "priceChangePercent": 6.89,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "WDC US",
+          "name": "WESTERN DIGITAL CORP",
+          "operationType": "持有",
+          "shares": 57000,
+          "prevShares": 57000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.25,
+          "weightChangePercent": -0.12,
+          "closingPrice": 484.772,
+          "priceChangePercent": -0.29,
+          "currency": "USD"
+        },
+        {
+          "symbol": "6787 JP",
+          "name": "MEIKO ELECTRONICS CO LTD",
+          "operationType": "股數加碼",
+          "shares": 175000,
+          "prevShares": 140000,
+          "sharesChangePercent": 25.0,
+          "currentWeightPercent": 3.58,
+          "weightChangePercent": 0.82,
+          "closingPrice": 43450.0,
+          "priceChangePercent": 8.49,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "HOT GY",
+          "name": "HOCHTIEF AG",
+          "operationType": "持有",
+          "shares": 20000,
+          "prevShares": 20000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.89,
+          "weightChangePercent": -0.14,
+          "closingPrice": 465.6,
+          "priceChangePercent": -1.11,
+          "currency": "EUR"
+        },
+        {
+          "symbol": "AMD US",
+          "name": "ADVANCED MICRO DEVICES.amd us(超微半導體公司)",
+          "operationType": "股數加碼",
+          "shares": 122000,
+          "prevShares": 110000,
+          "sharesChangePercent": 10.91,
+          "currentWeightPercent": 4.46,
+          "weightChangePercent": 0.43,
+          "closingPrice": 464.345,
+          "priceChangePercent": 3.35,
+          "currency": "USD"
+        },
+        {
+          "symbol": "IFX GY",
+          "name": "INFINEON TECHNOLOGIES AG",
+          "operationType": "股數加碼",
+          "shares": 300000,
+          "prevShares": 200000,
+          "sharesChangePercent": 50.0,
+          "currentWeightPercent": 1.93,
+          "weightChangePercent": 0.62,
+          "closingPrice": 72.18,
+          "priceChangePercent": 6.15,
+          "currency": "EUR"
+        },
+        {
+          "symbol": "285A JP",
+          "name": "KIOXIA HOLDINGS CORP",
+          "operationType": "持有",
+          "shares": 95000,
+          "prevShares": 95000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.69,
+          "weightChangePercent": 0.39,
+          "closingPrice": 57400.0,
+          "priceChangePercent": 3.72,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "ARM US",
+          "name": "ARM HOLDINGS PLC",
+          "operationType": "新增建倉",
+          "shares": 18518,
+          "prevShares": 0,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.45,
+          "weightChangePercent": 0.45,
+          "closingPrice": 303.14,
+          "priceChangePercent": 1.59,
+          "currency": "USD"
+        },
+        {
+          "symbol": "NOK US",
+          "name": "NOKIA CORP-SPON ADR",
+          "operationType": "持有",
+          "shares": 750000,
+          "prevShares": 750000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.86,
+          "weightChangePercent": -0.04,
+          "closingPrice": 15.07,
+          "priceChangePercent": 6.28,
+          "currency": "USD"
+        },
+        {
+          "symbol": "603256 CH",
+          "name": "GRACE FABRIC TECHNOLOGY CO-A",
+          "operationType": "持有",
+          "shares": 450000,
+          "prevShares": 450000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.78,
+          "weightChangePercent": 0.01,
+          "closingPrice": null,
+          "priceChangePercent": null,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "SNDK US",
+          "name": "SANDISK CORP",
+          "operationType": "持有",
+          "shares": 38000,
+          "prevShares": 38000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.77,
+          "weightChangePercent": 0.15,
+          "closingPrice": 1502.65,
+          "priceChangePercent": -2.57,
+          "currency": "USD"
+        },
+        {
+          "symbol": "6981 JP",
+          "name": "MURATA MANUFACTURING CO LTD",
+          "operationType": "新增建倉",
+          "shares": 500000,
+          "prevShares": 0,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.72,
+          "weightChangePercent": 1.72,
+          "closingPrice": 7130.0,
+          "priceChangePercent": 5.99,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "3017",
+          "name": "奇鋐",
+          "operationType": "持有",
+          "shares": 215000,
+          "prevShares": 215000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.38,
+          "weightChangePercent": -0.07,
+          "closingPrice": 2545.0,
+          "priceChangePercent": 2.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "7769",
+          "name": "鴻勁",
+          "operationType": "持有",
+          "shares": 36000,
+          "prevShares": 36000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.71,
+          "weightChangePercent": 0.03,
+          "closingPrice": 7730.0,
+          "priceChangePercent": 0.72,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "MRVL US",
+          "name": "MARVELL TECHNOLOGY INC",
+          "operationType": "股數加碼",
+          "shares": 160000,
+          "prevShares": 148000,
+          "sharesChangePercent": 8.11,
+          "currentWeightPercent": 2.48,
+          "weightChangePercent": 0.22,
+          "closingPrice": 195.02,
+          "priceChangePercent": 2.27,
+          "currency": "USD"
+        },
+        {
+          "symbol": "6274",
+          "name": "台燿",
+          "operationType": "持有",
+          "shares": 230000,
+          "prevShares": 230000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.78,
+          "weightChangePercent": -0.04,
+          "closingPrice": 1455.0,
+          "priceChangePercent": 9.81,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "MU US",
+          "name": "MICRON TECHNOLOGY INC",
+          "operationType": "股數加碼",
+          "shares": 78500,
+          "prevShares": 77000,
+          "sharesChangePercent": 1.95,
+          "currentWeightPercent": 4.86,
+          "weightChangePercent": 0.04,
+          "closingPrice": 754.745,
+          "priceChangePercent": -0.97,
+          "currency": "USD"
+        },
+        {
+          "symbol": "6997 JP",
+          "name": "NIPPON CHEMI-CON CORP",
+          "operationType": "股數加碼",
+          "shares": 1200000,
+          "prevShares": 1000000,
+          "sharesChangePercent": 20.0,
+          "currentWeightPercent": 1.79,
+          "weightChangePercent": 0.16,
+          "closingPrice": 3365.0,
+          "priceChangePercent": 15.12,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "LITE US",
+          "name": "LUMENTUM HOLDINGS INC",
+          "operationType": "持有",
+          "shares": 55000,
+          "prevShares": 55000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.31,
+          "weightChangePercent": -0.3,
+          "closingPrice": 943.0,
+          "priceChangePercent": -2.23,
+          "currency": "USD"
+        },
+        {
+          "symbol": "3037",
+          "name": "欣興",
+          "operationType": "股數加碼",
+          "shares": 1500000,
+          "prevShares": 1090000,
+          "sharesChangePercent": 37.61,
+          "currentWeightPercent": 3.49,
+          "weightChangePercent": 1.04,
+          "closingPrice": 970.0,
+          "priceChangePercent": 7.18,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "AVGO US",
+          "name": "BROADCOM LTD",
+          "operationType": "持有",
+          "shares": 25000,
+          "prevShares": 25000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.84,
+          "weightChangePercent": -0.08,
+          "closingPrice": 413.555,
+          "priceChangePercent": -0.24,
+          "currency": "USD"
+        },
+        {
+          "symbol": "4062 JP",
+          "name": "IBIDEN CO LTD",
+          "operationType": "持有",
+          "shares": 275000,
+          "prevShares": 275000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.48,
+          "weightChangePercent": 0.13,
+          "closingPrice": 19250.0,
+          "priceChangePercent": 7.69,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "GEV US",
+          "name": "GE VERNOVA INC",
+          "operationType": "持有",
+          "shares": 19000,
+          "prevShares": 19000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.61,
+          "weightChangePercent": -0.11,
+          "closingPrice": 1036.54,
+          "priceChangePercent": -0.7,
+          "currency": "USD"
+        },
+        {
+          "symbol": "NBIS US",
+          "name": "NEBIUS GROUP NV",
+          "operationType": "全數清倉",
+          "shares": 0,
+          "prevShares": 20000,
+          "sharesChangePercent": -100.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -0.38,
+          "closingPrice": 217.015,
+          "priceChangePercent": -1.33,
+          "currency": "USD"
+        },
+        {
+          "symbol": "AAOI US",
+          "name": "APPLIED OPTOELECTRONICS INC",
+          "operationType": "全數清倉",
+          "shares": 0,
+          "prevShares": 79677,
+          "sharesChangePercent": -100.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -1.31,
+          "closingPrice": 170.76,
+          "priceChangePercent": -3.42,
+          "currency": "USD"
+        },
+        {
+          "symbol": "SOI FP",
+          "name": "S.O.I.T.E.C.",
+          "operationType": "股數加碼",
+          "shares": 72000,
+          "prevShares": 60000,
+          "sharesChangePercent": 20.0,
+          "currentWeightPercent": 1.13,
+          "weightChangePercent": 0.24,
+          "closingPrice": 176.7,
+          "priceChangePercent": 6.06,
+          "currency": "EUR"
+        },
+        {
+          "symbol": "3711",
+          "name": "日月光投控",
+          "operationType": "持有",
+          "shares": 1100000,
+          "prevShares": 1100000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.44,
+          "weightChangePercent": -0.21,
+          "closingPrice": 561.0,
+          "priceChangePercent": 10.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "VIAV US",
+          "name": "VIAVI SOLUTIONS INC",
+          "operationType": "全數清倉",
+          "shares": 0,
+          "prevShares": 150000,
+          "sharesChangePercent": -100.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -0.67,
+          "closingPrice": 49.585,
+          "priceChangePercent": 1.24,
+          "currency": "USD"
+        },
+        {
+          "symbol": "2330",
+          "name": "台積電",
+          "operationType": "持有",
+          "shares": 400000,
+          "prevShares": 400000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.3,
+          "weightChangePercent": -0.18,
+          "closingPrice": 2255.0,
+          "priceChangePercent": 1.12,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6515",
+          "name": "穎崴",
+          "operationType": "持有",
+          "shares": 80000,
+          "prevShares": 80000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.96,
+          "weightChangePercent": -0.18,
+          "closingPrice": 8700.0,
+          "priceChangePercent": -8.52,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2383",
+          "name": "台光電",
+          "operationType": "股數加碼",
+          "shares": 248000,
+          "prevShares": 217000,
+          "sharesChangePercent": 14.29,
+          "currentWeightPercent": 2.99,
+          "weightChangePercent": 0.25,
+          "closingPrice": 5005.0,
+          "priceChangePercent": 6.72,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "COHR US",
+          "name": "COHERENT INC",
+          "operationType": "持有",
+          "shares": 68000,
+          "prevShares": 68000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.09,
+          "weightChangePercent": -0.16,
+          "closingPrice": 375.84,
+          "priceChangePercent": -0.57,
+          "currency": "USD"
+        },
+        {
+          "symbol": "010120 KS",
+          "name": "LS ELECTRIC CO LTD",
+          "operationType": "全數清倉",
+          "shares": 0,
+          "prevShares": 30000,
+          "sharesChangePercent": -100.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -0.45,
+          "closingPrice": 281000.0,
+          "priceChangePercent": 3.5,
+          "currency": "KRW"
+        },
+        {
+          "symbol": "VSH US",
+          "name": "VISHAY INTERTECHNOLOGY INC",
+          "operationType": "新增建倉",
+          "shares": 400000,
+          "prevShares": 0,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.37,
+          "weightChangePercent": 1.37,
+          "closingPrice": 46.375,
+          "priceChangePercent": 9.97,
+          "currency": "USD"
+        },
+        {
+          "symbol": "2360",
+          "name": "致茂",
+          "operationType": "持有",
+          "shares": 110000,
+          "prevShares": 110000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.64,
+          "weightChangePercent": -0.04,
+          "closingPrice": 2270.0,
+          "priceChangePercent": 0.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "GOOGL US",
+          "name": "ALPHABET INC-CL A(Alphabet公司)",
+          "operationType": "持有",
+          "shares": 44000,
+          "prevShares": 44000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.39,
+          "weightChangePercent": -0.12,
+          "closingPrice": 385.615,
+          "priceChangePercent": -0.53,
+          "currency": "USD"
+        },
+        {
+          "symbol": "5706 JP",
+          "name": "Mitsui Mining ＆ Smelting Co",
+          "operationType": "股數加碼",
+          "shares": 110000,
+          "prevShares": 95000,
+          "sharesChangePercent": 15.79,
+          "currentWeightPercent": 2.62,
+          "weightChangePercent": 0.2,
+          "closingPrice": 49610.0,
+          "priceChangePercent": 6.3,
+          "currency": "JPY"
+        },
+        {
+          "symbol": "2454",
+          "name": "聯發科",
+          "operationType": "持有",
+          "shares": 315000,
+          "prevShares": 315000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.88,
+          "weightChangePercent": 0.07,
+          "closingPrice": 3860.0,
+          "priceChangePercent": 8.73,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "NVDA US",
+          "name": "NVIDIA CORP(輝達公司)",
+          "operationType": "持有",
+          "shares": 75000,
+          "prevShares": 75000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.34,
+          "weightChangePercent": -0.12,
+          "closingPrice": 216.153,
+          "priceChangePercent": -1.53,
+          "currency": "USD"
+        },
+        {
+          "symbol": "BE US",
+          "name": "BLOOM ENERGY CORP- A",
+          "operationType": "持有",
+          "shares": 170000,
+          "prevShares": 170000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.26,
+          "weightChangePercent": 0.21,
+          "closingPrice": 311.505,
+          "priceChangePercent": 1.18,
+          "currency": "USD"
+        },
+        {
+          "symbol": "6869 HK",
+          "name": "YANGTZE OPTICAL FIBRE AND-H",
+          "operationType": "持有",
+          "shares": 260000,
+          "prevShares": 260000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.58,
+          "weightChangePercent": -0.06,
+          "closingPrice": 227.6,
+          "priceChangePercent": 5.76,
+          "currency": "HKD"
+        },
+        {
+          "symbol": "AIXA GY",
+          "name": "AIXTRON SE",
+          "operationType": "持有",
+          "shares": 305000,
+          "prevShares": 305000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.51,
+          "weightChangePercent": -0.08,
+          "closingPrice": 53.7,
+          "priceChangePercent": 2.6,
+          "currency": "EUR"
+        },
+        {
+          "symbol": "6223",
+          "name": "旺矽",
+          "operationType": "持有",
+          "shares": 90000,
+          "prevShares": 90000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.31,
+          "weightChangePercent": -0.14,
+          "closingPrice": 6035.0,
+          "priceChangePercent": 6.81,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "ENR GY",
+          "name": "SIEMENS ENERGY AG",
+          "operationType": "持有",
+          "shares": 75000,
+          "prevShares": 75000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.23,
+          "weightChangePercent": -0.05,
+          "closingPrice": 173.64,
+          "priceChangePercent": 0.01,
+          "currency": "EUR"
+        },
+        {
+          "symbol": "AXTI US",
+          "name": "AXT INC",
+          "operationType": "持有",
+          "shares": 90000,
+          "prevShares": 90000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.89,
+          "weightChangePercent": -0.07,
+          "closingPrice": 125.3,
+          "priceChangePercent": 3.54,
+          "currency": "USD"
+        }
+      ],
+      "summaryCounts": {
+        "新增建倉": 3,
+        "股數加碼": 12,
+        "股數減碼": 1,
+        "全數清倉": 4
+      }
+    }
   }
 }
