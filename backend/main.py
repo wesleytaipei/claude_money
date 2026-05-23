@@ -42,7 +42,7 @@ from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
 
-app = FastAPI(title="HC Finance")
+app = FastAPI(title="Synchro Capital")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -112,6 +112,38 @@ CACHE_TTL = 300  # 5 minutes
 # ── IO helpers (Gist + Local) ────────────────────────────────────────────────
 GIST_ID = os.getenv("GIST_ID")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
+# ── Supabase Auth ────────────────────────────────────────────────────────────
+SUPABASE_URL     = os.getenv("SUPABASE_URL", "https://rsfgfdcnvqjtlinorfno.supabase.co")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "sb_publishable_DXlyR51b5xWfx2wcpLvVbg_3ukRYyjf")
+
+_token_cache: dict[str, tuple[dict, float]] = {}
+_token_cache_lock = _threading.Lock()
+
+def _verify_supabase_token(token: str) -> dict | None:
+    """Validate a Supabase JWT by calling /auth/v1/user. Caches valid tokens 60 s."""
+    if not token:
+        return None
+    now = time.time()
+    with _token_cache_lock:
+        hit = _token_cache.get(token)
+        if hit and hit[1] > now:
+            return hit[0]
+    try:
+        r = http_requests.get(
+            f"{SUPABASE_URL}/auth/v1/user",
+            headers={"Authorization": f"Bearer {token}", "apikey": SUPABASE_ANON_KEY},
+            timeout=5,
+            verify=False,
+        )
+        if r.status_code == 200:
+            user = r.json()
+            with _token_cache_lock:
+                _token_cache[token] = (user, now + 60)
+            return user
+    except Exception:
+        pass
+    return None
 GIST_ENABLED = bool(GIST_ID and GITHUB_TOKEN)
 
 IS_RAILWAY = bool(os.getenv("RAILWAY_ENVIRONMENT_NAME") or os.getenv("RAILWAY_PROJECT_ID"))
@@ -2708,6 +2740,22 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
             response.headers["Cache-Control"] = "no-store"
         return response
 
+import asyncio as _asyncio
+from fastapi.responses import JSONResponse as _JSONResponse
+
+class SupabaseAuthMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        if not request.url.path.startswith("/api/"):
+            return await call_next(request)
+        token = request.headers.get("Authorization", "")
+        if token.startswith("Bearer "):
+            token = token[7:]
+        user = await _asyncio.to_thread(_verify_supabase_token, token)
+        if not user:
+            return _JSONResponse({"detail": "Unauthorized"}, status_code=401)
+        return await call_next(request)
+
+app.add_middleware(SupabaseAuthMiddleware)
 app.add_middleware(NoCacheMiddleware)
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
@@ -2716,5 +2764,13 @@ app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 def serve_index():
     return FileResponse(
         str(FRONTEND_DIR / "index.html"),
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@app.get("/login")
+def serve_login():
+    return FileResponse(
+        str(FRONTEND_DIR / "login.html"),
         headers={"Cache-Control": "no-store"},
     )

@@ -1,7 +1,24 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   HC Finance — Frontend Logic
+   Synchro Capital — Frontend Logic
    ══════════════════════════════════════════════════════════════════════════ */
 const API = '';  // same origin
+
+// ── Auth: attach Bearer token to all /api/* fetch calls ──────────────────
+const _origFetch = window.fetch.bind(window);
+window.fetch = async function(url, opts = {}) {
+  if (typeof url === 'string' && url.startsWith('/api')) {
+    const { data: { session } } = await _sup.auth.getSession();
+    if (session?.access_token) {
+      opts = { ...opts, headers: { ...(opts.headers || {}), 'Authorization': `Bearer ${session.access_token}` } };
+    }
+  }
+  return _origFetch(url, opts);
+};
+
+async function doLogout() {
+  await _sup.auth.signOut();
+  window.location.href = '/login';
+}
 
 // ── State ────────────────────────────────────────────────────────────────
 const state = {

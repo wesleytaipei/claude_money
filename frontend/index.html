@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HC 財務管理</title>
+  <title>Synchro Capital</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css?v=36" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>#app{opacity:0;transition:opacity .25s}</style>
 </head>
 <body>
   <div id="app">
@@ -17,9 +19,11 @@
     <!-- ── SIDEBAR ──────────────────────────────────────────── -->
     <aside class="sidebar">
       <div class="sidebar-brand">
-        <div class="brand-icon">💎</div>
+        <div class="brand-icon" style="background:var(--primary);border-radius:9px;display:flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M6 7.5C6 5.567 7.567 4 9.5 4H12a3.5 3.5 0 0 1 0 7H10A3.5 3.5 0 0 0 10 18h2.5c1.933 0 3.5-1.567 3.5-3.5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
         <div>
-          <div class="brand-title">HC Finance</div>
+          <div class="brand-title">Synchro Capital</div>
           <div class="brand-sub">Wesley Chen</div>
         </div>
       </div>
@@ -54,6 +58,7 @@
       <div class="sidebar-footer">
         <div class="datetime" id="datetime">—</div>
         <div class="last-save" id="last-save"></div>
+        <button class="btn-action" onclick="doLogout()" style="background:rgba(244,63,94,.12);color:#fb7185;border:1px solid rgba(244,63,94,.3)">⏏ 登出</button>
         <button class="btn-action btn-save" onclick="saveSnapshot()">💾 儲存資料</button>
         <button class="btn-action btn-refresh" onclick="refreshAll()">
           <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新數據</span>
@@ -454,6 +459,22 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=38"></script>
+  <script>
+    // Auth gate: check Supabase session before showing app
+    (async () => {
+      const { createClient } = supabase;
+      window._sup = createClient(
+        'https://rsfgfdcnvqjtlinorfno.supabase.co',
+        'sb_publishable_DXlyR51b5xWfx2wcpLvVbg_3ukRYyjf'
+      );
+      const { data: { session } } = await _sup.auth.getSession();
+      if (!session) { window.location.href = '/login'; return; }
+      // Load app only after auth confirmed
+      const s = document.createElement('script');
+      s.src = '/static/app.js?v=39';
+      s.onload = () => { document.getElementById('app').style.opacity = '1'; };
+      document.body.appendChild(s);
+    })();
+  </script>
 </body>
 </html>
