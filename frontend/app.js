@@ -2518,11 +2518,11 @@ function _drawAdlChart(rows) {
       labels,
       datasets: [
         {
-          label: 'A/D Line',
+          label: '騰落線',
           data: adlVals,
           yAxisID: 'y',
-          borderColor: 'rgba(99,102,241,.85)',
-          backgroundColor: 'rgba(99,102,241,.06)',
+          borderColor: 'rgba(244,63,94,.85)',
+          backgroundColor: 'rgba(244,63,94,.05)',
           borderWidth: 2,
           fill: true,
           pointRadius: 0,
@@ -2531,10 +2531,17 @@ function _drawAdlChart(rows) {
           segment: {
             borderColor: ctx => {
               const i = ctx.p1DataIndex;
-              if (i === 0) return 'rgba(99,102,241,.85)';
+              if (i === 0) return 'rgba(244,63,94,.85)';
+              // 台股慣例：紅 = 線上升（廣度擴張）、綠 = 線下降（廣度收縮）
               return adlVals[i] >= adlVals[i-1]
-                ? 'rgba(16,185,129,.85)'
-                : 'rgba(244,63,94,.85)';
+                ? 'rgba(244,63,94,.85)'
+                : 'rgba(16,185,129,.85)';
+            },
+            backgroundColor: ctx => {
+              const i = ctx.p1DataIndex;
+              return adlVals[i] >= adlVals[i-1]
+                ? 'rgba(244,63,94,.04)'
+                : 'rgba(16,185,129,.04)';
             },
           },
         },
@@ -2579,7 +2586,7 @@ function _drawAdlChart(rows) {
         tooltip: {
           callbacks: {
             label: ctx => {
-              if (ctx.dataset.label === 'A/D Line') {
+              if (ctx.dataset.label === '騰落線') {
                 const r = rows[ctx.dataIndex];
                 return [
                   `騰落線: ${ctx.parsed.y.toLocaleString()}`,

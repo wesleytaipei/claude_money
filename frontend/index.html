@@ -191,17 +191,23 @@
             </table>
           </div>
         </div>
-        <!-- ── A/D Line ── -->
+        <!-- ── 騰落線 ── -->
         <div class="panel" style="margin-top:20px">
           <div class="panel-head">
-            <h3>📈 上市+上櫃 騰落線 (A/D Line)</h3>
+            <h3>📈 上市+上櫃 騰落線</h3>
             <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="renderAdlChart(true)">↺</button>
           </div>
           <div id="adl-stats" style="display:flex;gap:24px;padding:12px 0 16px;flex-wrap:wrap"></div>
           <div style="position:relative;height:280px">
             <canvas id="adl-chart"></canvas>
           </div>
-          <p style="margin-top:8px;font-size:12px;color:var(--muted)">資料來源：TWSE 上市 + TPEX 上櫃股票（不含 ETF / 權證）。冷啟動首次建立約需 60 秒。</p>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted);line-height:1.8;border-left:3px solid var(--surface-2);padding-left:10px">
+            <b style="color:var(--text-dim)">騰落線讀法</b>：每日累加 (上漲家數 − 下跌家數)，反映市場廣度。<br>
+            <span style="color:rgba(244,63,94,.9)">■ 紅色上升</span> = 當日多數股票上漲，廣度健康，與指數同步確認趨勢。<br>
+            <span style="color:rgba(16,185,129,.9)">■ 綠色下降</span> = 當日多數股票下跌，廣度轉弱，警示市場可能出現背離。<br>
+            背離訊號：指數創新高但騰落線未跟進 → 漲勢集中於少數權值股，需留意反轉。
+          </div>
+          <p style="margin-top:8px;font-size:11px;color:var(--muted)">資料來源：TWSE 上市 + TPEX 上櫃股票（不含 ETF / 權證）。冷啟動首次建立約需 60 秒。</p>
         </div>
 
         <div class="panel" style="margin-top:20px">
