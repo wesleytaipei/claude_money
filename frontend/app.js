@@ -2481,7 +2481,7 @@ function _drawAdlChart(rows) {
       <div style="font-size:20px;font-weight:700;color:${netColor}">${net >= 0 ? '+' : ''}${net}</div>
     </div>
     <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">上漲 / 下跌</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">上市+上櫃 上漲/下跌</div>
       <div style="font-size:15px;font-weight:600">
         <span style="color:var(--red)">${last.raise.toLocaleString()}</span>
         <span style="color:var(--muted)"> / </span>
@@ -2506,53 +2506,88 @@ function _drawAdlChart(rows) {
   `;
 
   // ── Chart ────────────────────────────────────────────────
-  const labels = rows.map(r => `${r.date.slice(4,6)}/${r.date.slice(6,8)}`);
-  const adlVals = rows.map(r => r.adl);
-
-  // Colour gradient: green when ADL rising, red when falling
-  const lineColors = adlVals.map((v, i) =>
-    i === 0 ? 'rgba(99,102,241,.8)'
-    : v >= adlVals[i-1] ? 'rgba(16,185,129,.8)'
-    : 'rgba(244,63,94,.8)'
-  );
+  const labels    = rows.map(r => `${r.date.slice(4,6)}/${r.date.slice(6,8)}`);
+  const adlVals   = rows.map(r => r.adl);
+  const taiexVals = rows.map(r => r.taiex ?? null);
+  const otcVals   = rows.map(r => r.otc  ?? null);
 
   if (_adlChart) _adlChart.destroy();
   _adlChart = new Chart(canvas, {
     type: 'line',
     data: {
       labels,
-      datasets: [{
-        label: 'A/D Line (上市股票)',
-        data: adlVals,
-        borderColor: 'rgba(99,102,241,.85)',
-        backgroundColor: 'rgba(99,102,241,.06)',
-        borderWidth: 2,
-        fill: true,
-        pointRadius: 0,
-        tension: 0.3,
-        segment: {
-          borderColor: ctx => {
-            const i = ctx.p1DataIndex;
-            if (i === 0) return 'rgba(99,102,241,.85)';
-            return adlVals[i] >= adlVals[i-1]
-              ? 'rgba(16,185,129,.85)'
-              : 'rgba(244,63,94,.85)';
+      datasets: [
+        {
+          label: 'A/D Line',
+          data: adlVals,
+          yAxisID: 'y',
+          borderColor: 'rgba(99,102,241,.85)',
+          backgroundColor: 'rgba(99,102,241,.06)',
+          borderWidth: 2,
+          fill: true,
+          pointRadius: 0,
+          tension: 0.3,
+          order: 3,
+          segment: {
+            borderColor: ctx => {
+              const i = ctx.p1DataIndex;
+              if (i === 0) return 'rgba(99,102,241,.85)';
+              return adlVals[i] >= adlVals[i-1]
+                ? 'rgba(16,185,129,.85)'
+                : 'rgba(244,63,94,.85)';
+            },
           },
         },
-      }],
+        {
+          label: '加權指數',
+          data: taiexVals,
+          yAxisID: 'y2',
+          borderColor: 'rgba(249,115,22,.9)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.3,
+          fill: false,
+          order: 1,
+          spanGaps: true,
+        },
+        {
+          label: '櫃買指數',
+          data: otcVals,
+          yAxisID: 'y3',
+          borderColor: 'rgba(20,184,166,.9)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.3,
+          fill: false,
+          order: 2,
+          spanGaps: true,
+        },
+      ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#646f92', boxWidth: 14, font: { size: 12 } },
+        },
         tooltip: {
           callbacks: {
-            label: ctx => `騰落指標: ${ctx.parsed.y.toLocaleString()}`,
-            afterLabel: ctx => {
-              const r = rows[ctx.dataIndex];
-              return `上漲 ${r.raise} / 下跌 ${r.fall}  淨 ${r.raise-r.fall >= 0 ? '+' : ''}${r.raise-r.fall}`;
+            label: ctx => {
+              if (ctx.dataset.label === 'A/D Line') {
+                const r = rows[ctx.dataIndex];
+                return [
+                  `騰落線: ${ctx.parsed.y.toLocaleString()}`,
+                  `上漲 ${r.raise} / 下跌 ${r.fall}  淨 ${r.raise-r.fall >= 0?'+':''}${r.raise-r.fall}`,
+                ];
+              }
+              const v = ctx.parsed.y;
+              return v != null ? `${ctx.dataset.label}: ${v.toLocaleString()}` : null;
             },
           },
         },
@@ -2563,8 +2598,18 @@ function _drawAdlChart(rows) {
           ticks: { color: '#646f92', maxTicksLimit: 12, maxRotation: 0 },
         },
         y: {
+          type: 'linear', position: 'left',
           grid: { color: 'rgba(34,48,90,.5)' },
           ticks: { color: '#646f92', callback: v => v.toLocaleString() },
+        },
+        y2: {
+          type: 'linear', position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { color: 'rgba(249,115,22,.8)', callback: v => v.toLocaleString() },
+        },
+        y3: {
+          type: 'linear', position: 'right',
+          display: false,
         },
       },
     },

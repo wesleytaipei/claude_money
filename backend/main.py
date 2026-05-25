@@ -2702,31 +2702,75 @@ _ADL_FILE = DATA_DIR / "adl_history.json"
 _adl_lock = _threading.Lock()
 
 def _fetch_adl_day(date_str: str) -> dict | None:
-    """Fetch TWSE stock advance-decline counts for a single trading date."""
+    """Fetch combined TWSE+TPEX advance-decline counts for a single trading date."""
+    twse_raise = twse_fall = 0
+    tpex_raise = tpex_fall = 0
+    otc_close = None
+
+    # TWSE (上市) — column 2 = 股票 (excludes ETFs/warrants)
     try:
         r = http_requests.get(
             f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=json&date={date_str}",
             headers={"User-Agent": "Mozilla/5.0"}, timeout=10, verify=_TW_VERIFY,
         )
         d = json.loads(r.content.decode("utf-8"))
-        if d.get("stat") != "OK":
-            return None
-        for t in (d.get("tables") or []):
-            rows = t.get("data") or []
-            if len(rows) < 2:
-                continue
-            if "上漲" in str(rows[0][0]) and "下跌" in str(rows[1][0]):
-                def _p(s):
-                    return int(str(s).split("(")[0].replace(",", "").strip() or "0")
-                # Column 2 = 股票 (excludes ETFs/warrants)
-                return {
-                    "date": date_str,
-                    "raise": _p(rows[0][2]) if len(rows[0]) > 2 else 0,
-                    "fall":  _p(rows[1][2]) if len(rows[1]) > 2 else 0,
-                }
+        if d.get("stat") == "OK":
+            for t in (d.get("tables") or []):
+                rows = t.get("data") or []
+                if len(rows) >= 2 and "上漲" in str(rows[0][0]) and "下跌" in str(rows[1][0]):
+                    def _p(s):
+                        return int(str(s).split("(")[0].replace(",", "").strip() or "0")
+                    twse_raise = _p(rows[0][2]) if len(rows[0]) > 2 else 0
+                    twse_fall  = _p(rows[1][2]) if len(rows[1]) > 2 else 0
+                    break
     except Exception:
         pass
-    return None
+
+    # TPEX (上櫃) — ROC date format YYY/MM/DD
+    try:
+        roc_year = int(date_str[:4]) - 1911
+        roc_date = f"{roc_year}/{date_str[4:6]}/{date_str[6:8]}"
+        r = http_requests.get(
+            f"https://www.tpex.org.tw/www/zh-tw/afterTrading/highlight?date={roc_date}",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=10, verify=_TW_VERIFY,
+        )
+        d = r.json()
+        if d.get("stat") == "ok" and d.get("tables"):
+            row = d["tables"][0]["data"][0]
+            # field indices: 5=收市指數, 7=上漲家數, 9=下跌家數
+            tpex_raise = int(str(row[7]).replace(",", ""))
+            tpex_fall  = int(str(row[9]).replace(",", ""))
+            otc_close  = float(str(row[5]).replace(",", ""))
+    except Exception:
+        pass
+
+    if twse_raise == 0 and twse_fall == 0 and tpex_raise == 0 and tpex_fall == 0:
+        return None
+
+    return {
+        "date":  date_str,
+        "raise": twse_raise + tpex_raise,
+        "fall":  twse_fall  + tpex_fall,
+        "otc":   otc_close,
+    }
+
+
+def _enrich_with_taiex(data: list) -> None:
+    """Add TAIEX (^TWII) close prices to existing ADL records in-place via yfinance."""
+    if not data:
+        return
+    try:
+        import yfinance as _yf
+        from datetime import datetime as _dt, timedelta as _td
+        start = _dt.strptime(data[0]["date"],  "%Y%m%d").date()
+        end   = _dt.strptime(data[-1]["date"], "%Y%m%d").date() + _td(days=1)
+        hist = _yf.Ticker("^TWII").history(start=start.isoformat(), end=end.isoformat())
+        tmap = {ts.strftime("%Y%m%d"): round(float(row["Close"]), 2)
+                for ts, row in hist.iterrows()}
+        for item in data:
+            item["taiex"] = tmap.get(item["date"], item.get("taiex"))
+    except Exception:
+        pass
 
 def _load_adl_history() -> list:
     try:
@@ -2743,7 +2787,7 @@ def _save_adl_history(data: list):
         pass
 
 def _build_adl_history(lookback_days: int = 120) -> list:
-    """Parallel-fetch TWSE advance-decline data for last N trading days."""
+    """Parallel-fetch TWSE+TPEX advance-decline data for last N trading days."""
     from datetime import date as _date, timedelta as _td
     today = _date.today()
     candidates = []
@@ -2766,6 +2810,7 @@ def _build_adl_history(lookback_days: int = 120) -> list:
     for item in sorted_data:
         cum += item["raise"] - item["fall"]
         item["adl"] = cum
+    _enrich_with_taiex(sorted_data)
     return sorted_data
 
 def _adl_try_append_today(history: list) -> list:
@@ -2786,20 +2831,21 @@ def _adl_try_append_today(history: list) -> list:
     for item in history:
         cum += item["raise"] - item["fall"]
         item["adl"] = cum
+    _enrich_with_taiex(history)
     return history
 
 @app.get("/api/advance-decline")
 def get_advance_decline():
-    """TWSE 上市股票騰落線 (last ~120 trading days)."""
+    """上市+上櫃 騰落線 + 加權/櫃買指數 (last ~120 trading days)."""
     history = _load_adl_history()
-    if not history:
-        # Cold start — build synchronously (takes ~30 s)
+    # Rebuild if empty or old schema (missing otc/taiex fields)
+    if not history or "otc" not in history[-1]:
         history = _build_adl_history(120)
         _save_adl_history(history)
     else:
         history = _adl_try_append_today(history)
         _save_adl_history(history)
-    return {"data": history[-120:]}   # return at most 120 entries
+    return {"data": history[-120:]}
 
 
 # ── Serve frontend ───────────────────────────────────────────────────────────
