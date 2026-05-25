@@ -1714,7 +1714,7 @@ function goPage(name) {
   else if (name === 'growth') renderGrowthChart();
   else if (name === 'trend') renderTrendChart();
   else if (name === 'history') renderHistoryPage();
-  else if (name === 'important') renderImportantInfo(false);
+  else if (name === 'important') { renderImportantInfo(false); renderAdlChart(false); }
   else if (name === 'etf') renderEtfPage(false);
 
   // Switch active classes after content is ready
@@ -2414,6 +2414,161 @@ function _chipCellHtml(data) {
   const sign   = isDown ? '' : '+';
 
   return `<span style="color:${color};font-size:11px;white-space:nowrap" title="${tip}">${sign}${runPct.toFixed(2)}%</span>`;
+}
+
+// ── A/D Line chart ───────────────────────────────────────────────────────────
+let _adlChart = null;
+let _adlCache = { data: null, ts: 0 };
+
+async function renderAdlChart(force = false) {
+  const canvas = document.getElementById('adl-chart');
+  const statsEl = document.getElementById('adl-stats');
+  if (!canvas || !statsEl) return;
+
+  const TTL = 30 * 60 * 1000; // 30 min
+  if (!force && _adlCache.data && Date.now() - _adlCache.ts < TTL) {
+    _drawAdlChart(_adlCache.data);
+    return;
+  }
+
+  statsEl.innerHTML = '<span style="color:var(--muted);font-size:13px">⏳ 載入中…</span>';
+
+  try {
+    const res = await fetch('/api/advance-decline');
+    const json = await res.json();
+    const rows = json.data || [];
+
+    if (!rows.length) {
+      statsEl.innerHTML = '<span style="color:var(--muted);font-size:13px">⏳ 首次建立資料庫中，約需 30 秒，請稍後重新整理…</span>';
+      return;
+    }
+
+    _adlCache = { data: rows, ts: Date.now() };
+    _drawAdlChart(rows);
+  } catch(e) {
+    statsEl.innerHTML = '<span style="color:var(--red);font-size:13px">⚠ 無法載入騰落線資料</span>';
+  }
+}
+
+function _drawAdlChart(rows) {
+  const statsEl = document.getElementById('adl-stats');
+  const canvas  = document.getElementById('adl-chart');
+  if (!statsEl || !canvas) return;
+
+  // ── Stats cards ──────────────────────────────────────────
+  const last = rows[rows.length - 1];
+  const net  = last.raise - last.fall;
+  const total = last.raise + last.fall;
+  const raiseRate = total > 0 ? (last.raise / total * 100).toFixed(1) : '—';
+
+  // 3-day and 5-day average raise rate
+  function avgRate(n) {
+    const slice = rows.slice(-n);
+    if (!slice.length) return '—';
+    const avg = slice.reduce((s, r) => {
+      const t = r.raise + r.fall;
+      return s + (t > 0 ? r.raise / t * 100 : 50);
+    }, 0) / slice.length;
+    return avg.toFixed(2);
+  }
+
+  const netColor = net >= 0 ? 'var(--green)' : 'var(--red)';
+  const rateColor = r => +r >= 55 ? 'var(--green)' : +r <= 45 ? 'var(--red)' : 'var(--text-dim)';
+
+  statsEl.innerHTML = `
+    <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">淨上漲家數</div>
+      <div style="font-size:20px;font-weight:700;color:${netColor}">${net >= 0 ? '+' : ''}${net}</div>
+    </div>
+    <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">上漲 / 下跌</div>
+      <div style="font-size:15px;font-weight:600">
+        <span style="color:var(--red)">${last.raise.toLocaleString()}</span>
+        <span style="color:var(--muted)"> / </span>
+        <span style="color:var(--green)">${last.fall.toLocaleString()}</span>
+      </div>
+    </div>
+    <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">今日上漲率</div>
+      <div style="font-size:20px;font-weight:700;color:${rateColor(raiseRate)}">${raiseRate}%</div>
+    </div>
+    <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">3日平均</div>
+      <div style="font-size:20px;font-weight:700;color:${rateColor(avgRate(3))}">${avgRate(3)}%</div>
+    </div>
+    <div style="background:var(--surface-2);border-radius:10px;padding:10px 16px;min-width:100px">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">5日平均</div>
+      <div style="font-size:20px;font-weight:700;color:${rateColor(avgRate(5))}">${avgRate(5)}%</div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);align-self:flex-end;padding-bottom:8px">
+      ${last.date.slice(0,4)}/${last.date.slice(4,6)}/${last.date.slice(6,8)}
+    </div>
+  `;
+
+  // ── Chart ────────────────────────────────────────────────
+  const labels = rows.map(r => `${r.date.slice(4,6)}/${r.date.slice(6,8)}`);
+  const adlVals = rows.map(r => r.adl);
+
+  // Colour gradient: green when ADL rising, red when falling
+  const lineColors = adlVals.map((v, i) =>
+    i === 0 ? 'rgba(99,102,241,.8)'
+    : v >= adlVals[i-1] ? 'rgba(16,185,129,.8)'
+    : 'rgba(244,63,94,.8)'
+  );
+
+  if (_adlChart) _adlChart.destroy();
+  _adlChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'A/D Line (上市股票)',
+        data: adlVals,
+        borderColor: 'rgba(99,102,241,.85)',
+        backgroundColor: 'rgba(99,102,241,.06)',
+        borderWidth: 2,
+        fill: true,
+        pointRadius: 0,
+        tension: 0.3,
+        segment: {
+          borderColor: ctx => {
+            const i = ctx.p1DataIndex;
+            if (i === 0) return 'rgba(99,102,241,.85)';
+            return adlVals[i] >= adlVals[i-1]
+              ? 'rgba(16,185,129,.85)'
+              : 'rgba(244,63,94,.85)';
+          },
+        },
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `騰落指標: ${ctx.parsed.y.toLocaleString()}`,
+            afterLabel: ctx => {
+              const r = rows[ctx.dataIndex];
+              return `上漲 ${r.raise} / 下跌 ${r.fall}  淨 ${r.raise-r.fall >= 0 ? '+' : ''}${r.raise-r.fall}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(34,48,90,.5)' },
+          ticks: { color: '#646f92', maxTicksLimit: 12, maxRotation: 0 },
+        },
+        y: {
+          grid: { color: 'rgba(34,48,90,.5)' },
+          ticks: { color: '#646f92', callback: v => v.toLocaleString() },
+        },
+      },
+    },
+  });
 }
 
 async function renderImportantInfo(force = false) {

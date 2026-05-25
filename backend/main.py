@@ -2697,6 +2697,111 @@ def get_fsc_offerings():
         return {"items": [], "total": 0, "error": str(e)}
 
 
+# ── Advance-Decline Line ─────────────────────────────────────────────────────
+_ADL_FILE = DATA_DIR / "adl_history.json"
+_adl_lock = _threading.Lock()
+
+def _fetch_adl_day(date_str: str) -> dict | None:
+    """Fetch TWSE stock advance-decline counts for a single trading date."""
+    try:
+        r = http_requests.get(
+            f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?response=json&date={date_str}",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=10, verify=_TW_VERIFY,
+        )
+        d = json.loads(r.content.decode("utf-8"))
+        if d.get("stat") != "OK":
+            return None
+        for t in (d.get("tables") or []):
+            rows = t.get("data") or []
+            if len(rows) < 2:
+                continue
+            if "上漲" in str(rows[0][0]) and "下跌" in str(rows[1][0]):
+                def _p(s):
+                    return int(str(s).split("(")[0].replace(",", "").strip() or "0")
+                # Column 2 = 股票 (excludes ETFs/warrants)
+                return {
+                    "date": date_str,
+                    "raise": _p(rows[0][2]) if len(rows[0]) > 2 else 0,
+                    "fall":  _p(rows[1][2]) if len(rows[1]) > 2 else 0,
+                }
+    except Exception:
+        pass
+    return None
+
+def _load_adl_history() -> list:
+    try:
+        if _ADL_FILE.exists():
+            return json.loads(_ADL_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return []
+
+def _save_adl_history(data: list):
+    try:
+        _ADL_FILE.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+def _build_adl_history(lookback_days: int = 120) -> list:
+    """Parallel-fetch TWSE advance-decline data for last N trading days."""
+    from datetime import date as _date, timedelta as _td
+    today = _date.today()
+    candidates = []
+    d = today
+    while len(candidates) < lookback_days:
+        d -= _td(days=1)
+        if d.weekday() < 5:
+            candidates.append(d.strftime("%Y%m%d"))
+
+    results: dict[str, dict] = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(_fetch_adl_day, dt): dt for dt in candidates}
+        for fut in as_completed(futures):
+            res = fut.result()
+            if res:
+                results[res["date"]] = res
+
+    sorted_data = sorted(results.values(), key=lambda x: x["date"])
+    cum = 0
+    for item in sorted_data:
+        cum += item["raise"] - item["fall"]
+        item["adl"] = cum
+    return sorted_data
+
+def _adl_try_append_today(history: list) -> list:
+    """If today's data missing and market closed, fetch and append."""
+    from datetime import date as _date
+    today_str = _date.today().strftime("%Y%m%d")
+    if history and history[-1]["date"] >= today_str:
+        return history
+    if _is_tw_market_open():
+        return history
+    today_data = _fetch_adl_day(today_str)
+    if not today_data:
+        return history
+    history = [x for x in history if x["date"] != today_str]
+    history.append(today_data)
+    history.sort(key=lambda x: x["date"])
+    cum = 0
+    for item in history:
+        cum += item["raise"] - item["fall"]
+        item["adl"] = cum
+    return history
+
+@app.get("/api/advance-decline")
+def get_advance_decline():
+    """TWSE 上市股票騰落線 (last ~120 trading days)."""
+    history = _load_adl_history()
+    if not history:
+        # Cold start — build synchronously (takes ~30 s)
+        history = _build_adl_history(120)
+        _save_adl_history(history)
+    else:
+        history = _adl_try_append_today(history)
+        _save_adl_history(history)
+    return {"data": history[-120:]}   # return at most 120 entries
+
+
 # ── Serve frontend ───────────────────────────────────────────────────────────
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware
