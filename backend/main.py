@@ -2911,14 +2911,13 @@ def _gist_push_ranking_history():
 
 
 def _parse_twse_date(raw: str) -> str:
-    """Convert TWSE date string (ROC '1140526' or '114/05/26') to 'YYYYMMDD'."""
+    """Convert TWSE date string to 'YYYYMMDD'. Handles AD (20260526), ROC slash (115/05/26), ROC compact (1150526)."""
     try:
-        raw = raw.strip()
-        if "/" in raw:
-            parts = raw.split("/")
-            return f"{int(parts[0])+1911}{parts[1]}{parts[2]}"
-        if len(raw) == 7:
-            return str(int(raw[:3]) + 1911) + raw[3:]
+        raw = raw.strip().replace("/", "")
+        if len(raw) == 8 and raw.isdigit() and int(raw[:4]) > 1911:
+            return raw  # already YYYYMMDD
+        if len(raw) == 7 and raw.isdigit():
+            return str(int(raw[:3]) + 1911) + raw[3:]  # ROC YYYMMDD
     except Exception:
         pass
     return ""
@@ -3042,6 +3041,31 @@ def get_turnover_ranking():
     _turnover_cache = {"twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date}
     _turnover_cache_ts = now
     return _turnover_cache
+
+
+@app.post("/api/turnover-ranking/seed-history")
+def seed_ranking_history(date: str):
+    """Insert today's cached rankings as a historical entry for the given date (YYYYMMDD).
+    Used to seed historical base data for testing streak/rank_delta.
+    Clears the in-memory cache so next GET recomputes with the new history."""
+    global _turnover_cache, _turnover_cache_ts
+    if not re.match(r'^\d{8}$', date):
+        return {"error": "date must be YYYYMMDD"}
+    if not _turnover_cache:
+        return {"error": "no cached ranking yet; call GET /api/turnover-ranking first"}
+    twse_map = {item["code"]: i + 1 for i, item in enumerate(_turnover_cache.get("twse", []))}
+    tpex_map = {item["code"]: i + 1 for i, item in enumerate(_turnover_cache.get("tpex", []))}
+    history = _load_ranking_history()
+    history = [h for h in history if h["date"] != date]
+    history.append({"date": date, "twse": twse_map, "tpex": tpex_map})
+    history.sort(key=lambda x: x["date"])
+    history = history[-90:]
+    _save_ranking_history(history)
+    _gist_push_ranking_history()
+    # Bust cache so next GET recomputes streak/rank_delta with new history
+    _turnover_cache = {}
+    _turnover_cache_ts = 0.0
+    return {"ok": True, "seeded_date": date, "twse_count": len(twse_map), "tpex_count": len(tpex_map)}
 
 
 # ── Serve frontend ───────────────────────────────────────────────────────────
