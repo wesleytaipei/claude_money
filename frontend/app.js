@@ -3604,20 +3604,16 @@ async function _etfRenderFocusView() {
 let _rankingCache = { data: null, ts: 0 };
 
 async function renderRanking(force = false) {
-  const body  = document.getElementById('ranking-body');
-  const subEl = document.getElementById('ranking-sub');
+  const body = document.getElementById('ranking-body');
   if (!body) return;
 
-  const AGE = 30 * 60 * 1000; // 30 min
+  const AGE = 30 * 60 * 1000;
   if (!force && _rankingCache.data && Date.now() - _rankingCache.ts < AGE) {
     _renderRankingData(_rankingCache.data);
     return;
   }
 
-  body.innerHTML = `<div class="empty-state" style="padding:60px 0">
-    <div style="font-size:32px;margin-bottom:12px">⏳</div>
-    <div>正在抓取成交值資料…</div>
-  </div>`;
+  body.innerHTML = `<div class="empty-state" style="padding:40px 0">⏳ 正在抓取成交值資料…</div>`;
 
   try {
     const res = await fetch('/api/turnover-ranking');
@@ -3631,53 +3627,64 @@ async function renderRanking(force = false) {
 }
 
 function _rankRow(item, rank) {
+  // Rank label
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
   const rankEl = medal
-    ? `<span style="font-size:18px;line-height:1">${medal}</span>`
-    : `<span style="font-size:13px;font-weight:700;color:var(--text-muted);width:22px;text-align:center;display:inline-block">${rank}</span>`;
+    ? `<span style="font-size:14px">${medal}</span>`
+    : `<span style="font-size:11px;font-weight:700;color:var(--text-muted)">${rank}</span>`;
 
-  const turnoverBil = (item.turnover / 1e8).toFixed(1);
-
-  let chgHtml = '—';
-  if (item.chg_pct != null) {
-    const up   = item.chg_pct > 0;
-    const flat = item.chg_pct === 0;
-    const col  = flat ? 'var(--text-muted)' : up ? 'var(--red)' : 'var(--green)';
-    const sign = item.chg_pct > 0 ? '+' : '';
-    chgHtml = `<span style="color:${col};font-weight:600">${sign}${item.chg_pct.toFixed(2)}%</span>`;
+  // Streak badge
+  let streakEl = '';
+  if (item.streak >= 2) {
+    const fc = item.streak >= 20 ? '#f97316' : item.streak >= 10 ? '#fbbf24' : '#94a3b8';
+    streakEl = `<span style="color:${fc};font-size:10px;margin-left:3px">🔥${item.streak}d</span>`;
+  } else if (item.rank_delta == null) {
+    streakEl = `<span style="color:#6366f1;font-size:9px;font-weight:700;margin-left:3px;
+      background:rgba(99,102,241,.15);padding:1px 3px;border-radius:3px">NEW</span>`;
   }
 
-  const closeHtml = item.close != null
-    ? `<span style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace">${item.close.toFixed(2)}</span>`
-    : '<span style="color:var(--text-muted)">—</span>';
+  // Rank delta
+  let deltaEl = '<span style="color:var(--text-muted);font-size:10px">─</span>';
+  if (item.rank_delta == null) {
+    deltaEl = '';
+  } else if (item.rank_delta > 0) {
+    deltaEl = `<span style="color:#10b981;font-size:10px;font-weight:700">▲${item.rank_delta}</span>`;
+  } else if (item.rank_delta < 0) {
+    deltaEl = `<span style="color:#f43f5e;font-size:10px;font-weight:700">▼${Math.abs(item.rank_delta)}</span>`;
+  }
 
-  // Bar width: relative to first item (max)
+  // Price + change
+  const closeStr = item.close != null ? item.close.toFixed(2) : '—';
+  let chgEl = '<span style="color:var(--text-muted)">—</span>';
+  if (item.chg_pct != null) {
+    const col  = item.chg_pct > 0 ? 'var(--red)' : item.chg_pct < 0 ? 'var(--green)' : 'var(--text-muted)';
+    const sign = item.chg_pct > 0 ? '+' : '';
+    chgEl = `<span style="color:${col}">${sign}${item.chg_pct.toFixed(2)}%</span>`;
+  }
+
+  const bil = (item.turnover / 1e8).toFixed(1);
   const pct = Math.min(100, item._barPct || 100);
-  const barColor = rank <= 3 ? 'rgba(251,191,36,.45)' : 'rgba(99,102,241,.25)';
+  const barCol = rank <= 3 ? 'rgba(251,191,36,.25)' : 'rgba(99,102,241,.12)';
 
   return `<div style="
       position:relative;overflow:hidden;
-      display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:8px;
-      padding:10px 14px;border-radius:10px;
+      display:grid;grid-template-columns:22px 1fr 38px 50px 86px 24px;
+      align-items:center;gap:4px;
+      padding:4px 8px;border-radius:6px;
       background:var(--surface-1);border:1px solid var(--border);
-      transition:background .15s;
-    " onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='var(--surface-1)'">
-    <div style="
-      position:absolute;left:0;top:0;bottom:0;width:${pct}%;
-      background:${barColor};pointer-events:none;z-index:0;
-      border-radius:10px 0 0 10px;
-    "></div>
-    <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:center">${rankEl}</div>
-    <div style="position:relative;z-index:1;min-width:0">
-      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
-        <span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace;margin-right:5px">${item.code}</span>${item.name}
-      </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-top:2px">成交值 <b style="color:var(--fg)">${turnoverBil} 億</b></div>
+    ">
+    <div style="position:absolute;left:0;top:0;bottom:0;width:${pct}%;background:${barCol};pointer-events:none;z-index:0;border-radius:6px 0 0 6px"></div>
+    <div style="position:relative;z-index:1;text-align:center">${rankEl}</div>
+    <div style="position:relative;z-index:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)">${item.code}</span>
+      <span style="font-weight:600;margin-left:3px">${item.name}</span>${streakEl}
     </div>
-    <div style="position:relative;z-index:1;text-align:right;flex-shrink:0">
-      ${closeHtml}
-      <div style="font-size:12px;margin-top:2px">${chgHtml}</div>
+    <div style="position:relative;z-index:1;text-align:center;font-size:10px">${deltaEl}</div>
+    <div style="position:relative;z-index:1;text-align:right;font-size:12px;font-weight:600">${bil}億</div>
+    <div style="position:relative;z-index:1;text-align:right;font-size:11px;font-family:'JetBrains Mono',monospace">
+      ${closeStr}<br><span style="font-size:10px">${chgEl}</span>
     </div>
+    <div style="position:relative;z-index:1;text-align:center"></div>
   </div>`;
 }
 
@@ -3686,36 +3693,38 @@ function _renderRankingData(data) {
   const subEl = document.getElementById('ranking-sub');
   if (!body) return;
 
-  const ts = data.ts ? new Date(data.ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '—';
-  if (subEl) subEl.textContent = `上市 + 上櫃 各前30名　更新 ${ts}`;
+  const td   = data.trade_date || '—';
+  const ts   = data.ts ? new Date(data.ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '—';
+  if (subEl) subEl.textContent = `資料日期 ${td}　抓取時間 ${ts}`;
 
-  function buildList(items, label) {
-    if (!items || items.length === 0)
-      return `<div style="color:var(--text-muted);padding:20px 0;text-align:center">無資料</div>`;
+  function colHeader() {
+    return `<div style="display:grid;grid-template-columns:22px 1fr 38px 50px 86px 24px;gap:4px;
+                padding:3px 8px 5px;font-size:10px;color:var(--text-muted);font-weight:600;border-bottom:1px solid var(--border);margin-bottom:4px">
+      <div style="text-align:center">#</div>
+      <div>名稱</div>
+      <div style="text-align:center">漲跌</div>
+      <div style="text-align:right">成交值</div>
+      <div style="text-align:right">收盤 / 漲跌%</div>
+      <div></div>
+    </div>`;
+  }
+
+  function buildList(items) {
+    if (!items || !items.length)
+      return `<div style="color:var(--text-muted);padding:12px;text-align:center;font-size:12px">無資料</div>`;
     const max = items[0].turnover || 1;
-    const rows = items.map((item, i) => {
+    return colHeader() + items.map((item, i) => {
       item._barPct = (item.turnover / max) * 100;
       return _rankRow(item, i + 1);
     }).join('');
-    return `<div style="display:flex;flex-direction:column;gap:6px">${rows}</div>`;
   }
 
+  const hdr = (ico, label) => `<div style="font-size:11px;font-weight:700;color:var(--text-muted);
+    padding:0 4px 6px;border-bottom:2px solid var(--border);margin-bottom:6px">${ico} ${label}</div>`;
+
   body.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;
-                    text-transform:uppercase;padding:0 4px 10px;border-bottom:2px solid var(--border);margin-bottom:12px">
-          🏛️ 上市 TWSE
-        </div>
-        ${buildList(data.twse, '上市')}
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;
-                    text-transform:uppercase;padding:0 4px 10px;border-bottom:2px solid var(--border);margin-bottom:12px">
-          🏪 上櫃 TPEX
-        </div>
-        ${buildList(data.tpex, '上櫃')}
-      </div>
-    </div>
-  `;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+      <div>${hdr('🏛️','上市 TWSE')}${buildList(data.twse)}</div>
+      <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
+    </div>`;
 }

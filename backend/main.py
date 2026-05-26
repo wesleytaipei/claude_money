@@ -2869,15 +2869,46 @@ def get_advance_decline():
 _turnover_cache: dict = {}
 _turnover_cache_ts: float = 0.0
 _TURNOVER_CACHE_TTL = 1800  # 30 min
+RANKING_HISTORY_FILE = DATA_DIR / "turnover_ranking_history.json"
 
 
-def _fetch_twse_turnover_ranking(n: int = 30) -> list[dict]:
-    """Top-n TWSE stocks by 成交金額 (STOCK_DAY_ALL)."""
+def _load_ranking_history() -> list[dict]:
+    try:
+        return json.loads(RANKING_HISTORY_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _save_ranking_history(history: list[dict]) -> None:
+    try:
+        RANKING_HISTORY_FILE.write_text(
+            json.dumps(history, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _parse_twse_date(raw: str) -> str:
+    """Convert TWSE date string (ROC '1140526' or '114/05/26') to 'YYYYMMDD'."""
+    try:
+        raw = raw.strip()
+        if "/" in raw:
+            parts = raw.split("/")
+            return f"{int(parts[0])+1911}{parts[1]}{parts[2]}"
+        if len(raw) == 7:
+            return str(int(raw[:3]) + 1911) + raw[3:]
+    except Exception:
+        pass
+    return ""
+
+
+def _fetch_twse_turnover_ranking(n: int = 25) -> tuple[list[dict], str]:
+    """Returns (top-n items, trade_date_ymd like '20260526')."""
     try:
         r = http_requests.get(
             "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json",
             headers={"User-Agent": "Mozilla/5.0"}, timeout=15, verify=_TW_VERIFY)
         d = json.loads(r.content.decode("utf-8"))
+        trade_date = _parse_twse_date(d.get("date", ""))
         rows = d.get("data") or []
         result = []
         for row in rows:
@@ -2896,13 +2927,13 @@ def _fetch_twse_turnover_ranking(n: int = 30) -> list[dict]:
             except Exception:
                 continue
         result.sort(key=lambda x: x["turnover"], reverse=True)
-        return result[:n]
+        return result[:n], trade_date
     except Exception:
-        return []
+        return [], ""
 
 
-def _fetch_tpex_turnover_ranking(n: int = 30) -> list[dict]:
-    """Top-n TPEX stocks by TransactionAmount (openapi daily_close_quotes)."""
+def _fetch_tpex_turnover_ranking(n: int = 25) -> list[dict]:
+    """Top-n TPEX stocks by TransactionAmount."""
     try:
         r = http_requests.get(
             "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
@@ -2935,16 +2966,56 @@ def _fetch_tpex_turnover_ranking(n: int = 30) -> list[dict]:
         return []
 
 
+def _enrich_ranking_stats(items: list[dict], market: str, history: list[dict], today_idx: int) -> None:
+    """Add streak (consecutive days on list) and rank_delta (vs prev trading day) in-place."""
+    for i, item in enumerate(items):
+        code = item["code"]
+        current_rank = i + 1
+        streak = 0
+        for j in range(today_idx, -1, -1):
+            if code in history[j].get(market, {}):
+                streak += 1
+            else:
+                break
+        rank_delta = None
+        if today_idx > 0:
+            prev = history[today_idx - 1].get(market, {}).get(code)
+            if prev is not None:
+                rank_delta = prev - current_rank  # positive = rank improved (smaller number)
+        item["streak"] = max(1, streak)
+        item["rank_delta"] = rank_delta
+
+
 @app.get("/api/turnover-ranking")
 def get_turnover_ranking():
-    """上市+上櫃 成交值排行 (top 30 each), cached 30 min."""
+    """上市+上櫃 成交值排行 (top 25 each), cached 30 min, with streak/rank_delta."""
     global _turnover_cache, _turnover_cache_ts
     now = time.time()
     if _turnover_cache and now - _turnover_cache_ts < _TURNOVER_CACHE_TTL:
         return _turnover_cache
-    twse = _fetch_twse_turnover_ranking(30)
-    tpex = _fetch_tpex_turnover_ranking(30)
-    _turnover_cache = {"twse": twse, "tpex": tpex, "ts": int(now)}
+
+    twse, trade_date = _fetch_twse_turnover_ranking(25)
+    tpex = _fetch_tpex_turnover_ranking(25)
+
+    today_str = trade_date or datetime.now().strftime("%Y%m%d")
+    history = _load_ranking_history()
+    twse_map = {item["code"]: i + 1 for i, item in enumerate(twse)}
+    tpex_map = {item["code"]: i + 1 for i, item in enumerate(tpex)}
+
+    if history and history[-1]["date"] == today_str:
+        history[-1] = {"date": today_str, "twse": twse_map, "tpex": tpex_map}
+    else:
+        history.append({"date": today_str, "twse": twse_map, "tpex": tpex_map})
+    history = history[-90:]
+    _save_ranking_history(history)
+
+    today_idx = len(history) - 1
+    _enrich_ranking_stats(twse, "twse", history, today_idx)
+    _enrich_ranking_stats(tpex, "tpex", history, today_idx)
+
+    display_date = (f"{today_str[:4]}/{today_str[4:6]}/{today_str[6:]}"
+                    if len(today_str) == 8 else "")
+    _turnover_cache = {"twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date}
     _turnover_cache_ts = now
     return _turnover_cache
 
