@@ -1059,22 +1059,28 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
         # Start from CBAS metadata (conversion_price, due_date, etc.)
         entry = dict(cbas.get(s, {"price": None, "name": "", "ts": now}))
         mis = mis_prices.get(s, {})
-        if mis.get("price") is not None:
-            # Real trade from MIS (z or 漲停) — authoritative
+        mis_live  = mis.get("price") is not None and not mis.get("from_cache")
+        yahoo_p   = yahoo_prices.get(s, {}).get("price")
+
+        if mis_live:
+            # Live z field from MIS — authoritative intraday/closing price
             entry["price"]      = mis["price"]
             entry["change_pct"] = mis.get("change_pct")
-        elif yahoo_prices.get(s, {}).get("price") is not None:
-            # Yahoo Finance has today's closing price (available right after 13:30)
-            yp    = yahoo_prices[s]
-            yp_p  = yp["price"]
+        elif yahoo_p is not None:
+            # Yahoo has the actual closing price (post-market override or primary fallback)
+            yp_p = yahoo_p
             entry["price"] = yp_p
-            # Prefer Yahoo change_pct; fall back to MIS prev_close (y field)
+            yp = yahoo_prices[s]
             if yp.get("change_pct") is not None:
                 entry["change_pct"] = yp["change_pct"]
             else:
                 prev = mis.get("prev_close")
                 if prev and prev > 0:
                     entry["change_pct"] = round((yp_p - prev) / prev * 100, 2)
+        elif mis.get("price") is not None:
+            # Intraday cache only (Yahoo also failed) — best available
+            entry["price"]      = mis["price"]
+            entry["change_pct"] = mis.get("change_pct")
         else:
             # No real MIS trade, no Yahoo — keep CBAS closing price, compute change_pct from MIS y
             prev = mis.get("prev_close")
