@@ -1716,6 +1716,7 @@ function goPage(name) {
   else if (name === 'history') renderHistoryPage();
   else if (name === 'important') { renderImportantInfo(false); renderAdlChart(false); }
   else if (name === 'etf') renderEtfPage(false);
+  else if (name === 'ranking') renderRanking(false);
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1725,7 +1726,8 @@ function goPage(name) {
   const titles = {
     dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
     growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊',
-    etf: 'ETF追蹤'
+    etf: 'ETF追蹤',
+    ranking: '成交值排行'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -3596,4 +3598,124 @@ async function _etfRenderFocusView() {
       ${mkSection('⚠️', '減碼 / 清倉', tSell, '#f43f5e')}
     </div>
     <div style="font-size:11px;color:var(--text-muted);margin-top:8px">共 ${entries.length} 個重點標的</div>`;
+}
+
+// ── 成交值排行 ────────────────────────────────────────────────────────────────
+let _rankingCache = { data: null, ts: 0 };
+
+async function renderRanking(force = false) {
+  const body  = document.getElementById('ranking-body');
+  const subEl = document.getElementById('ranking-sub');
+  if (!body) return;
+
+  const AGE = 30 * 60 * 1000; // 30 min
+  if (!force && _rankingCache.data && Date.now() - _rankingCache.ts < AGE) {
+    _renderRankingData(_rankingCache.data);
+    return;
+  }
+
+  body.innerHTML = `<div class="empty-state" style="padding:60px 0">
+    <div style="font-size:32px;margin-bottom:12px">⏳</div>
+    <div>正在抓取成交值資料…</div>
+  </div>`;
+
+  try {
+    const res = await fetch('/api/turnover-ranking');
+    if (!res.ok) throw new Error(res.statusText);
+    const data = await res.json();
+    _rankingCache = { data, ts: Date.now() };
+    _renderRankingData(data);
+  } catch (e) {
+    body.innerHTML = `<div class="empty-state" style="color:var(--red)">載入失敗：${e.message}</div>`;
+  }
+}
+
+function _rankRow(item, rank) {
+  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
+  const rankEl = medal
+    ? `<span style="font-size:18px;line-height:1">${medal}</span>`
+    : `<span style="font-size:13px;font-weight:700;color:var(--text-muted);width:22px;text-align:center;display:inline-block">${rank}</span>`;
+
+  const turnoverBil = (item.turnover / 1e8).toFixed(1);
+
+  let chgHtml = '—';
+  if (item.chg_pct != null) {
+    const up   = item.chg_pct > 0;
+    const flat = item.chg_pct === 0;
+    const col  = flat ? 'var(--text-muted)' : up ? 'var(--red)' : 'var(--green)';
+    const sign = item.chg_pct > 0 ? '+' : '';
+    chgHtml = `<span style="color:${col};font-weight:600">${sign}${item.chg_pct.toFixed(2)}%</span>`;
+  }
+
+  const closeHtml = item.close != null
+    ? `<span style="font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace">${item.close.toFixed(2)}</span>`
+    : '<span style="color:var(--text-muted)">—</span>';
+
+  // Bar width: relative to first item (max)
+  const pct = Math.min(100, item._barPct || 100);
+  const barColor = rank <= 3 ? 'rgba(251,191,36,.45)' : 'rgba(99,102,241,.25)';
+
+  return `<div style="
+      position:relative;overflow:hidden;
+      display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:8px;
+      padding:10px 14px;border-radius:10px;
+      background:var(--surface-1);border:1px solid var(--border);
+      transition:background .15s;
+    " onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='var(--surface-1)'">
+    <div style="
+      position:absolute;left:0;top:0;bottom:0;width:${pct}%;
+      background:${barColor};pointer-events:none;z-index:0;
+      border-radius:10px 0 0 10px;
+    "></div>
+    <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:center">${rankEl}</div>
+    <div style="position:relative;z-index:1;min-width:0">
+      <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+        <span style="color:var(--text-muted);font-size:11px;font-family:'JetBrains Mono',monospace;margin-right:5px">${item.code}</span>${item.name}
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:2px">成交值 <b style="color:var(--fg)">${turnoverBil} 億</b></div>
+    </div>
+    <div style="position:relative;z-index:1;text-align:right;flex-shrink:0">
+      ${closeHtml}
+      <div style="font-size:12px;margin-top:2px">${chgHtml}</div>
+    </div>
+  </div>`;
+}
+
+function _renderRankingData(data) {
+  const body  = document.getElementById('ranking-body');
+  const subEl = document.getElementById('ranking-sub');
+  if (!body) return;
+
+  const ts = data.ts ? new Date(data.ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '—';
+  if (subEl) subEl.textContent = `上市 + 上櫃 各前30名　更新 ${ts}`;
+
+  function buildList(items, label) {
+    if (!items || items.length === 0)
+      return `<div style="color:var(--text-muted);padding:20px 0;text-align:center">無資料</div>`;
+    const max = items[0].turnover || 1;
+    const rows = items.map((item, i) => {
+      item._barPct = (item.turnover / max) * 100;
+      return _rankRow(item, i + 1);
+    }).join('');
+    return `<div style="display:flex;flex-direction:column;gap:6px">${rows}</div>`;
+  }
+
+  body.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;
+                    text-transform:uppercase;padding:0 4px 10px;border-bottom:2px solid var(--border);margin-bottom:12px">
+          🏛️ 上市 TWSE
+        </div>
+        ${buildList(data.twse, '上市')}
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);letter-spacing:.08em;
+                    text-transform:uppercase;padding:0 4px 10px;border-bottom:2px solid var(--border);margin-bottom:12px">
+          🏪 上櫃 TPEX
+        </div>
+        ${buildList(data.tpex, '上櫃')}
+      </div>
+    </div>
+  `;
 }

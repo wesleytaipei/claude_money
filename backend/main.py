@@ -2865,6 +2865,90 @@ def get_advance_decline():
     return {"data": history[-120:]}
 
 
+# ── 成交值排行 ────────────────────────────────────────────────────────────────
+_turnover_cache: dict = {}
+_turnover_cache_ts: float = 0.0
+_TURNOVER_CACHE_TTL = 1800  # 30 min
+
+
+def _fetch_twse_turnover_ranking(n: int = 30) -> list[dict]:
+    """Top-n TWSE stocks by 成交金額 (STOCK_DAY_ALL)."""
+    try:
+        r = http_requests.get(
+            "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=15, verify=_TW_VERIFY)
+        d = json.loads(r.content.decode("utf-8"))
+        rows = d.get("data") or []
+        result = []
+        for row in rows:
+            code = str(row[0]).strip()
+            if not re.match(r'^[1-9]\d{3}$', code):
+                continue
+            try:
+                turnover = int(str(row[3]).replace(",", ""))
+                close    = float(str(row[7]).replace(",", "")) if row[7] not in ("--", "") else None
+                chg      = float(str(row[8]).replace(",", "").replace("+", "")) if row[8] not in ("--", "", "X", "除息", "除權") else None
+                name     = str(row[1]).strip()
+                prev_close = round(close - chg, 2) if close is not None and chg is not None else None
+                chg_pct  = round(chg / prev_close * 100, 2) if prev_close and prev_close > 0 else None
+                result.append({"code": code, "name": name, "turnover": turnover,
+                                "close": close, "chg": chg, "chg_pct": chg_pct})
+            except Exception:
+                continue
+        result.sort(key=lambda x: x["turnover"], reverse=True)
+        return result[:n]
+    except Exception:
+        return []
+
+
+def _fetch_tpex_turnover_ranking(n: int = 30) -> list[dict]:
+    """Top-n TPEX stocks by TransactionAmount (openapi daily_close_quotes)."""
+    try:
+        r = http_requests.get(
+            "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=15, verify=_TW_VERIFY)
+        rows = r.json()
+        result = []
+        for row in rows:
+            code = str(row.get("SecuritiesCompanyCode", "")).strip()
+            if not re.match(r'^[1-9]\d{3}$', code):
+                continue
+            try:
+                turnover_str = str(row.get("TransactionAmount", "0")).replace(",", "")
+                turnover = int(float(turnover_str)) if turnover_str not in ("", "--") else 0
+                if turnover <= 0:
+                    continue
+                close_str = str(row.get("Close", "")).replace(",", "")
+                close = float(close_str) if close_str not in ("", "--") else None
+                chg_str = str(row.get("Change", "")).replace(",", "").replace("+", "")
+                chg = float(chg_str) if chg_str not in ("", "--", "X") else None
+                prev_close = round(close - chg, 2) if close is not None and chg is not None else None
+                chg_pct = round(chg / prev_close * 100, 2) if prev_close and prev_close > 0 else None
+                name = str(row.get("CompanyName", "")).strip()
+                result.append({"code": code, "name": name, "turnover": turnover,
+                                "close": close, "chg": chg, "chg_pct": chg_pct})
+            except Exception:
+                continue
+        result.sort(key=lambda x: x["turnover"], reverse=True)
+        return result[:n]
+    except Exception:
+        return []
+
+
+@app.get("/api/turnover-ranking")
+def get_turnover_ranking():
+    """上市+上櫃 成交值排行 (top 30 each), cached 30 min."""
+    global _turnover_cache, _turnover_cache_ts
+    now = time.time()
+    if _turnover_cache and now - _turnover_cache_ts < _TURNOVER_CACHE_TTL:
+        return _turnover_cache
+    twse = _fetch_twse_turnover_ranking(30)
+    tpex = _fetch_tpex_turnover_ranking(30)
+    _turnover_cache = {"twse": twse, "tpex": tpex, "ts": int(now)}
+    _turnover_cache_ts = now
+    return _turnover_cache
+
+
 # ── Serve frontend ───────────────────────────────────────────────────────────
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware

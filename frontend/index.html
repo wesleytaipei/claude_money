@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=36" />
+  <link rel="stylesheet" href="/static/style.css?v=37" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -48,6 +48,9 @@
         </button>
         <button class="nav-item" data-page="etf">
           <span class="nav-ico">🔍</span><span>ETF追蹤</span>
+        </button>
+        <button class="nav-item" data-page="ranking">
+          <span class="nav-ico">🏆</span><span>成交值排行</span>
         </button>
       </nav>
 
@@ -453,6 +456,20 @@
         </div>
         <div id="etf-body">
           <div class="empty-state">點擊側邊欄「ETF追蹤」載入資料</div>
+        </div>
+      </section>
+
+      <!-- ══ 成交值排行 ══ -->
+      <section class="page" id="page-ranking">
+        <div class="page-header">
+          <div>
+            <h1>成交值排行</h1>
+            <p class="page-sub" id="ranking-sub">上市 + 上櫃 各前30名</p>
+          </div>
+          <button class="btn-ghost" onclick="renderRanking(true)" title="重新抓取">🔄</button>
+        </div>
+        <div id="ranking-body">
+          <div class="empty-state">點擊側邊欄「成交值排行」載入資料</div>
         </div>
       </section>
 
