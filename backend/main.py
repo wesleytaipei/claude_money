@@ -952,12 +952,14 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
                 with _cb_intraday_lock:
                     _cb_intraday_cache[code] = {"price": price, "date": today_str}
                 _intraday_updated = True
-            elif v_f > 0:
+            from_cache = False
+            if price is None and v_f > 0:
                 # z="-" but stock traded today — try intraday cache from this session
                 with _cb_intraday_lock:
                     cached = _cb_intraday_cache.get(code)
                 if cached and cached.get("date") == today_str:
                     price = cached["price"]
+                    from_cache = True  # flag: may not equal final closing price
 
             # change_pct only when we have a real trade price
             change_pct = None
@@ -967,7 +969,8 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
             prices[code] = {
                 "price":      round(price, 4) if price is not None else None,
                 "change_pct": change_pct,
-                "prev_close": y_f,   # kept for CBAS fallback change_pct calc
+                "prev_close": y_f,
+                "from_cache": from_cache,  # True = intraday cache, not live z
                 "ts":         now,
             }
 
@@ -1038,11 +1041,19 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
     # Always fetch real-time prices from MIS for all requested symbols
     mis_prices = _fetch_mis_cb_prices(symbols)
 
-    # Yahoo fallback for CBs where MIS has no price (post-market 13:30–18:00 window)
+    # Yahoo fallback:
+    # 1. Always: symbols with price=None (MIS totally failed)
+    # 2. Post-market: symbols where price came from intraday cache — Yahoo has the
+    #    actual closing price; cache may hold the last intraday z, not the final close.
     no_price = [s for s in symbols if mis_prices.get(s, {}).get("price") is None]
+    from_cache_postmarket = (
+        [s for s in symbols if mis_prices.get(s, {}).get("from_cache")]
+        if not _is_tw_market_open() else []
+    )
+    need_yahoo = list(dict.fromkeys(no_price + from_cache_postmarket))
     yahoo_prices: dict[str, dict] = {}
-    if no_price:
-        yahoo_prices = _fetch_yahoo_cb_prices(no_price)
+    if need_yahoo:
+        yahoo_prices = _fetch_yahoo_cb_prices(need_yahoo)
 
     for s in symbols:
         # Start from CBAS metadata (conversion_price, due_date, etc.)
