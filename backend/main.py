@@ -173,6 +173,25 @@ def sync_from_gist(force: bool = False) -> list[dict]:
         path = DATA_DIR / name
         try:
             gist_data = json.loads(content)
+
+            # List-type files (e.g. turnover_ranking_history.json) have no _TS_KEY.
+            # Compare by most-recent entry date; pull from Gist if it's ahead.
+            if isinstance(gist_data, list):
+                local_data = load_json(path, [])
+                gist_latest  = gist_data[-1].get("date",  "0") if gist_data  else "0"
+                local_latest = (local_data[-1].get("date", "0")
+                                if isinstance(local_data, list) and local_data else "0")
+                should_pull  = force or gist_latest > local_latest
+                if should_pull:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text(content, encoding="utf-8")
+                    action = "pulled"
+                    logger.info(f"[Gist] pulled {name} (gist {gist_latest} > local {local_latest})")
+                else:
+                    action = "in_sync"
+                results.append({"name": name, "action": action, "local_ts": None, "gist_ts": None})
+                continue
+
             gist_ts   = _parse_ts(gist_data.get(_TS_KEY))
             local_data = load_json(path, {})
             local_ts   = _parse_ts(local_data.get(_TS_KEY))
@@ -2887,6 +2906,10 @@ def _save_ranking_history(history: list[dict]) -> None:
         pass
 
 
+def _gist_push_ranking_history():
+    _gist_push_file(RANKING_HISTORY_FILE)
+
+
 def _parse_twse_date(raw: str) -> str:
     """Convert TWSE date string (ROC '1140526' or '114/05/26') to 'YYYYMMDD'."""
     try:
@@ -3008,6 +3031,7 @@ def get_turnover_ranking():
         history.append({"date": today_str, "twse": twse_map, "tpex": tpex_map})
     history = history[-90:]
     _save_ranking_history(history)
+    _gist_push_ranking_history()
 
     today_idx = len(history) - 1
     _enrich_ranking_stats(twse, "twse", history, today_idx)
