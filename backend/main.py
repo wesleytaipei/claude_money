@@ -3019,19 +3019,43 @@ def get_turnover_ranking():
     twse, trade_date = _fetch_twse_turnover_ranking(25)
     tpex = _fetch_tpex_turnover_ranking(25)
 
-    today_str = trade_date or datetime.now().strftime("%Y%m%d")
+    # If both fetches failed, return empty without touching history
+    if not twse and not tpex:
+        _turnover_cache = {"twse": [], "tpex": [], "ts": int(now), "trade_date": "",
+                           "twse_changes": {"added": [], "removed": []},
+                           "tpex_changes": {"added": [], "removed": []}}
+        _turnover_cache_ts = now
+        return _turnover_cache
+
     history = _load_ranking_history()
+
+    # Determine today_str: prefer trade_date from TWSE; if TWSE failed use most recent history date
+    if trade_date:
+        today_str = trade_date
+    elif history:
+        today_str = history[-1]["date"]
+    else:
+        today_str = datetime.now().strftime("%Y%m%d")
+
     twse_map   = {item["code"]: i + 1    for i, item in enumerate(twse)}
     tpex_map   = {item["code"]: i + 1    for i, item in enumerate(tpex)}
     twse_names = {item["code"]: item["name"] for item in twse}
     tpex_names = {item["code"]: item["name"] for item in tpex}
 
-    entry = {"date": today_str, "twse": twse_map, "tpex": tpex_map,
-             "twse_names": twse_names, "tpex_names": tpex_names}
-    if history and history[-1]["date"] == today_str:
-        history[-1] = entry
-    else:
-        history.append(entry)
+    # Find any existing entry for today (may have duplicates from old bug)
+    existing = next((h for h in reversed(history) if h["date"] == today_str), {})
+    # Preserve data for whichever market's fetch failed this time
+    entry = {
+        "date":       today_str,
+        "twse":       twse_map   if twse_map   else existing.get("twse", {}),
+        "tpex":       tpex_map   if tpex_map   else existing.get("tpex", {}),
+        "twse_names": twse_names if twse_names else existing.get("twse_names", {}),
+        "tpex_names": tpex_names if tpex_names else existing.get("tpex_names", {}),
+    }
+    # Remove ALL entries for today_str (dedup) then append; sort for clean order
+    history = [h for h in history if h["date"] != today_str]
+    history.append(entry)
+    history.sort(key=lambda x: x["date"])
     history = history[-90:]
     _save_ranking_history(history)
     _gist_push_ranking_history()
@@ -3040,10 +3064,10 @@ def get_turnover_ranking():
     _enrich_ranking_stats(twse, "twse", history, today_idx)
     _enrich_ranking_stats(tpex, "tpex", history, today_idx)
 
-    # Added / removed vs previous trading day
+    # Added / removed vs previous trading day — only if today's fetch succeeded for that market
     prev = history[today_idx - 1] if today_idx > 0 else None
     def _changes(today_map, today_names_map, mkt):
-        if not prev:
+        if not prev or not today_map:  # skip if fetch failed or no history base
             return {"added": [], "removed": []}
         prev_map   = prev.get(mkt, {})
         prev_names = prev.get(f"{mkt}_names", {})
