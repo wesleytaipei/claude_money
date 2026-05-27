@@ -63,7 +63,10 @@ def fetch_macromicro(url):
         print(f"Error fetching macromicro {url}: {e}")
     return {"current": None, "prev": None}
 
-_twse_margin_cache = {"date": "", "data": None}   # daily
+_twse_margin_cache = {"date": "", "data": None, "last_good": None, "fail_ts": 0.0}
+_tpex_margin_cache_v2 = {"date": "", "data": None, "last_good": None, "fail_ts": 0.0}
+_MARGIN_COOLDOWN = 180   # seconds before retrying after all attempts fail
+_MARGIN_RETRIES  = 3
 
 def _safe_float(v):
     """Parse a string that may be '-', '', or a comma-number."""
@@ -83,54 +86,59 @@ def fetch_twse_margin(force=False):
     #   [1] 融券(交易單位)
     #   [2] 融資金額(仟元)   cols [4]=前日 [5]=今日  ← the one we want
     today_str = _tw_today()
-    if not force and _twse_margin_cache["date"] == today_str and _twse_margin_cache["data"]:
-        return _twse_margin_cache["data"]
-    try:
-        resp_json = requests.get(
-            "https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json",
-            headers=HEADERS, verify=False, timeout=15
-        ).json()
-        tables = resp_json.get("tables", [])
-        if not tables:
-            print("[TWSE margin] empty tables — market closed or pre-data")
-            return {"balance": None, "increase": None}
+    c = _twse_margin_cache
+    if not force and c["date"] == today_str and c["data"]:
+        return c["data"]
+    # Cooldown: don't hammer if all recent attempts failed
+    if not force and c["fail_ts"] and time.time() - c["fail_ts"] < _MARGIN_COOLDOWN:
+        return c["last_good"] or {"balance": None, "increase": None}
 
-        data = tables[0].get("data", [])
-        if len(data) < 3:
-            print(f"[TWSE margin] unexpected row count: {len(data)}")
-            return {"balance": None, "increase": None}
+    last_err = None
+    for attempt in range(_MARGIN_RETRIES):
+        try:
+            resp_json = requests.get(
+                "https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json",
+                headers=HEADERS, verify=False, timeout=15
+            ).json()
+            tables = resp_json.get("tables", [])
+            if not tables:
+                raise ValueError("empty tables")
+            data = tables[0].get("data", [])
+            if len(data) < 3:
+                raise ValueError(f"only {len(data)} rows")
+            row = data[2]
+            if len(row) < 6:
+                raise ValueError(f"short row: {row}")
+            yest_val  = _safe_float(row[4])
+            today_val = _safe_float(row[5])
+            if today_val is None:
+                raise ValueError(f"non-numeric value: {row}")
+            increase = (today_val - yest_val) if yest_val is not None else 0
+            result = {
+                "balance":  round(today_val / 100000, 2),
+                "increase": round(increase  / 100000, 2),
+            }
+            # Always cache valid data; mark stale if not today's date
+            resp_raw = resp_json.get("date", "")
+            resp_date = f"{resp_raw[:4]}-{resp_raw[4:6]}-{resp_raw[6:8]}" if len(resp_raw) == 8 else ""
+            result["stale"] = (resp_date != today_str) if resp_date else False
+            c["date"]      = today_str if not result["stale"] else resp_date
+            c["data"]      = result if not result["stale"] else None
+            c["last_good"] = result
+            c["fail_ts"]   = 0.0
+            print(f"[TWSE margin] ok (date={resp_date}, stale={result['stale']})")
+            return result
+        except Exception as e:
+            last_err = e
+            if attempt < _MARGIN_RETRIES - 1:
+                time.sleep(1)
 
-        row = data[2]   # 融資金額(仟元) is always index 2
-        if len(row) < 6:
-            print(f"[TWSE margin] short row: {row}")
-            return {"balance": None, "increase": None}
+    print(f"[TWSE margin] all {_MARGIN_RETRIES} attempts failed: {last_err}")
+    c["fail_ts"] = time.time()
+    return c["last_good"] or {"balance": None, "increase": None}
 
-        yest_val  = _safe_float(row[4])   # 前日餘額(仟元)
-        today_val = _safe_float(row[5])   # 今日餘額(仟元)
-        if today_val is None:
-            print(f"[TWSE margin] non-numeric today value: {row}")
-            return {"balance": None, "increase": None}
 
-        increase = (today_val - yest_val) if yest_val is not None else 0
-        result = {
-            "balance":  round(today_val / 100000, 2),   # 仟元 → 億
-            "increase": round(increase  / 100000, 2),
-        }
-        # Only cache if the response date matches today (TWSE may serve yesterday's data before market close)
-        resp_date_raw = resp_json.get("date", "")  # e.g. "20260505"
-        resp_date_str = f"{resp_date_raw[:4]}-{resp_date_raw[4:6]}-{resp_date_raw[6:8]}" if len(resp_date_raw) == 8 else ""
-        if resp_date_str == today_str:
-            _twse_margin_cache["date"] = today_str
-            _twse_margin_cache["data"] = result
-            print(f"[TWSE margin] cached for {today_str}")
-        else:
-            print(f"[TWSE margin] response date {resp_date_str} ≠ today {today_str}, not caching")
-        return result
-    except Exception as e:
-        print(f"[TWSE margin] error: {type(e).__name__}: {e}")
-    return {"balance": None, "increase": None}
-
-_tpex_margin_cache = {"date": "", "data": None}   # daily
+_tpex_margin_cache = {"date": "", "data": None}   # kept for compat (unused below)
 
 def fetch_tpex_margin(force=False):
     """
@@ -141,62 +149,62 @@ def fetch_tpex_margin(force=False):
     """
     import json as _json
     today_str = _tw_today()
-    if not force and _tpex_margin_cache["date"] == today_str and _tpex_margin_cache["data"]:
-        return _tpex_margin_cache["data"]
-    try:
-        url = ("https://www.tpex.org.tw/web/stock/margin_trading/margin_balance"
-               "/margin_bal_result.php?l=zh-tw&o=json")
-        r = requests.get(url, headers=HEADERS, verify=False, timeout=15)
-        r.raise_for_status()
+    c = _tpex_margin_cache_v2
+    if not force and c["date"] == today_str and c["data"]:
+        return c["data"]
+    if not force and c["fail_ts"] and time.time() - c["fail_ts"] < _MARGIN_COOLDOWN:
+        return c["last_good"] or {"balance": None, "increase": None}
+
+    url = ("https://www.tpex.org.tw/web/stock/margin_trading/margin_balance"
+           "/margin_bal_result.php?l=zh-tw&o=json")
+    last_err = None
+    for attempt in range(_MARGIN_RETRIES):
         try:
-            raw = r.content.decode("cp950", errors="replace")
-        except Exception:
-            raw = r.text
-        data = _json.loads(raw)
-        tables = data.get("tables", [])
-        if not tables:
-            print("[TPEX margin] empty tables — market closed or pre-data")
-            return {"balance": None, "increase": None}
+            r = requests.get(url, headers=HEADERS, verify=False, timeout=15)
+            r.raise_for_status()
+            # TPEX may return cp950; try that first then fall back to utf-8
+            for enc in ("cp950", "utf-8", "big5"):
+                try:
+                    raw = r.content.decode(enc, errors="strict")
+                    break
+                except Exception:
+                    raw = r.text
+            data = _json.loads(raw)
+            tables = data.get("tables", [])
+            if not tables:
+                raise ValueError("empty tables")
+            summary = tables[0].get("summary", [])
+            if len(summary) < 2:
+                raise ValueError(f"summary rows={len(summary)}")
+            row = summary[1]
+            if len(row) < 7:
+                raise ValueError(f"short summary row: {row}")
+            today_val = _safe_float(row[6])
+            yest_val  = _safe_float(row[2])
+            if today_val is None:
+                raise ValueError(f"non-numeric: {row}")
+            increase = (today_val - yest_val) if yest_val is not None else 0
+            result = {
+                "balance":  round(today_val / 100000, 2),
+                "increase": round(increase  / 100000, 2),
+            }
+            resp_raw  = data.get("date", "")
+            resp_date = f"{resp_raw[:4]}-{resp_raw[4:6]}-{resp_raw[6:8]}" if len(resp_raw) == 8 else ""
+            result["stale"] = (resp_date != today_str) if resp_date else False
+            c["date"]      = today_str if not result["stale"] else resp_date
+            c["data"]      = result if not result["stale"] else None
+            c["last_good"] = result
+            c["fail_ts"]   = 0.0
+            print(f"[TPEX margin] ok (date={resp_date}, stale={result['stale']})")
+            return result
+        except Exception as e:
+            last_err = e
+            if attempt < _MARGIN_RETRIES - 1:
+                time.sleep(1)
 
-        summary = tables[0].get("summary", [])
-        if not summary:
-            print(f"[TPEX margin] no summary in table; keys={list(tables[0].keys())}")
-            return {"balance": None, "increase": None}
-
-        if len(summary) < 2:
-            print(f"[TPEX margin] only {len(summary)} summary rows, expected 2")
-            return {"balance": None, "increase": None}
-
-        row = summary[1]
-        if len(row) < 7:
-            print(f"[TPEX margin] short summary row: {row}")
-            return {"balance": None, "increase": None}
-
-        today_val = _safe_float(row[6])   # 今日餘額(仟元)
-        yest_val  = _safe_float(row[2])   # 前日餘額(仟元)
-        if today_val is None:
-            print(f"[TPEX margin] non-numeric today value in row: {row}")
-            return {"balance": None, "increase": None}
-
-        increase = (today_val - yest_val) if yest_val is not None else 0
-        result = {
-            "balance":  round(today_val / 100000, 2),   # 仟元 → 億
-            "increase": round(increase  / 100000, 2),
-        }
-        # Only cache if response date matches today
-        resp_date_raw = data.get("date", "")  # e.g. "20260505"
-        resp_date_str = f"{resp_date_raw[:4]}-{resp_date_raw[4:6]}-{resp_date_raw[6:8]}" if len(resp_date_raw) == 8 else ""
-        if resp_date_str == today_str:
-            _tpex_margin_cache["date"] = today_str
-            _tpex_margin_cache["data"] = result
-            print(f"[TPEX margin] cached for {today_str}")
-        else:
-            print(f"[TPEX margin] response date {resp_date_str} ≠ today {today_str}, not caching")
-        return result
-    except Exception as e:
-        print(f"[TPEX margin] error: {type(e).__name__}: {e}")
-
-    return {"balance": None, "increase": None}
+    print(f"[TPEX margin] all {_MARGIN_RETRIES} attempts failed: {last_err}")
+    c["fail_ts"] = time.time()
+    return c["last_good"] or {"balance": None, "increase": None}
 
 def fetch_yahoo_future(symbol_encoded):
     """Fetch futures from Yahoo Finance Taiwan."""
