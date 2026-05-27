@@ -3695,7 +3695,7 @@ function _renderRankingData(data) {
 
   const td   = data.trade_date || '—';
   const ts   = data.ts ? new Date(data.ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '—';
-  if (subEl) subEl.textContent = `資料日期 ${td}　抓取時間 ${ts}`;
+  if (subEl) subEl.textContent = `資料日期 ${td}　${ts}`;
 
   function colHeader() {
     return `<div style="display:grid;grid-template-columns:22px 1fr 38px 50px 86px 24px;gap:4px;
@@ -3757,19 +3757,19 @@ function _renderRankingData(data) {
   const twseChanges = buildChanges(data.twse_changes, '🏛️ 上市異動');
   const tpexChanges = buildChanges(data.tpex_changes, '🏪 上櫃異動');
   const changesHtml = (twseChanges || tpexChanges) ? `
-    <div style="margin-top:20px;padding:12px 14px;border-radius:10px;
+    <div style="margin-bottom:14px;padding:10px 14px;border-radius:10px;
       background:var(--surface-1);border:1px solid var(--border)">
-      <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:12px;
-        letter-spacing:.04em">📋 異動紀錄　<span style="font-weight:400;font-size:11px">vs 前一交易日</span></div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;
+        letter-spacing:.04em">📋 異動紀錄　<span style="font-weight:400">vs 前一交易日</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
         ${twseChanges || '<div></div>'}${tpexChanges || '<div></div>'}
       </div>
     </div>` : '';
 
   body.innerHTML = `
+    ${changesHtml}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
       <div>${hdr('🏛️','上市 TWSE')}${buildList(data.twse)}</div>
       <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
-    </div>
-    ${changesHtml}`;
+    </div>`;
 }
