@@ -3021,13 +3021,17 @@ def get_turnover_ranking():
 
     today_str = trade_date or datetime.now().strftime("%Y%m%d")
     history = _load_ranking_history()
-    twse_map = {item["code"]: i + 1 for i, item in enumerate(twse)}
-    tpex_map = {item["code"]: i + 1 for i, item in enumerate(tpex)}
+    twse_map   = {item["code"]: i + 1    for i, item in enumerate(twse)}
+    tpex_map   = {item["code"]: i + 1    for i, item in enumerate(tpex)}
+    twse_names = {item["code"]: item["name"] for item in twse}
+    tpex_names = {item["code"]: item["name"] for item in tpex}
 
+    entry = {"date": today_str, "twse": twse_map, "tpex": tpex_map,
+             "twse_names": twse_names, "tpex_names": tpex_names}
     if history and history[-1]["date"] == today_str:
-        history[-1] = {"date": today_str, "twse": twse_map, "tpex": tpex_map}
+        history[-1] = entry
     else:
-        history.append({"date": today_str, "twse": twse_map, "tpex": tpex_map})
+        history.append(entry)
     history = history[-90:]
     _save_ranking_history(history)
     _gist_push_ranking_history()
@@ -3036,9 +3040,30 @@ def get_turnover_ranking():
     _enrich_ranking_stats(twse, "twse", history, today_idx)
     _enrich_ranking_stats(tpex, "tpex", history, today_idx)
 
+    # Added / removed vs previous trading day
+    prev = history[today_idx - 1] if today_idx > 0 else None
+    def _changes(today_map, today_names_map, mkt):
+        if not prev:
+            return {"added": [], "removed": []}
+        prev_map   = prev.get(mkt, {})
+        prev_names = prev.get(f"{mkt}_names", {})
+        added = sorted(
+            [{"code": c, "name": today_names_map.get(c, c), "rank": r}
+             for c, r in today_map.items() if c not in prev_map],
+            key=lambda x: x["rank"])
+        removed = sorted(
+            [{"code": c, "name": prev_names.get(c, c), "prev_rank": r}
+             for c, r in prev_map.items() if c not in today_map],
+            key=lambda x: x["prev_rank"])
+        return {"added": added, "removed": removed}
+
     display_date = (f"{today_str[:4]}/{today_str[4:6]}/{today_str[6:]}"
                     if len(today_str) == 8 else "")
-    _turnover_cache = {"twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date}
+    _turnover_cache = {
+        "twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date,
+        "twse_changes": _changes(twse_map, twse_names, "twse"),
+        "tpex_changes": _changes(tpex_map, tpex_names, "tpex"),
+    }
     _turnover_cache_ts = now
     return _turnover_cache
 
@@ -3053,11 +3078,16 @@ def seed_ranking_history(date: str):
         return {"error": "date must be YYYYMMDD"}
     if not _turnover_cache:
         return {"error": "no cached ranking yet; call GET /api/turnover-ranking first"}
-    twse_map = {item["code"]: i + 1 for i, item in enumerate(_turnover_cache.get("twse", []))}
-    tpex_map = {item["code"]: i + 1 for i, item in enumerate(_turnover_cache.get("tpex", []))}
+    twse_items = _turnover_cache.get("twse", [])
+    tpex_items = _turnover_cache.get("tpex", [])
+    twse_map   = {item["code"]: i + 1    for i, item in enumerate(twse_items)}
+    tpex_map   = {item["code"]: i + 1    for i, item in enumerate(tpex_items)}
+    twse_names = {item["code"]: item["name"] for item in twse_items}
+    tpex_names = {item["code"]: item["name"] for item in tpex_items}
     history = _load_ranking_history()
     history = [h for h in history if h["date"] != date]
-    history.append({"date": date, "twse": twse_map, "tpex": tpex_map})
+    history.append({"date": date, "twse": twse_map, "tpex": tpex_map,
+                    "twse_names": twse_names, "tpex_names": tpex_names})
     history.sort(key=lambda x: x["date"])
     history = history[-90:]
     _save_ranking_history(history)

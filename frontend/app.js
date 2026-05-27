@@ -3722,9 +3722,54 @@ function _renderRankingData(data) {
   const hdr = (ico, label) => `<div style="font-size:11px;font-weight:700;color:var(--text-muted);
     padding:0 4px 6px;border-bottom:2px solid var(--border);margin-bottom:6px">${ico} ${label}</div>`;
 
+  function buildChanges(changes, label) {
+    if (!changes) return '';
+    const { added = [], removed = [] } = changes;
+    if (!added.length && !removed.length) return '';
+
+    const pill = (text, bg, border, extra = '') =>
+      `<span style="display:inline-flex;align-items:center;gap:3px;
+        padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600;
+        background:${bg};border:1px solid ${border};white-space:nowrap;${extra}">${text}</span>`;
+
+    const addedPills = added.map(x =>
+      pill(`<span style="opacity:.7">${x.code}</span> ${x.name} <span style="opacity:.6">#${x.rank}</span>`,
+           'rgba(16,185,129,.12)', 'rgba(16,185,129,.4)')
+    ).join(' ');
+
+    const removedPills = removed.map(x =>
+      pill(`<span style="opacity:.7">${x.code}</span> ${x.name} <span style="opacity:.6">#${x.prev_rank}</span>`,
+           'rgba(244,63,94,.10)', 'rgba(244,63,94,.35)', 'text-decoration:line-through;')
+    ).join(' ');
+
+    const rows = [];
+    if (added.length)   rows.push(`<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:700;color:#10b981;flex-shrink:0;padding-top:2px">▲ 新增 ${added.length}</span>${addedPills}</div>`);
+    if (removed.length) rows.push(`<div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:700;color:#f43f5e;flex-shrink:0;padding-top:2px">▼ 移除 ${removed.length}</span>${removedPills}</div>`);
+
+    return `<div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);padding:0 4px 6px;border-bottom:2px solid var(--border);margin-bottom:8px">${label}</div>
+      <div style="display:flex;flex-direction:column;gap:6px">${rows.join('')}</div>
+    </div>`;
+  }
+
+  const twseChanges = buildChanges(data.twse_changes, '🏛️ 上市異動');
+  const tpexChanges = buildChanges(data.tpex_changes, '🏪 上櫃異動');
+  const changesHtml = (twseChanges || tpexChanges) ? `
+    <div style="margin-top:20px;padding:12px 14px;border-radius:10px;
+      background:var(--surface-1);border:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:12px;
+        letter-spacing:.04em">📋 異動紀錄　<span style="font-weight:400;font-size:11px">vs 前一交易日</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        ${twseChanges || '<div></div>'}${tpexChanges || '<div></div>'}
+      </div>
+    </div>` : '';
+
   body.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
       <div>${hdr('🏛️','上市 TWSE')}${buildList(data.twse)}</div>
       <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
-    </div>`;
+    </div>
+    ${changesHtml}`;
 }
