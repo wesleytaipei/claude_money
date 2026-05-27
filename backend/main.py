@@ -2850,24 +2850,36 @@ def _build_adl_history(lookback_days: int = 120) -> list:
     return sorted_data
 
 def _adl_try_append_today(history: list) -> list:
-    """If today's data missing and market closed, fetch and append."""
-    from datetime import date as _date
-    today_str = _date.today().strftime("%Y%m%d")
-    if history and history[-1]["date"] >= today_str:
+    """Fetch any missing weekdays since last history entry up to today (post-market)."""
+    from datetime import date as _date, timedelta as _td
+    today = _date.today()
+    today_str = today.strftime("%Y%m%d")
+    last_str  = history[-1]["date"] if history else ""
+    if last_str >= today_str:
         return history
     if _is_tw_market_open():
         return history
-    today_data = _fetch_adl_day(today_str)
-    if not today_data:
-        return history
-    history = [x for x in history if x["date"] != today_str]
-    history.append(today_data)
-    history.sort(key=lambda x: x["date"])
-    cum = 0
-    for item in history:
-        cum += item["raise"] - item["fall"]
-        item["adl"] = cum
-    _enrich_with_taiex(history)
+    # Collect all weekdays from day-after-last up to today
+    start = _date.fromisoformat(f"{last_str[:4]}-{last_str[4:6]}-{last_str[6:]}") + _td(days=1) if last_str else today
+    missing = [
+        (start + _td(days=i)).strftime("%Y%m%d")
+        for i in range((today - start).days + 1)
+        if (start + _td(days=i)).weekday() < 5
+    ]
+    fetched = False
+    for date_str in missing:
+        data = _fetch_adl_day(date_str)
+        if data:
+            history = [x for x in history if x["date"] != date_str]
+            history.append(data)
+            fetched = True
+    if fetched:
+        history.sort(key=lambda x: x["date"])
+        cum = 0
+        for item in history:
+            cum += item["raise"] - item["fall"]
+            item["adl"] = cum
+        _enrich_with_taiex(history)
     return history
 
 @app.get("/api/advance-decline")
