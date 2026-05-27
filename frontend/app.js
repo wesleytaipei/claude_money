@@ -3689,12 +3689,13 @@ function _rankRow(item, rank) {
 }
 
 function _renderRankingData(data) {
-  const body = document.getElementById('ranking-body');
+  const body  = document.getElementById('ranking-body');
+  const subEl = document.getElementById('ranking-sub');
   if (!body) return;
 
   const td = data.trade_date || '—';
   const ts = data.ts ? new Date(data.ts * 1000).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '—';
-  const dateBar = `<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">資料日期 ${td}　${ts}</div>`;
+  if (subEl) subEl.textContent = `資料日期 ${td}　${ts}`;
 
   function colHeader() {
     return `<div style="display:grid;grid-template-columns:22px 1fr 38px 50px 86px 24px;gap:4px;
@@ -3767,7 +3768,6 @@ function _renderRankingData(data) {
 
   body.innerHTML = `
     ${changesHtml}
-    ${dateBar}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
       <div>${hdr('🏛️','上市 TWSE')}${buildList(data.twse)}</div>
       <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
