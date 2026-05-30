@@ -3031,8 +3031,12 @@ def get_turnover_ranking():
     twse, trade_date = _fetch_twse_turnover_ranking(25)
     tpex = _fetch_tpex_turnover_ranking(25)
 
-    # If both fetches failed, return empty without touching history
+    # If both fetches failed, preserve existing valid cache rather than wiping it
     if not twse and not tpex:
+        if _turnover_cache and _turnover_cache.get("twse"):
+            # Retry in 5 min instead of full TTL
+            _turnover_cache_ts = now - (_TURNOVER_CACHE_TTL - 300)
+            return _turnover_cache
         _turnover_cache = {"twse": [], "tpex": [], "ts": int(now), "trade_date": "",
                            "twse_changes": {"added": [], "removed": []},
                            "tpex_changes": {"added": [], "removed": []}}
