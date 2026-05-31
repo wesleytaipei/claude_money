@@ -2737,10 +2737,13 @@ async function renderImportantInfo(force = false) {
 
       const changeVal = r.colorFn ? r.colorFn(r.metric) : (r.changeKey ? r.metric[r.changeKey] : null);
       const subColor = _importantChangeColor(changeVal);
+      const staleBadge = r.metric && r.metric.stale
+        ? ` <span title="非當日，雲端中繼的最後良好值" style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;vertical-align:middle">舊</span>`
+        : '';
 
       html += `<tr>
         <td style="font-weight:600">${r.name}</td>
-        <td style="font-size:15px; font-weight:600; font-family:'JetBrains Mono',monospace">${v1}</td>
+        <td style="font-size:15px; font-weight:600; font-family:'JetBrains Mono',monospace">${v1}${staleBadge}</td>
         <td style="color:${subColor}; font-weight:500; font-family:'JetBrains Mono',monospace">${v2}</td>
       </tr>`;
     }
@@ -3769,7 +3772,7 @@ function _renderRankingData(data) {
   body.innerHTML = `
     ${changesHtml}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
-      <div>${hdr('🏛️','上市 TWSE')}${buildList(data.twse)}</div>
+      <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? ' <span title="非當日，雲端中繼的最後良好值" style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;vertical-align:middle">舊</span>' : ''))}${buildList(data.twse)}</div>
       <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
     </div>`;
 }

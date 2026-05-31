@@ -1271,6 +1271,61 @@ def _gist_push_file(path: Path):
     _threading.Thread(target=_push, daemon=True).start()
 
 
+# ── TWSE → Railway last-good relay ───────────────────────────────────────────
+# TWSE's WAF blocks Railway's datacenter IP ("FOR SECURITY REASONS"), so every
+# twse.com.tw fetch fails there while TPEX (上櫃) works fine. The Taiwan/local
+# instance CAN reach TWSE, so it stamps each freshly-fetched 上市 figure into a
+# small last-good file and pushes it to the Gist; Railway serves that copy when
+# its own fetch is blocked. Invariant: only the non-Railway env writes/pushes —
+# Railway never clobbers good data with its own empties.
+
+def _save_lastgood(name: str, payload: dict) -> None:
+    """Write a stamped last-good cache file and push to Gist, but only when the
+    value actually changed (so we don't re-push on every cache hit)."""
+    if IS_RAILWAY:
+        return  # Railway is read-only for relay files
+    path = DATA_DIR / name
+    core = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+    prev = load_json(path, {})
+    prev_core = json.dumps({k: v for k, v in prev.items() if k != _TS_KEY},
+                           ensure_ascii=False, sort_keys=True)
+    if core == prev_core:
+        return  # unchanged
+    stamped = dict(payload)
+    stamped[_TS_KEY] = _now_iso()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(stamped, ensure_ascii=False, indent=2), encoding="utf-8")
+    _gist_push_file(path)
+    logger.info(f"[relay] saved + pushed last-good {name}")
+
+
+def _gist_pull_one(name: str) -> None:
+    """Best-effort refresh a single relay file from Gist (newer-wins by _TS_KEY).
+    Railway only syncs the whole Gist at startup, so we pull on demand here."""
+    if not GIST_ENABLED:
+        return
+    try:
+        content = _pull_gist_all().get(name)
+        if not content:
+            return
+        path = DATA_DIR / name
+        gist_ts  = _parse_ts(json.loads(content).get(_TS_KEY))
+        local_ts = _parse_ts(load_json(path, {}).get(_TS_KEY))
+        if gist_ts >= local_ts:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"[relay] pull_one {name} failed: {e}")
+
+
+def _load_lastgood(name: str) -> dict | None:
+    """Load a last-good file; on Railway pull the newest copy from Gist first."""
+    if IS_RAILWAY:
+        _gist_pull_one(name)
+    data = load_json(DATA_DIR / name, None)
+    return data if isinstance(data, dict) else None
+
+
 def _gist_push_chip_cache():
     _gist_push_file(DATA_DIR / "chip_cache.json")
 
@@ -2479,6 +2534,28 @@ def get_important_info(force: bool = False):
         data = scrape_important_info(force)
         if ratio_history_pop_dirty():
             _gist_push_file(DATA_DIR / "margin_ratio_history.json")
+
+        # ── 上市 margin relay: TWSE is IP-blocked on Railway, so persist the
+        #    fresh value locally and restore last-good on Railway. ──
+        mb = data.get("margin_balance_tse") or {}
+        if mb.get("balance") is not None:
+            _save_lastgood("margin_tse_lastgood.json",
+                           {"balance": mb.get("balance"), "increase": mb.get("increase")})
+        elif IS_RAILWAY:
+            lg = _load_lastgood("margin_tse_lastgood.json")
+            if lg and lg.get("balance") is not None:
+                data["margin_balance_tse"] = {"balance": lg["balance"],
+                                              "increase": lg.get("increase"), "stale": True}
+
+        tr = data.get("taiex_margin_ratio") or {}
+        if tr.get("current") is not None:
+            _save_lastgood("margin_ratio_tse_lastgood.json",
+                           {"current": tr.get("current"), "prev": tr.get("prev")})
+        elif IS_RAILWAY:
+            lg = _load_lastgood("margin_ratio_tse_lastgood.json")
+            if lg and lg.get("current") is not None:
+                data["taiex_margin_ratio"] = {"current": lg["current"],
+                                              "prev": lg.get("prev"), "stale": True}
         return data
     except Exception as e:
         logger.error(f"[important-info] failed: {e}")
@@ -3031,6 +3108,18 @@ def get_turnover_ranking():
     twse, trade_date = _fetch_twse_turnover_ranking(25)
     tpex = _fetch_tpex_turnover_ranking(25)
 
+    # ── TWSE relay: persist fresh (local) / restore last-good (Railway, blocked) ──
+    twse_stale = False
+    if twse:
+        _save_lastgood("turnover_twse_lastgood.json",
+                       {"twse": twse, "trade_date": trade_date})
+    else:
+        lg = _load_lastgood("turnover_twse_lastgood.json")
+        if lg and lg.get("twse"):
+            twse = lg["twse"]
+            trade_date = trade_date or lg.get("trade_date", "")
+            twse_stale = True
+
     # If both fetches failed, preserve existing valid cache rather than wiping it
     if not twse and not tpex:
         if _turnover_cache and _turnover_cache.get("twse"):
@@ -3101,6 +3190,7 @@ def get_turnover_ranking():
                     if len(today_str) == 8 else "")
     _turnover_cache = {
         "twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date,
+        "twse_stale": twse_stale,
         "twse_changes": _changes(twse_map, twse_names, "twse"),
         "tpex_changes": _changes(tpex_map, tpex_names, "tpex"),
     }
