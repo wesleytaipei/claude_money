@@ -1147,6 +1147,14 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   align-items: stretch;
 }
 
+/* 成交值排行 — 上市/上櫃 side by side on desktop, stacked on phones */
+.ranking-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
 /* ══ Mobile table readability (≤ 900px) ══════════════════════════════════════
    On phones the data tables are wider than the screen. Instead of clipping the
    right-hand columns off-screen, we: (1) signal that a table scrolls sideways,
@@ -1201,6 +1209,10 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   /* ETF 重點關注: stack the 3 sections vertically so each table is full-width
      and readable instead of three crammed ~120px columns.                     */
   .etf-focus-grid { grid-template-columns: 1fr; }
+
+  /* 成交值排行: stack 上市/上櫃 so each list gets full width (names + all
+     columns visible) instead of two crammed half-width columns.               */
+  .ranking-2col { grid-template-columns: 1fr; }
 }
 
 /* Narrow portrait only (≤ 430px) */

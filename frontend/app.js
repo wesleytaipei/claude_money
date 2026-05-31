@@ -3765,14 +3765,14 @@ function _renderRankingData(data) {
       background:var(--surface-1);border:1px solid var(--border)">
       <div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:10px;
         letter-spacing:.04em">📋 異動紀錄　<span style="font-weight:400">vs 前一交易日</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="ranking-2col">
         ${twseChanges || '<div></div>'}${tpexChanges || '<div></div>'}
       </div>
     </div>` : '';
 
   body.innerHTML = `
     ${changesHtml}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+    <div class="ranking-2col">
       <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? _staleBadge : ''))}${buildList(data.twse)}</div>
       <div>${hdr('🏪', '上櫃 TPEX' + (data.tpex_stale ? _staleBadge : ''))}${buildList(data.tpex)}</div>
     </div>`;
