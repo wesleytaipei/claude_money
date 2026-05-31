@@ -143,6 +143,23 @@ def _gist_headers():
         "Accept": "application/vnd.github.v3+json",
     }
 
+def _gist_file_content(name: str, meta: dict) -> str:
+    """Return a Gist file's full content. GitHub truncates inline `content` to
+    empty once the gist's cumulative size is large (our ETF history files push
+    past that), so fall back to the file's raw_url to get the real body."""
+    content = meta.get("content") or ""
+    if (not content or meta.get("truncated")) and meta.get("raw_url"):
+        try:
+            rr = http_requests.get(meta["raw_url"], headers=_gist_headers(), timeout=20)
+            if rr.status_code == 200:
+                content = rr.text
+            else:
+                logger.error(f"[Gist] raw fetch {name} failed: {rr.status_code}")
+        except Exception as e:
+            logger.error(f"[Gist] raw fetch {name} exception: {e}")
+    return content
+
+
 def _pull_gist_all() -> dict[str, str]:
     """Fetch all files from Gist. Returns {filename: content} or {} on failure."""
     if not GIST_ENABLED:
@@ -153,11 +170,12 @@ def _pull_gist_all() -> dict[str, str]:
             headers=_gist_headers(), timeout=10
         )
         if r.status_code == 200:
-            return {
-                name: meta.get("content", "")
-                for name, meta in r.json().get("files", {}).items()
-                if meta.get("content")
-            }
+            out = {}
+            for name, meta in r.json().get("files", {}).items():
+                content = _gist_file_content(name, meta)
+                if content:
+                    out[name] = content
+            return out
         logger.error(f"[Gist] pull failed: {r.status_code}")
     except Exception as e:
         logger.error(f"[Gist] pull exception: {e}")
@@ -1301,11 +1319,19 @@ def _save_lastgood(name: str, payload: dict) -> None:
 
 def _gist_pull_one(name: str) -> None:
     """Best-effort refresh a single relay file from Gist (newer-wins by _TS_KEY).
-    Railway only syncs the whole Gist at startup, so we pull on demand here."""
+    Railway only syncs the whole Gist at startup, so we pull on demand here.
+    Fetches just this one file (via raw_url) to stay cheap."""
     if not GIST_ENABLED:
         return
     try:
-        content = _pull_gist_all().get(name)
+        r = http_requests.get(f"https://api.github.com/gists/{GIST_ID}",
+                              headers=_gist_headers(), timeout=10)
+        if r.status_code != 200:
+            return
+        meta = r.json().get("files", {}).get(name)
+        if not meta:
+            return
+        content = _gist_file_content(name, meta)
         if not content:
             return
         path = DATA_DIR / name
