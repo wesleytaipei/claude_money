@@ -490,6 +490,36 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
     # _tw_mis_cache.clear() 
     # v2: ensuring correct fallback for missing percentages (e.g. 6826)
     by_sym = _tw_table.get("by_symbol", {})
+
+    def _tw_fallback(sym: str) -> tuple[str, dict]:
+        """Yahoo scrape → yfinance. Works from cloud IPs (e.g. Railway) where the
+        TWSE MIS endpoint is IP-blocked, so it's our only live TW price source there."""
+        entry = by_sym.get(sym, {})
+        market = entry.get("market", "tse")
+        # 1. Yahoo scrape (most accurate change%)
+        yahoo = _fetch_yahoo_tw_scrape(sym, market)
+        if yahoo.get("price"):
+            return sym, {
+                "price":      yahoo["price"],
+                "change_pct": yahoo["change_pct"],
+                "name":       yahoo.get("name", entry.get("name", "")),
+                "ts":         now,
+            }
+        # 2. yfinance — try both suffixes (handles 00988A etc.)
+        suffixes = [".TWO", ".TW"] if market == "otc" else [".TW", ".TWO"]
+        for suffix in suffixes:
+            try:
+                fi = yf.Ticker(f"{sym}{suffix}").fast_info
+                price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
+                if price:
+                    prev = float(getattr(fi, "previous_close", None) or 0)
+                    change_pct = round((price - prev) / prev * 100, 2) if prev > 0 else None
+                    return sym, {"price": price, "change_pct": change_pct, "name": entry.get("name", ""), "ts": now}
+            except Exception:
+                continue
+        # Final miss
+        return sym, {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
+
     parts = []
     for sym in to_fetch:
         entry = by_sym.get(sym)
@@ -506,7 +536,6 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
 
     try:
         r = http_requests.get(url, headers=headers, timeout=10, verify=_TW_VERIFY)
-        found: set[str] = set()
         batch_entries: dict = {}
         for item in r.json().get("msgArray", []):
             code = (item.get("c") or "").strip().upper()
@@ -521,57 +550,22 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
             }
             batch_entries[code] = entry
             result[code] = entry
-            found.add(code)
         with _tw_mis_lock:
             _tw_mis_cache.update(batch_entries)
-
-        # Fallback only when price is completely missing (not found or None)
-        # change_pct=None is acceptable — _mis_parse_price now covers most cases via bid/limit
-        need_fallback = [
-            sym for sym in to_fetch
-            if sym not in found or result[sym].get("price") is None
-        ]
-
-        def _tw_fallback(sym: str) -> tuple[str, dict]:
-            entry = by_sym.get(sym, {})
-            market = entry.get("market", "tse")
-            # 1. Yahoo scrape (most accurate change%)
-            yahoo = _fetch_yahoo_tw_scrape(sym, market)
-            if yahoo.get("price"):
-                return sym, {
-                    "price":      yahoo["price"],
-                    "change_pct": yahoo["change_pct"],
-                    "name":       yahoo.get("name", entry.get("name", "")),
-                    "ts":         now,
-                }
-            # 2. yfinance — try both suffixes (handles 00988A etc.)
-            suffixes = [".TWO", ".TW"] if market == "otc" else [".TW", ".TWO"]
-            for suffix in suffixes:
-                try:
-                    fi = yf.Ticker(f"{sym}{suffix}").fast_info
-                    price = round(float(fi.last_price), 2) if getattr(fi, "last_price", None) else None
-                    if price:
-                        prev = float(getattr(fi, "previous_close", None) or 0)
-                        change_pct = round((price - prev) / prev * 100, 2) if prev > 0 else None
-                        return sym, {"price": price, "change_pct": change_pct, "name": entry.get("name", ""), "ts": now}
-                except Exception:
-                    continue
-            # Final miss
-            return sym, {"price": None, "change_pct": None, "name": entry.get("name", ""), "ts": now}
-
-        if need_fallback:
-            with ThreadPoolExecutor(max_workers=min(8, len(need_fallback))) as ex:
-                for fut in as_completed([ex.submit(_tw_fallback, s) for s in need_fallback]):
-                    sym, hit = fut.result()
-                    with _tw_mis_lock:
-                        _tw_mis_cache[sym] = hit
-                    result[sym] = hit
-
     except Exception as e:
         logger.error(f"[tw-prices] MIS fetch failed: {e}")
-        for sym in to_fetch:
-            if sym not in result:
-                result[sym] = {"price": None, "change_pct": None, "name": "", "ts": now}
+
+    # Fallback (Yahoo → yfinance) for anything MIS couldn't provide. Crucially this
+    # also runs when MIS is entirely blocked (Railway IP) — the except above leaves
+    # everything unfilled, and we recover here instead of returning all-null.
+    need_fallback = [s for s in to_fetch if result.get(s, {}).get("price") is None]
+    if need_fallback:
+        with ThreadPoolExecutor(max_workers=min(8, len(need_fallback))) as ex:
+            for fut in as_completed([ex.submit(_tw_fallback, s) for s in need_fallback]):
+                sym, hit = fut.result()
+                with _tw_mis_lock:
+                    _tw_mis_cache[sym] = hit
+                result[sym] = hit
 
     return result
 

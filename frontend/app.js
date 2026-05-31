@@ -3729,7 +3729,13 @@ function _renderRankingData(data) {
   function buildChanges(changes, label) {
     if (!changes) return '';
     const { added = [], removed = [] } = changes;
-    if (!added.length && !removed.length) return '';
+    // No membership change today — show an explicit note so the column doesn't
+    // look like it's missing (e.g. OTC top-25 unchanged between trading days).
+    if (!added.length && !removed.length)
+      return `<div>
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);padding:0 4px 6px;border-bottom:2px solid var(--border);margin-bottom:8px">${label}</div>
+        <div style="font-size:12px;color:var(--text-muted);padding:2px 4px">本日無進出（前 25 名不變）</div>
+      </div>`;
 
     const pill = (text, bg, border, extra = '') =>
       `<span style="display:inline-flex;align-items:center;gap:3px;
