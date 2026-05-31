@@ -3605,6 +3605,7 @@ async function _etfRenderFocusView() {
 
 // ── 成交值排行 ────────────────────────────────────────────────────────────────
 let _rankingCache = { data: null, ts: 0 };
+const _staleBadge = ' <span title="非當日，雲端中繼的最後良好值" style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;vertical-align:middle">舊</span>';
 
 async function renderRanking(force = false) {
   const body = document.getElementById('ranking-body');
@@ -3772,7 +3773,7 @@ function _renderRankingData(data) {
   body.innerHTML = `
     ${changesHtml}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
-      <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? ' <span title="非當日，雲端中繼的最後良好值" style="background:rgba(245,158,11,.2);color:#f59e0b;font-size:10px;font-weight:700;padding:0 4px;border-radius:3px;vertical-align:middle">舊</span>' : ''))}${buildList(data.twse)}</div>
-      <div>${hdr('🏪','上櫃 TPEX')}${buildList(data.tpex)}</div>
+      <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? _staleBadge : ''))}${buildList(data.twse)}</div>
+      <div>${hdr('🏪', '上櫃 TPEX' + (data.tpex_stale ? _staleBadge : ''))}${buildList(data.tpex)}</div>
     </div>`;
 }

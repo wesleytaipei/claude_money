@@ -1297,11 +1297,15 @@ def _gist_push_file(path: Path):
 # its own fetch is blocked. Invariant: only the non-Railway env writes/pushes —
 # Railway never clobbers good data with its own empties.
 
-def _save_lastgood(name: str, payload: dict) -> None:
+def _save_lastgood(name: str, payload: dict, allow_railway: bool = False) -> None:
     """Write a stamped last-good cache file and push to Gist, but only when the
-    value actually changed (so we don't re-push on every cache hit)."""
-    if IS_RAILWAY:
-        return  # Railway is read-only for relay files
+    value actually changed (so we don't re-push on every cache hit).
+
+    allow_railway: TWSE files must only be written by the Taiwan/local instance
+    (Railway only ever has stale relayed data). TPEX files may be written by any
+    env, since TPEX isn't IP-blocked — this backfills intermittent fetch misses."""
+    if IS_RAILWAY and not allow_railway:
+        return  # Railway is read-only for TWSE relay files
     path = DATA_DIR / name
     core = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     prev = load_json(path, {})
@@ -3146,6 +3150,16 @@ def get_turnover_ranking():
             trade_date = trade_date or lg.get("trade_date", "")
             twse_stale = True
 
+    # ── TPEX relay: backfills the occasional flaky 4MB fetch (any env may write) ──
+    tpex_stale = False
+    if tpex:
+        _save_lastgood("turnover_tpex_lastgood.json", {"tpex": tpex}, allow_railway=True)
+    else:
+        lg = _load_lastgood("turnover_tpex_lastgood.json")
+        if lg and lg.get("tpex"):
+            tpex = lg["tpex"]
+            tpex_stale = True
+
     # If both fetches failed, preserve existing valid cache rather than wiping it
     if not twse and not tpex:
         if _turnover_cache and _turnover_cache.get("twse"):
@@ -3216,11 +3230,13 @@ def get_turnover_ranking():
                     if len(today_str) == 8 else "")
     _turnover_cache = {
         "twse": twse, "tpex": tpex, "ts": int(now), "trade_date": display_date,
-        "twse_stale": twse_stale,
+        "twse_stale": twse_stale, "tpex_stale": tpex_stale,
         "twse_changes": _changes(twse_map, twse_names, "twse"),
         "tpex_changes": _changes(tpex_map, tpex_names, "tpex"),
     }
-    _turnover_cache_ts = now
+    # If TPEX had to be backfilled from last-good, retry the live fetch in ~5 min
+    # instead of holding the stale copy for the full TTL.
+    _turnover_cache_ts = now - (_TURNOVER_CACHE_TTL - 300) if tpex_stale else now
     return _turnover_cache
 
 
