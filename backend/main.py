@@ -1173,7 +1173,9 @@ def _netdiag():
             r = http_requests.get(u, headers={"User-Agent": "Mozilla/5.0"},
                                   timeout=15, verify=False)
             out[k] = {"status": r.status_code, "ms": int((time.time()-t0)*1000),
-                      "bytes": len(r.content)}
+                      "bytes": len(r.content), "final_url": r.url,
+                      "ctype": r.headers.get("content-type", ""),
+                      "preview": r.text[:200]}
         except Exception as e:
             out[k] = {"err": f"{type(e).__name__}: {e}", "ms": int((time.time()-t0)*1000)}
     return out

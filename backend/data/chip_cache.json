@@ -64,19 +64,19 @@
     }
   },
   "2327": {
-    "fetch_date": "2026-05-23",
+    "fetch_date": "2026-05-30",
     "data": {
       "total": 2071465,
-      "current": 1528887,
-      "prev": 1523908,
-      "change": 4979,
-      "change_pct": 0.24,
-      "run_change": 32317,
-      "run_change_pct": 1.56,
+      "current": 1556702,
+      "prev": 1528887,
+      "change": 27815,
+      "change_pct": 1.34,
+      "run_change": 32794,
+      "run_change_pct": 1.58,
       "run_weeks": 3,
-      "current_date": "20260515",
-      "prev_date": "20260508",
-      "run_start_date": "20260430"
+      "current_date": "20260522",
+      "prev_date": "20260515",
+      "run_start_date": "20260508"
     }
   },
   "3715": {
@@ -640,18 +640,18 @@
     }
   },
   "4931": {
-    "fetch_date": "2026-05-23",
+    "fetch_date": "2026-05-30",
     "data": {
       "total": 65566,
-      "current": 20440,
-      "prev": 15974,
-      "change": 4466,
-      "change_pct": 6.81,
-      "run_change": 4466,
-      "run_change_pct": 6.81,
-      "run_weeks": 2,
-      "current_date": "20260515",
-      "prev_date": "20260508",
+      "current": 20651,
+      "prev": 20440,
+      "change": 211,
+      "change_pct": 0.32,
+      "run_change": 4677,
+      "run_change_pct": 7.13,
+      "run_weeks": 3,
+      "current_date": "20260522",
+      "prev_date": "20260515",
       "run_start_date": "20260508"
     }
   },
@@ -752,19 +752,19 @@
     }
   },
   "5425": {
-    "fetch_date": "2026-05-16",
+    "fetch_date": "2026-05-30",
     "data": {
       "total": 263485,
-      "current": 102991,
-      "prev": 100050,
-      "change": 2941,
-      "change_pct": 1.12,
-      "run_change": 9849,
-      "run_change_pct": 3.74,
-      "run_weeks": 3,
-      "current_date": "20260508",
-      "prev_date": "20260430",
-      "run_start_date": "20260424"
+      "current": 122310,
+      "prev": 101723,
+      "change": 20587,
+      "change_pct": 7.81,
+      "run_change": 20587,
+      "run_change_pct": 7.81,
+      "run_weeks": 2,
+      "current_date": "20260522",
+      "prev_date": "20260515",
+      "run_start_date": "20260515"
     }
   },
   "8096": {
@@ -777,6 +777,22 @@
       "change_pct": 3.81,
       "run_change": 5683,
       "run_change_pct": 3.81,
+      "run_weeks": 2,
+      "current_date": "20260522",
+      "prev_date": "20260515",
+      "run_start_date": "20260515"
+    }
+  },
+  "6223": {
+    "fetch_date": "2026-05-30",
+    "data": {
+      "total": 97981,
+      "current": 53621,
+      "prev": 52130,
+      "change": 1491,
+      "change_pct": 1.52,
+      "run_change": 1491,
+      "run_change_pct": 1.52,
       "run_weeks": 2,
       "current_date": "20260522",
       "prev_date": "20260515",

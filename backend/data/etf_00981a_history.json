@@ -19086,5 +19086,2972 @@
         "全數清倉": 1
       }
     }
+  },
+  "2026-05-27": {
+    "aum": 290447804921.0,
+    "holdings_raw": [
+      {
+        "symbol": "2330",
+        "name": "台積電",
+        "shares": 11657000,
+        "weight": 9.23
+      },
+      {
+        "symbol": "2383",
+        "name": "台光電",
+        "shares": 4723000,
+        "weight": 8.63
+      },
+      {
+        "symbol": "2454",
+        "name": "聯發科",
+        "shares": 4263000,
+        "weight": 6.81
+      },
+      {
+        "symbol": "2308",
+        "name": "台達電",
+        "shares": 6572000,
+        "weight": 5.7
+      },
+      {
+        "symbol": "2345",
+        "name": "智邦",
+        "shares": 6231000,
+        "weight": 5.62
+      },
+      {
+        "symbol": "3017",
+        "name": "奇鋐",
+        "shares": 5141000,
+        "weight": 4.78
+      },
+      {
+        "symbol": "6223",
+        "name": "旺矽",
+        "shares": 2169000,
+        "weight": 4.77
+      },
+      {
+        "symbol": "3037",
+        "name": "欣興",
+        "shares": 12466000,
+        "weight": 4.64
+      },
+      {
+        "symbol": "2327",
+        "name": "國巨*",
+        "shares": 18313000,
+        "weight": 4.42
+      },
+      {
+        "symbol": "6669",
+        "name": "緯穎",
+        "shares": 2344000,
+        "weight": 4.1
+      },
+      {
+        "symbol": "2368",
+        "name": "金像電",
+        "shares": 7769000,
+        "weight": 3.68
+      },
+      {
+        "symbol": "3711",
+        "name": "日月光投控",
+        "shares": 16640000,
+        "weight": 3.68
+      },
+      {
+        "symbol": "8046",
+        "name": "南電",
+        "shares": 11398000,
+        "weight": 3.55
+      },
+      {
+        "symbol": "2303",
+        "name": "聯電",
+        "shares": 71190000,
+        "weight": 3.52
+      },
+      {
+        "symbol": "3665",
+        "name": "貿聯-KY",
+        "shares": 4703848,
+        "weight": 3.43
+      },
+      {
+        "symbol": "3653",
+        "name": "健策",
+        "shares": 2267000,
+        "weight": 2.86
+      },
+      {
+        "symbol": "5274",
+        "name": "信驊",
+        "shares": 422000,
+        "weight": 2.65
+      },
+      {
+        "symbol": "6274",
+        "name": "台燿",
+        "shares": 4151000,
+        "weight": 2.33
+      },
+      {
+        "symbol": "6515",
+        "name": "穎崴",
+        "shares": 442000,
+        "weight": 1.49
+      },
+      {
+        "symbol": "6805",
+        "name": "富世達",
+        "shares": 1761000,
+        "weight": 1.05
+      },
+      {
+        "symbol": "8210",
+        "name": "勤誠",
+        "shares": 2167000,
+        "weight": 1.04
+      },
+      {
+        "symbol": "6510",
+        "name": "精測",
+        "shares": 930000,
+        "weight": 1.02
+      },
+      {
+        "symbol": "2449",
+        "name": "京元電子",
+        "shares": 8268000,
+        "weight": 0.9
+      },
+      {
+        "symbol": "3533",
+        "name": "嘉澤",
+        "shares": 852000,
+        "weight": 0.77
+      },
+      {
+        "symbol": "2404",
+        "name": "漢唐",
+        "shares": 1715000,
+        "weight": 0.73
+      },
+      {
+        "symbol": "6187",
+        "name": "萬潤",
+        "shares": 1334000,
+        "weight": 0.52
+      },
+      {
+        "symbol": "3264",
+        "name": "欣銓",
+        "shares": 6217000,
+        "weight": 0.49
+      },
+      {
+        "symbol": "5439",
+        "name": "高技",
+        "shares": 3528000,
+        "weight": 0.47
+      },
+      {
+        "symbol": "8996",
+        "name": "高力",
+        "shares": 1034000,
+        "weight": 0.43
+      },
+      {
+        "symbol": "3008",
+        "name": "大立光",
+        "shares": 329000,
+        "weight": 0.4
+      },
+      {
+        "symbol": "8358",
+        "name": "金居",
+        "shares": 1980000,
+        "weight": 0.38
+      },
+      {
+        "symbol": "8150",
+        "name": "南茂",
+        "shares": 11635000,
+        "weight": 0.38
+      },
+      {
+        "symbol": "4966",
+        "name": "譜瑞-KY",
+        "shares": 1036000,
+        "weight": 0.31
+      },
+      {
+        "symbol": "6278",
+        "name": "台表科",
+        "shares": 3734000,
+        "weight": 0.3
+      },
+      {
+        "symbol": "6147",
+        "name": "頎邦",
+        "shares": 3201000,
+        "weight": 0.29
+      },
+      {
+        "symbol": "1590",
+        "name": "亞德客-KY",
+        "shares": 530000,
+        "weight": 0.26
+      },
+      {
+        "symbol": "6415",
+        "name": "矽力*-KY",
+        "shares": 1038000,
+        "weight": 0.24
+      },
+      {
+        "symbol": "3443",
+        "name": "創意",
+        "shares": 96000,
+        "weight": 0.17
+      },
+      {
+        "symbol": "6191",
+        "name": "精成科",
+        "shares": 3988000,
+        "weight": 0.13
+      },
+      {
+        "symbol": "3376",
+        "name": "新日興",
+        "shares": 1741000,
+        "weight": 0.13
+      },
+      {
+        "symbol": "6271",
+        "name": "同欣電",
+        "shares": 686000,
+        "weight": 0.06
+      },
+      {
+        "symbol": "2002",
+        "name": "中鋼",
+        "shares": 5163000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "2313",
+        "name": "華通",
+        "shares": 329000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "1319",
+        "name": "東陽",
+        "shares": 511000,
+        "weight": 0.01
+      },
+      {
+        "symbol": "2357",
+        "name": "華碩",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "3661",
+        "name": "世芯-KY",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "1815",
+        "name": "富喬",
+        "shares": 107000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2439",
+        "name": "美律",
+        "shares": 18000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2317",
+        "name": "鴻海",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "5347",
+        "name": "世界",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2481",
+        "name": "強茂",
+        "shares": 5000,
+        "weight": 0.0
+      }
+    ],
+    "_full_data": {
+      "fundName": "00981A 主動統一台股增長",
+      "aum": 290447804921.0,
+      "aumChange": 4008443962.0,
+      "prevAum": 286439360959.0,
+      "nav": 31.89,
+      "date": "2026-05-27",
+      "prevDate": "2026-05-26",
+      "holdings": [
+        {
+          "symbol": "3665",
+          "name": "貿聯-KY",
+          "operationType": "持有",
+          "shares": 4703848,
+          "prevShares": 4703848,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.43,
+          "weightChangePercent": -0.29,
+          "closingPrice": 2115.0,
+          "priceChangePercent": -6.62,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6274",
+          "name": "台燿",
+          "operationType": "持有",
+          "shares": 4151000,
+          "prevShares": 4151000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.33,
+          "weightChangePercent": 0.04,
+          "closingPrice": 1630.0,
+          "priceChangePercent": 3.16,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8358",
+          "name": "金居",
+          "operationType": "持有",
+          "shares": 1980000,
+          "prevShares": 1980000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.38,
+          "weightChangePercent": 0.01,
+          "closingPrice": 560.0,
+          "priceChangePercent": 5.07,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2345",
+          "name": "智邦",
+          "operationType": "持有",
+          "shares": 6231000,
+          "prevShares": 6231000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.62,
+          "weightChangePercent": -0.08,
+          "closingPrice": 2620.0,
+          "priceChangePercent": 0.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5347",
+          "name": "世界",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 166.0,
+          "priceChangePercent": 0.61,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5274",
+          "name": "信驊",
+          "operationType": "持有",
+          "shares": 422000,
+          "prevShares": 422000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.65,
+          "weightChangePercent": 0.11,
+          "closingPrice": 18230.0,
+          "priceChangePercent": 5.74,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8996",
+          "name": "高力",
+          "operationType": "持有",
+          "shares": 1034000,
+          "prevShares": 1034000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.43,
+          "weightChangePercent": -0.02,
+          "closingPrice": 1215.0,
+          "priceChangePercent": -2.41,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "4966",
+          "name": "譜瑞-KY",
+          "operationType": "持有",
+          "shares": 1036000,
+          "prevShares": 1036000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.31,
+          "weightChangePercent": 0.02,
+          "closingPrice": 870.0,
+          "priceChangePercent": 7.81,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2002",
+          "name": "中鋼",
+          "operationType": "持有",
+          "shares": 5163000,
+          "prevShares": 5163000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": -0.01,
+          "closingPrice": 19.1,
+          "priceChangePercent": -2.05,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5439",
+          "name": "高技",
+          "operationType": "持有",
+          "shares": 3528000,
+          "prevShares": 3528000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.47,
+          "weightChangePercent": -0.01,
+          "closingPrice": 385.5,
+          "priceChangePercent": -1.41,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2327",
+          "name": "國巨*",
+          "operationType": "持有",
+          "shares": 18313000,
+          "prevShares": 18313000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.42,
+          "weightChangePercent": 0.19,
+          "closingPrice": 701.0,
+          "priceChangePercent": 6.05,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6187",
+          "name": "萬潤",
+          "operationType": "股數加碼",
+          "shares": 1334000,
+          "prevShares": 1224000,
+          "sharesChangePercent": 8.99,
+          "currentWeightPercent": 0.52,
+          "weightChangePercent": 0.03,
+          "closingPrice": 1130.0,
+          "priceChangePercent": -2.16,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2317",
+          "name": "鴻海",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 264.0,
+          "priceChangePercent": 1.93,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3653",
+          "name": "健策",
+          "operationType": "持有",
+          "shares": 2267000,
+          "prevShares": 2267000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.86,
+          "weightChangePercent": -0.04,
+          "closingPrice": 3670.0,
+          "priceChangePercent": 0.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3443",
+          "name": "創意",
+          "operationType": "持有",
+          "shares": 96000,
+          "prevShares": 96000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.17,
+          "weightChangePercent": -0.01,
+          "closingPrice": 5100.0,
+          "priceChangePercent": -3.5,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8210",
+          "name": "勤誠",
+          "operationType": "持有",
+          "shares": 2167000,
+          "prevShares": 2167000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.04,
+          "weightChangePercent": -0.05,
+          "closingPrice": 1395.0,
+          "priceChangePercent": -3.12,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3376",
+          "name": "新日興",
+          "operationType": "持有",
+          "shares": 1741000,
+          "prevShares": 1741000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.13,
+          "weightChangePercent": 0.0,
+          "closingPrice": 212.0,
+          "priceChangePercent": -3.2,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2308",
+          "name": "台達電",
+          "operationType": "持有",
+          "shares": 6572000,
+          "prevShares": 6572000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.7,
+          "weightChangePercent": 0.31,
+          "closingPrice": 2520.0,
+          "priceChangePercent": 7.23,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2383",
+          "name": "台光電",
+          "operationType": "持有",
+          "shares": 4723000,
+          "prevShares": 4723000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 8.63,
+          "weightChangePercent": -0.09,
+          "closingPrice": 5305.0,
+          "priceChangePercent": 0.28,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2357",
+          "name": "華碩",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 701.0,
+          "priceChangePercent": 0.29,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6191",
+          "name": "精成科",
+          "operationType": "持有",
+          "shares": 3988000,
+          "prevShares": 3988000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.13,
+          "weightChangePercent": 0.0,
+          "closingPrice": 98.0,
+          "priceChangePercent": 1.87,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6278",
+          "name": "台表科",
+          "operationType": "持有",
+          "shares": 3734000,
+          "prevShares": 3734000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.3,
+          "weightChangePercent": -0.02,
+          "closingPrice": 235.5,
+          "priceChangePercent": -4.46,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1319",
+          "name": "東陽",
+          "operationType": "持有",
+          "shares": 511000,
+          "prevShares": 511000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.01,
+          "weightChangePercent": 0.0,
+          "closingPrice": 78.7,
+          "priceChangePercent": -1.75,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6669",
+          "name": "緯穎",
+          "operationType": "持有",
+          "shares": 2344000,
+          "prevShares": 2344000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.1,
+          "weightChangePercent": -0.22,
+          "closingPrice": 5075.0,
+          "priceChangePercent": -3.88,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6515",
+          "name": "穎崴",
+          "operationType": "持有",
+          "shares": 442000,
+          "prevShares": 442000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.49,
+          "weightChangePercent": 0.12,
+          "closingPrice": 9795.0,
+          "priceChangePercent": 9.99,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2368",
+          "name": "金像電",
+          "operationType": "股數加碼",
+          "shares": 7769000,
+          "prevShares": 7669000,
+          "sharesChangePercent": 1.3,
+          "currentWeightPercent": 3.68,
+          "weightChangePercent": -0.19,
+          "closingPrice": 1375.0,
+          "priceChangePercent": -4.84,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6147",
+          "name": "頎邦",
+          "operationType": "持有",
+          "shares": 3201000,
+          "prevShares": 3201000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.29,
+          "weightChangePercent": 0.0,
+          "closingPrice": 265.0,
+          "priceChangePercent": 1.73,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6510",
+          "name": "精測",
+          "operationType": "持有",
+          "shares": 930000,
+          "prevShares": 930000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.02,
+          "weightChangePercent": -0.09,
+          "closingPrice": 3195.0,
+          "priceChangePercent": -6.44,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6271",
+          "name": "同欣電",
+          "operationType": "持有",
+          "shares": 686000,
+          "prevShares": 686000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.06,
+          "weightChangePercent": 0.0,
+          "closingPrice": 254.5,
+          "priceChangePercent": -2.3,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2330",
+          "name": "台積電",
+          "operationType": "持有",
+          "shares": 11657000,
+          "prevShares": 11657000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 9.23,
+          "weightChangePercent": -0.01,
+          "closingPrice": 2300.0,
+          "priceChangePercent": 1.32,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8150",
+          "name": "南茂",
+          "operationType": "股數加碼",
+          "shares": 11635000,
+          "prevShares": 11334000,
+          "sharesChangePercent": 2.66,
+          "currentWeightPercent": 0.38,
+          "weightChangePercent": 0.04,
+          "closingPrice": 93.9,
+          "priceChangePercent": 9.95,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3264",
+          "name": "欣銓",
+          "operationType": "持有",
+          "shares": 6217000,
+          "prevShares": 6217000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.49,
+          "weightChangePercent": -0.01,
+          "closingPrice": 229.5,
+          "priceChangePercent": -0.65,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2454",
+          "name": "聯發科",
+          "operationType": "持有",
+          "shares": 4263000,
+          "prevShares": 4263000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 6.81,
+          "weightChangePercent": 0.46,
+          "closingPrice": 4640.0,
+          "priceChangePercent": 8.79,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3711",
+          "name": "日月光投控",
+          "operationType": "股數加碼",
+          "shares": 16640000,
+          "prevShares": 15640000,
+          "sharesChangePercent": 6.39,
+          "currentWeightPercent": 3.68,
+          "weightChangePercent": 0.34,
+          "closingPrice": 642.0,
+          "priceChangePercent": 5.07,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6805",
+          "name": "富世達",
+          "operationType": "持有",
+          "shares": 1761000,
+          "prevShares": 1761000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.05,
+          "weightChangePercent": -0.05,
+          "closingPrice": 1740.0,
+          "priceChangePercent": -2.52,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3533",
+          "name": "嘉澤",
+          "operationType": "股數加碼",
+          "shares": 852000,
+          "prevShares": 772000,
+          "sharesChangePercent": 10.36,
+          "currentWeightPercent": 0.77,
+          "weightChangePercent": 0.06,
+          "closingPrice": 2625.0,
+          "priceChangePercent": -0.57,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2404",
+          "name": "漢唐",
+          "operationType": "持有",
+          "shares": 1715000,
+          "prevShares": 1715000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.73,
+          "weightChangePercent": -0.03,
+          "closingPrice": 1235.0,
+          "priceChangePercent": -2.37,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1590",
+          "name": "亞德客-KY",
+          "operationType": "持有",
+          "shares": 530000,
+          "prevShares": 530000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.26,
+          "weightChangePercent": -0.01,
+          "closingPrice": 1435.0,
+          "priceChangePercent": -2.05,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2313",
+          "name": "華通",
+          "operationType": "股數減碼",
+          "shares": 329000,
+          "prevShares": 1649000,
+          "sharesChangePercent": -80.05,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": -0.13,
+          "closingPrice": 282.0,
+          "priceChangePercent": -0.88,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2449",
+          "name": "京元電子",
+          "operationType": "股數減碼",
+          "shares": 8268000,
+          "prevShares": 12919000,
+          "sharesChangePercent": -36.0,
+          "currentWeightPercent": 0.9,
+          "weightChangePercent": -0.63,
+          "closingPrice": 315.5,
+          "priceChangePercent": -6.79,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3661",
+          "name": "世芯-KY",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 4500.0,
+          "priceChangePercent": -3.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6223",
+          "name": "旺矽",
+          "operationType": "持有",
+          "shares": 2169000,
+          "prevShares": 2169000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.77,
+          "weightChangePercent": 0.04,
+          "closingPrice": 6390.0,
+          "priceChangePercent": 2.4,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1815",
+          "name": "富喬",
+          "operationType": "持有",
+          "shares": 107000,
+          "prevShares": 107000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 103.5,
+          "priceChangePercent": -4.17,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2481",
+          "name": "強茂",
+          "operationType": "股數減碼",
+          "shares": 5000,
+          "prevShares": 2056000,
+          "sharesChangePercent": -99.76,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -0.11,
+          "closingPrice": 147.5,
+          "priceChangePercent": 0.34,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3008",
+          "name": "大立光",
+          "operationType": "持有",
+          "shares": 329000,
+          "prevShares": 329000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.4,
+          "weightChangePercent": -0.02,
+          "closingPrice": 3505.0,
+          "priceChangePercent": -4.37,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3037",
+          "name": "欣興",
+          "operationType": "股數加碼",
+          "shares": 12466000,
+          "prevShares": 12076000,
+          "sharesChangePercent": 3.23,
+          "currentWeightPercent": 4.64,
+          "weightChangePercent": 0.07,
+          "closingPrice": 1080.0,
+          "priceChangePercent": -0.46,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8046",
+          "name": "南電",
+          "operationType": "持有",
+          "shares": 11398000,
+          "prevShares": 11398000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.55,
+          "weightChangePercent": -0.12,
+          "closingPrice": 905.0,
+          "priceChangePercent": -1.84,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2303",
+          "name": "聯電",
+          "operationType": "股數加碼",
+          "shares": 71190000,
+          "prevShares": 66190000,
+          "sharesChangePercent": 7.55,
+          "currentWeightPercent": 3.52,
+          "weightChangePercent": 0.5,
+          "closingPrice": 143.5,
+          "priceChangePercent": 9.96,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3017",
+          "name": "奇鋐",
+          "operationType": "持有",
+          "shares": 5141000,
+          "prevShares": 5141000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.78,
+          "weightChangePercent": -0.11,
+          "closingPrice": 2700.0,
+          "priceChangePercent": -0.92,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2439",
+          "name": "美律",
+          "operationType": "持有",
+          "shares": 18000,
+          "prevShares": 18000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 90.7,
+          "priceChangePercent": -1.73,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6415",
+          "name": "矽力*-KY",
+          "operationType": "持有",
+          "shares": 1038000,
+          "prevShares": 1038000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.24,
+          "weightChangePercent": 0.01,
+          "closingPrice": 665.0,
+          "priceChangePercent": 5.56,
+          "currency": "TWD"
+        }
+      ],
+      "summaryCounts": {
+        "新增建倉": 0,
+        "股數加碼": 7,
+        "股數減碼": 3,
+        "全數清倉": 0
+      }
+    }
+  },
+  "2026-05-28": {
+    "aum": 281543971553.0,
+    "holdings_raw": [
+      {
+        "symbol": "2330",
+        "name": "台積電",
+        "shares": 11960000,
+        "weight": 9.75
+      },
+      {
+        "symbol": "2383",
+        "name": "台光電",
+        "shares": 4723000,
+        "weight": 8.48
+      },
+      {
+        "symbol": "2454",
+        "name": "聯發科",
+        "shares": 4263000,
+        "weight": 6.68
+      },
+      {
+        "symbol": "2308",
+        "name": "台達電",
+        "shares": 6572000,
+        "weight": 5.58
+      },
+      {
+        "symbol": "2345",
+        "name": "智邦",
+        "shares": 6231000,
+        "weight": 5.39
+      },
+      {
+        "symbol": "2327",
+        "name": "國巨*",
+        "shares": 18313000,
+        "weight": 4.83
+      },
+      {
+        "symbol": "3017",
+        "name": "奇鋐",
+        "shares": 5141000,
+        "weight": 4.71
+      },
+      {
+        "symbol": "6223",
+        "name": "旺矽",
+        "shares": 2169000,
+        "weight": 4.56
+      },
+      {
+        "symbol": "3037",
+        "name": "欣興",
+        "shares": 12466000,
+        "weight": 4.54
+      },
+      {
+        "symbol": "6669",
+        "name": "緯穎",
+        "shares": 2344000,
+        "weight": 4.12
+      },
+      {
+        "symbol": "3711",
+        "name": "日月光投控",
+        "shares": 17948000,
+        "weight": 4.0
+      },
+      {
+        "symbol": "2368",
+        "name": "金像電",
+        "shares": 7769000,
+        "weight": 3.6
+      },
+      {
+        "symbol": "2303",
+        "name": "聯電",
+        "shares": 71190000,
+        "weight": 3.59
+      },
+      {
+        "symbol": "3665",
+        "name": "貿聯-KY",
+        "shares": 4703848,
+        "weight": 3.53
+      },
+      {
+        "symbol": "8046",
+        "name": "南電",
+        "shares": 11398000,
+        "weight": 3.44
+      },
+      {
+        "symbol": "3653",
+        "name": "健策",
+        "shares": 2267000,
+        "weight": 2.82
+      },
+      {
+        "symbol": "5274",
+        "name": "信驊",
+        "shares": 422000,
+        "weight": 2.67
+      },
+      {
+        "symbol": "6274",
+        "name": "台燿",
+        "shares": 4151000,
+        "weight": 2.27
+      },
+      {
+        "symbol": "6515",
+        "name": "穎崴",
+        "shares": 442000,
+        "weight": 1.43
+      },
+      {
+        "symbol": "6805",
+        "name": "富世達",
+        "shares": 1761000,
+        "weight": 1.1
+      },
+      {
+        "symbol": "6510",
+        "name": "精測",
+        "shares": 930000,
+        "weight": 1.08
+      },
+      {
+        "symbol": "8210",
+        "name": "勤誠",
+        "shares": 2167000,
+        "weight": 1.02
+      },
+      {
+        "symbol": "2449",
+        "name": "京元電子",
+        "shares": 8268000,
+        "weight": 0.94
+      },
+      {
+        "symbol": "3533",
+        "name": "嘉澤",
+        "shares": 852000,
+        "weight": 0.75
+      },
+      {
+        "symbol": "2404",
+        "name": "漢唐",
+        "shares": 1715000,
+        "weight": 0.71
+      },
+      {
+        "symbol": "6187",
+        "name": "萬潤",
+        "shares": 1334000,
+        "weight": 0.59
+      },
+      {
+        "symbol": "3264",
+        "name": "欣銓",
+        "shares": 6217000,
+        "weight": 0.52
+      },
+      {
+        "symbol": "5439",
+        "name": "高技",
+        "shares": 3528000,
+        "weight": 0.46
+      },
+      {
+        "symbol": "6147",
+        "name": "頎邦",
+        "shares": 4631000,
+        "weight": 0.46
+      },
+      {
+        "symbol": "8150",
+        "name": "南茂",
+        "shares": 11635000,
+        "weight": 0.43
+      },
+      {
+        "symbol": "8996",
+        "name": "高力",
+        "shares": 1034000,
+        "weight": 0.4
+      },
+      {
+        "symbol": "3008",
+        "name": "大立光",
+        "shares": 329000,
+        "weight": 0.4
+      },
+      {
+        "symbol": "8358",
+        "name": "金居",
+        "shares": 1980000,
+        "weight": 0.39
+      },
+      {
+        "symbol": "4966",
+        "name": "譜瑞-KY",
+        "shares": 1036000,
+        "weight": 0.31
+      },
+      {
+        "symbol": "6278",
+        "name": "台表科",
+        "shares": 3734000,
+        "weight": 0.3
+      },
+      {
+        "symbol": "1590",
+        "name": "亞德客-KY",
+        "shares": 530000,
+        "weight": 0.26
+      },
+      {
+        "symbol": "3443",
+        "name": "創意",
+        "shares": 96000,
+        "weight": 0.16
+      },
+      {
+        "symbol": "6191",
+        "name": "精成科",
+        "shares": 3988000,
+        "weight": 0.14
+      },
+      {
+        "symbol": "3376",
+        "name": "新日興",
+        "shares": 1741000,
+        "weight": 0.13
+      },
+      {
+        "symbol": "6271",
+        "name": "同欣電",
+        "shares": 686000,
+        "weight": 0.06
+      },
+      {
+        "symbol": "2002",
+        "name": "中鋼",
+        "shares": 5163000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "2313",
+        "name": "華通",
+        "shares": 329000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "1319",
+        "name": "東陽",
+        "shares": 511000,
+        "weight": 0.02
+      },
+      {
+        "symbol": "2357",
+        "name": "華碩",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "3661",
+        "name": "世芯-KY",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "1815",
+        "name": "富喬",
+        "shares": 107000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2439",
+        "name": "美律",
+        "shares": 18000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2317",
+        "name": "鴻海",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "5347",
+        "name": "世界",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2481",
+        "name": "強茂",
+        "shares": 5000,
+        "weight": 0.0
+      }
+    ],
+    "_full_data": {
+      "fundName": "00981A 主動統一台股增長",
+      "aum": 281543971553.0,
+      "aumChange": -8903833368.0,
+      "prevAum": 290447804921.0,
+      "nav": 30.88,
+      "date": "2026-05-28",
+      "prevDate": "2026-05-27",
+      "holdings": [
+        {
+          "symbol": "2357",
+          "name": "華碩",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 692.0,
+          "priceChangePercent": -1.28,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6271",
+          "name": "同欣電",
+          "operationType": "持有",
+          "shares": 686000,
+          "prevShares": 686000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.06,
+          "weightChangePercent": 0.0,
+          "closingPrice": 244.5,
+          "priceChangePercent": -3.93,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "4966",
+          "name": "譜瑞-KY",
+          "operationType": "持有",
+          "shares": 1036000,
+          "prevShares": 1036000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.31,
+          "weightChangePercent": 0.0,
+          "closingPrice": 845.0,
+          "priceChangePercent": -2.87,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2303",
+          "name": "聯電",
+          "operationType": "持有",
+          "shares": 71190000,
+          "prevShares": 71190000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.59,
+          "weightChangePercent": 0.07,
+          "closingPrice": 142.0,
+          "priceChangePercent": -1.05,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6278",
+          "name": "台表科",
+          "operationType": "持有",
+          "shares": 3734000,
+          "prevShares": 3734000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.3,
+          "weightChangePercent": 0.0,
+          "closingPrice": 222.5,
+          "priceChangePercent": -5.52,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3376",
+          "name": "新日興",
+          "operationType": "持有",
+          "shares": 1741000,
+          "prevShares": 1741000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.13,
+          "weightChangePercent": 0.0,
+          "closingPrice": 205.0,
+          "priceChangePercent": -3.3,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2317",
+          "name": "鴻海",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 263.0,
+          "priceChangePercent": -0.38,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2330",
+          "name": "台積電",
+          "operationType": "股數加碼",
+          "shares": 11960000,
+          "prevShares": 11657000,
+          "sharesChangePercent": 2.6,
+          "currentWeightPercent": 9.75,
+          "weightChangePercent": 0.52,
+          "closingPrice": 2295.0,
+          "priceChangePercent": -0.22,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6223",
+          "name": "旺矽",
+          "operationType": "持有",
+          "shares": 2169000,
+          "prevShares": 2169000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.56,
+          "weightChangePercent": -0.21,
+          "closingPrice": 5915.0,
+          "priceChangePercent": -7.43,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3665",
+          "name": "貿聯-KY",
+          "operationType": "持有",
+          "shares": 4703848,
+          "prevShares": 4703848,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.53,
+          "weightChangePercent": 0.1,
+          "closingPrice": 2115.0,
+          "priceChangePercent": 0.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2481",
+          "name": "強茂",
+          "operationType": "持有",
+          "shares": 5000,
+          "prevShares": 5000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 148.0,
+          "priceChangePercent": 0.34,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3711",
+          "name": "日月光投控",
+          "operationType": "股數加碼",
+          "shares": 17948000,
+          "prevShares": 16640000,
+          "sharesChangePercent": 7.86,
+          "currentWeightPercent": 4.0,
+          "weightChangePercent": 0.32,
+          "closingPrice": 627.0,
+          "priceChangePercent": -2.34,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3264",
+          "name": "欣銓",
+          "operationType": "持有",
+          "shares": 6217000,
+          "prevShares": 6217000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.52,
+          "weightChangePercent": 0.03,
+          "closingPrice": 235.5,
+          "priceChangePercent": 2.61,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2404",
+          "name": "漢唐",
+          "operationType": "持有",
+          "shares": 1715000,
+          "prevShares": 1715000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.71,
+          "weightChangePercent": -0.02,
+          "closingPrice": 1160.0,
+          "priceChangePercent": -6.07,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2383",
+          "name": "台光電",
+          "operationType": "持有",
+          "shares": 4723000,
+          "prevShares": 4723000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 8.48,
+          "weightChangePercent": -0.15,
+          "closingPrice": 5055.0,
+          "priceChangePercent": -4.71,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5347",
+          "name": "世界",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 161.5,
+          "priceChangePercent": -2.71,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6805",
+          "name": "富世達",
+          "operationType": "持有",
+          "shares": 1761000,
+          "prevShares": 1761000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.1,
+          "weightChangePercent": 0.05,
+          "closingPrice": 1765.0,
+          "priceChangePercent": 1.44,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6510",
+          "name": "精測",
+          "operationType": "持有",
+          "shares": 930000,
+          "prevShares": 930000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.08,
+          "weightChangePercent": 0.06,
+          "closingPrice": 3280.0,
+          "priceChangePercent": 2.66,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2313",
+          "name": "華通",
+          "operationType": "持有",
+          "shares": 329000,
+          "prevShares": 329000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": 0.0,
+          "closingPrice": 259.0,
+          "priceChangePercent": -8.16,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3443",
+          "name": "創意",
+          "operationType": "持有",
+          "shares": 96000,
+          "prevShares": 96000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.16,
+          "weightChangePercent": -0.01,
+          "closingPrice": 4590.0,
+          "priceChangePercent": -10.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6147",
+          "name": "頎邦",
+          "operationType": "股數加碼",
+          "shares": 4631000,
+          "prevShares": 3201000,
+          "sharesChangePercent": 44.67,
+          "currentWeightPercent": 0.46,
+          "weightChangePercent": 0.17,
+          "closingPrice": 278.0,
+          "priceChangePercent": 4.91,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1815",
+          "name": "富喬",
+          "operationType": "持有",
+          "shares": 107000,
+          "prevShares": 107000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 103.5,
+          "priceChangePercent": 0.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5274",
+          "name": "信驊",
+          "operationType": "持有",
+          "shares": 422000,
+          "prevShares": 422000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.67,
+          "weightChangePercent": 0.02,
+          "closingPrice": 17835.0,
+          "priceChangePercent": -2.17,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2002",
+          "name": "中鋼",
+          "operationType": "持有",
+          "shares": 5163000,
+          "prevShares": 5163000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": 0.0,
+          "closingPrice": 18.85,
+          "priceChangePercent": -1.31,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6669",
+          "name": "緯穎",
+          "operationType": "持有",
+          "shares": 2344000,
+          "prevShares": 2344000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.12,
+          "weightChangePercent": 0.02,
+          "closingPrice": 4950.0,
+          "priceChangePercent": -2.46,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3017",
+          "name": "奇鋐",
+          "operationType": "持有",
+          "shares": 5141000,
+          "prevShares": 5141000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.71,
+          "weightChangePercent": -0.07,
+          "closingPrice": 2580.0,
+          "priceChangePercent": -4.44,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2327",
+          "name": "國巨*",
+          "operationType": "持有",
+          "shares": 18313000,
+          "prevShares": 18313000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.83,
+          "weightChangePercent": 0.41,
+          "closingPrice": 742.0,
+          "priceChangePercent": 5.85,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2449",
+          "name": "京元電子",
+          "operationType": "持有",
+          "shares": 8268000,
+          "prevShares": 8268000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.94,
+          "weightChangePercent": 0.04,
+          "closingPrice": 320.0,
+          "priceChangePercent": 1.43,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6191",
+          "name": "精成科",
+          "operationType": "持有",
+          "shares": 3988000,
+          "prevShares": 3988000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.14,
+          "weightChangePercent": 0.01,
+          "closingPrice": 97.1,
+          "priceChangePercent": -0.92,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8210",
+          "name": "勤誠",
+          "operationType": "持有",
+          "shares": 2167000,
+          "prevShares": 2167000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.02,
+          "weightChangePercent": -0.02,
+          "closingPrice": 1325.0,
+          "priceChangePercent": -5.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3533",
+          "name": "嘉澤",
+          "operationType": "持有",
+          "shares": 852000,
+          "prevShares": 852000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.75,
+          "weightChangePercent": -0.02,
+          "closingPrice": 2485.0,
+          "priceChangePercent": -5.33,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6274",
+          "name": "台燿",
+          "operationType": "持有",
+          "shares": 4151000,
+          "prevShares": 4151000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.27,
+          "weightChangePercent": -0.06,
+          "closingPrice": 1540.0,
+          "priceChangePercent": -5.52,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3008",
+          "name": "大立光",
+          "operationType": "持有",
+          "shares": 329000,
+          "prevShares": 329000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.4,
+          "weightChangePercent": 0.0,
+          "closingPrice": 3425.0,
+          "priceChangePercent": -2.28,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5439",
+          "name": "高技",
+          "operationType": "持有",
+          "shares": 3528000,
+          "prevShares": 3528000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.46,
+          "weightChangePercent": -0.01,
+          "closingPrice": 370.0,
+          "priceChangePercent": -4.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8358",
+          "name": "金居",
+          "operationType": "持有",
+          "shares": 1980000,
+          "prevShares": 1980000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.39,
+          "weightChangePercent": 0.01,
+          "closingPrice": 553.0,
+          "priceChangePercent": -1.25,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2439",
+          "name": "美律",
+          "operationType": "持有",
+          "shares": 18000,
+          "prevShares": 18000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 91.5,
+          "priceChangePercent": 0.88,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1590",
+          "name": "亞德客-KY",
+          "operationType": "持有",
+          "shares": 530000,
+          "prevShares": 530000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.26,
+          "weightChangePercent": 0.0,
+          "closingPrice": 1390.0,
+          "priceChangePercent": -3.14,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1319",
+          "name": "東陽",
+          "operationType": "持有",
+          "shares": 511000,
+          "prevShares": 511000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.02,
+          "weightChangePercent": 0.01,
+          "closingPrice": 86.5,
+          "priceChangePercent": 9.91,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6187",
+          "name": "萬潤",
+          "operationType": "持有",
+          "shares": 1334000,
+          "prevShares": 1334000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.59,
+          "weightChangePercent": 0.07,
+          "closingPrice": 1240.0,
+          "priceChangePercent": 9.73,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6515",
+          "name": "穎崴",
+          "operationType": "持有",
+          "shares": 442000,
+          "prevShares": 442000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.43,
+          "weightChangePercent": -0.06,
+          "closingPrice": 9120.0,
+          "priceChangePercent": -6.89,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8996",
+          "name": "高力",
+          "operationType": "持有",
+          "shares": 1034000,
+          "prevShares": 1034000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.4,
+          "weightChangePercent": -0.03,
+          "closingPrice": 1095.0,
+          "priceChangePercent": -9.88,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2454",
+          "name": "聯發科",
+          "operationType": "持有",
+          "shares": 4263000,
+          "prevShares": 4263000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 6.68,
+          "weightChangePercent": -0.13,
+          "closingPrice": 4410.0,
+          "priceChangePercent": -4.96,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3653",
+          "name": "健策",
+          "operationType": "持有",
+          "shares": 2267000,
+          "prevShares": 2267000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.82,
+          "weightChangePercent": -0.04,
+          "closingPrice": 3500.0,
+          "priceChangePercent": -4.63,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3037",
+          "name": "欣興",
+          "operationType": "持有",
+          "shares": 12466000,
+          "prevShares": 12466000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.54,
+          "weightChangePercent": -0.1,
+          "closingPrice": 1025.0,
+          "priceChangePercent": -5.09,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8150",
+          "name": "南茂",
+          "operationType": "持有",
+          "shares": 11635000,
+          "prevShares": 11635000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.43,
+          "weightChangePercent": 0.05,
+          "closingPrice": 103.0,
+          "priceChangePercent": 9.69,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2345",
+          "name": "智邦",
+          "operationType": "持有",
+          "shares": 6231000,
+          "prevShares": 6231000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.39,
+          "weightChangePercent": -0.23,
+          "closingPrice": 2435.0,
+          "priceChangePercent": -7.06,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2308",
+          "name": "台達電",
+          "operationType": "持有",
+          "shares": 6572000,
+          "prevShares": 6572000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.58,
+          "weightChangePercent": -0.12,
+          "closingPrice": 2390.0,
+          "priceChangePercent": -5.16,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6415",
+          "name": "矽力*-KY",
+          "operationType": "全數清倉",
+          "shares": 0,
+          "prevShares": 1038000,
+          "sharesChangePercent": -100.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": -0.24,
+          "closingPrice": 620.0,
+          "priceChangePercent": -6.77,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8046",
+          "name": "南電",
+          "operationType": "持有",
+          "shares": 11398000,
+          "prevShares": 11398000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.44,
+          "weightChangePercent": -0.11,
+          "closingPrice": 850.0,
+          "priceChangePercent": -6.08,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2368",
+          "name": "金像電",
+          "operationType": "持有",
+          "shares": 7769000,
+          "prevShares": 7769000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.6,
+          "weightChangePercent": -0.08,
+          "closingPrice": 1305.0,
+          "priceChangePercent": -5.09,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3661",
+          "name": "世芯-KY",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 4300.0,
+          "priceChangePercent": -4.44,
+          "currency": "TWD"
+        }
+      ],
+      "summaryCounts": {
+        "新增建倉": 0,
+        "股數加碼": 3,
+        "股數減碼": 0,
+        "全數清倉": 1
+      }
+    }
+  },
+  "2026-05-29": {
+    "aum": 286037131363.0,
+    "holdings_raw": [
+      {
+        "symbol": "2330",
+        "name": "台積電",
+        "shares": 11960000,
+        "weight": 9.85
+      },
+      {
+        "symbol": "2383",
+        "name": "台光電",
+        "shares": 4723000,
+        "weight": 8.45
+      },
+      {
+        "symbol": "2454",
+        "name": "聯發科",
+        "shares": 4263000,
+        "weight": 6.42
+      },
+      {
+        "symbol": "2308",
+        "name": "台達電",
+        "shares": 6572000,
+        "weight": 5.62
+      },
+      {
+        "symbol": "2345",
+        "name": "智邦",
+        "shares": 6231000,
+        "weight": 5.29
+      },
+      {
+        "symbol": "3017",
+        "name": "奇鋐",
+        "shares": 5191000,
+        "weight": 4.84
+      },
+      {
+        "symbol": "2327",
+        "name": "國巨*",
+        "shares": 18313000,
+        "weight": 4.72
+      },
+      {
+        "symbol": "6669",
+        "name": "緯穎",
+        "shares": 2437000,
+        "weight": 4.64
+      },
+      {
+        "symbol": "3037",
+        "name": "欣興",
+        "shares": 12466000,
+        "weight": 4.6
+      },
+      {
+        "symbol": "6223",
+        "name": "旺矽",
+        "shares": 2169000,
+        "weight": 4.52
+      },
+      {
+        "symbol": "3711",
+        "name": "日月光投控",
+        "shares": 17948000,
+        "weight": 3.83
+      },
+      {
+        "symbol": "2303",
+        "name": "聯電",
+        "shares": 71190000,
+        "weight": 3.6
+      },
+      {
+        "symbol": "2368",
+        "name": "金像電",
+        "shares": 7769000,
+        "weight": 3.59
+      },
+      {
+        "symbol": "3665",
+        "name": "貿聯-KY",
+        "shares": 4703848,
+        "weight": 3.43
+      },
+      {
+        "symbol": "8046",
+        "name": "南電",
+        "shares": 10828000,
+        "weight": 3.21
+      },
+      {
+        "symbol": "3653",
+        "name": "健策",
+        "shares": 2267000,
+        "weight": 2.81
+      },
+      {
+        "symbol": "5274",
+        "name": "信驊",
+        "shares": 422000,
+        "weight": 2.8
+      },
+      {
+        "symbol": "6274",
+        "name": "台燿",
+        "shares": 4400000,
+        "weight": 2.6
+      },
+      {
+        "symbol": "6515",
+        "name": "穎崴",
+        "shares": 442000,
+        "weight": 1.34
+      },
+      {
+        "symbol": "6805",
+        "name": "富世達",
+        "shares": 1761000,
+        "weight": 1.19
+      },
+      {
+        "symbol": "8210",
+        "name": "勤誠",
+        "shares": 2167000,
+        "weight": 1.03
+      },
+      {
+        "symbol": "6510",
+        "name": "精測",
+        "shares": 930000,
+        "weight": 1.02
+      },
+      {
+        "symbol": "3533",
+        "name": "嘉澤",
+        "shares": 852000,
+        "weight": 0.79
+      },
+      {
+        "symbol": "2317",
+        "name": "鴻海",
+        "shares": 7307000,
+        "weight": 0.74
+      },
+      {
+        "symbol": "2404",
+        "name": "漢唐",
+        "shares": 1715000,
+        "weight": 0.69
+      },
+      {
+        "symbol": "2449",
+        "name": "京元電子",
+        "shares": 5208000,
+        "weight": 0.6
+      },
+      {
+        "symbol": "3264",
+        "name": "欣銓",
+        "shares": 6217000,
+        "weight": 0.53
+      },
+      {
+        "symbol": "6187",
+        "name": "萬潤",
+        "shares": 1334000,
+        "weight": 0.52
+      },
+      {
+        "symbol": "6147",
+        "name": "頎邦",
+        "shares": 4631000,
+        "weight": 0.49
+      },
+      {
+        "symbol": "4966",
+        "name": "譜瑞-KY",
+        "shares": 1642000,
+        "weight": 0.48
+      },
+      {
+        "symbol": "5439",
+        "name": "高技",
+        "shares": 3528000,
+        "weight": 0.47
+      },
+      {
+        "symbol": "8150",
+        "name": "南茂",
+        "shares": 11635000,
+        "weight": 0.46
+      },
+      {
+        "symbol": "8358",
+        "name": "金居",
+        "shares": 1980000,
+        "weight": 0.42
+      },
+      {
+        "symbol": "3008",
+        "name": "大立光",
+        "shares": 329000,
+        "weight": 0.4
+      },
+      {
+        "symbol": "8996",
+        "name": "高力",
+        "shares": 1034000,
+        "weight": 0.39
+      },
+      {
+        "symbol": "2382",
+        "name": "廣達",
+        "shares": 2491000,
+        "weight": 0.3
+      },
+      {
+        "symbol": "6278",
+        "name": "台表科",
+        "shares": 3734000,
+        "weight": 0.29
+      },
+      {
+        "symbol": "1590",
+        "name": "亞德客-KY",
+        "shares": 530000,
+        "weight": 0.26
+      },
+      {
+        "symbol": "3443",
+        "name": "創意",
+        "shares": 96000,
+        "weight": 0.16
+      },
+      {
+        "symbol": "6191",
+        "name": "精成科",
+        "shares": 3988000,
+        "weight": 0.14
+      },
+      {
+        "symbol": "3376",
+        "name": "新日興",
+        "shares": 1741000,
+        "weight": 0.12
+      },
+      {
+        "symbol": "6271",
+        "name": "同欣電",
+        "shares": 686000,
+        "weight": 0.06
+      },
+      {
+        "symbol": "2002",
+        "name": "中鋼",
+        "shares": 5163000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "2313",
+        "name": "華通",
+        "shares": 329000,
+        "weight": 0.03
+      },
+      {
+        "symbol": "1319",
+        "name": "東陽",
+        "shares": 511000,
+        "weight": 0.02
+      },
+      {
+        "symbol": "2357",
+        "name": "華碩",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "3661",
+        "name": "世芯-KY",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "1815",
+        "name": "富喬",
+        "shares": 107000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2439",
+        "name": "美律",
+        "shares": 18000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "5347",
+        "name": "世界",
+        "shares": 1000,
+        "weight": 0.0
+      },
+      {
+        "symbol": "2481",
+        "name": "強茂",
+        "shares": 5000,
+        "weight": 0.0
+      }
+    ],
+    "_full_data": {
+      "fundName": "00981A 主動統一台股增長",
+      "aum": 286037131363.0,
+      "aumChange": 4493159810.0,
+      "prevAum": 281543971553.0,
+      "nav": 31.37,
+      "date": "2026-05-29",
+      "prevDate": "2026-05-28",
+      "holdings": [
+        {
+          "symbol": "2357",
+          "name": "華碩",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 761.0,
+          "priceChangePercent": 9.97,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6271",
+          "name": "同欣電",
+          "operationType": "持有",
+          "shares": 686000,
+          "prevShares": 686000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.06,
+          "weightChangePercent": 0.0,
+          "closingPrice": 247.0,
+          "priceChangePercent": 1.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "4966",
+          "name": "譜瑞-KY",
+          "operationType": "股數加碼",
+          "shares": 1642000,
+          "prevShares": 1036000,
+          "sharesChangePercent": 58.49,
+          "currentWeightPercent": 0.48,
+          "weightChangePercent": 0.17,
+          "closingPrice": 834.0,
+          "priceChangePercent": -1.3,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2303",
+          "name": "聯電",
+          "operationType": "持有",
+          "shares": 71190000,
+          "prevShares": 71190000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.6,
+          "weightChangePercent": 0.01,
+          "closingPrice": 144.5,
+          "priceChangePercent": 1.76,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6278",
+          "name": "台表科",
+          "operationType": "持有",
+          "shares": 3734000,
+          "prevShares": 3734000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.29,
+          "weightChangePercent": -0.01,
+          "closingPrice": 221.0,
+          "priceChangePercent": -0.67,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3376",
+          "name": "新日興",
+          "operationType": "持有",
+          "shares": 1741000,
+          "prevShares": 1741000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.12,
+          "weightChangePercent": -0.01,
+          "closingPrice": 202.5,
+          "priceChangePercent": -1.22,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2317",
+          "name": "鴻海",
+          "operationType": "股數加碼",
+          "shares": 7307000,
+          "prevShares": 1000,
+          "sharesChangePercent": 730600.0,
+          "currentWeightPercent": 0.74,
+          "weightChangePercent": 0.74,
+          "closingPrice": 289.0,
+          "priceChangePercent": 9.89,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2330",
+          "name": "台積電",
+          "operationType": "持有",
+          "shares": 11960000,
+          "prevShares": 11960000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 9.85,
+          "weightChangePercent": 0.1,
+          "closingPrice": 2355.0,
+          "priceChangePercent": 2.61,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6223",
+          "name": "旺矽",
+          "operationType": "持有",
+          "shares": 2169000,
+          "prevShares": 2169000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.52,
+          "weightChangePercent": -0.04,
+          "closingPrice": 5960.0,
+          "priceChangePercent": 0.76,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3665",
+          "name": "貿聯-KY",
+          "operationType": "持有",
+          "shares": 4703848,
+          "prevShares": 4703848,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.43,
+          "weightChangePercent": -0.1,
+          "closingPrice": 2085.0,
+          "priceChangePercent": -1.42,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2481",
+          "name": "強茂",
+          "operationType": "持有",
+          "shares": 5000,
+          "prevShares": 5000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 162.5,
+          "priceChangePercent": 9.8,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3711",
+          "name": "日月光投控",
+          "operationType": "持有",
+          "shares": 17948000,
+          "prevShares": 17948000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.83,
+          "weightChangePercent": -0.17,
+          "closingPrice": 611.0,
+          "priceChangePercent": -2.55,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2382",
+          "name": "廣達",
+          "operationType": "新增建倉",
+          "shares": 2491000,
+          "prevShares": 0,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.3,
+          "weightChangePercent": 0.3,
+          "closingPrice": 339.0,
+          "priceChangePercent": 9.89,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3264",
+          "name": "欣銓",
+          "operationType": "持有",
+          "shares": 6217000,
+          "prevShares": 6217000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.53,
+          "weightChangePercent": 0.01,
+          "closingPrice": 243.5,
+          "priceChangePercent": 3.4,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2404",
+          "name": "漢唐",
+          "operationType": "持有",
+          "shares": 1715000,
+          "prevShares": 1715000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.69,
+          "weightChangePercent": -0.02,
+          "closingPrice": 1155.0,
+          "priceChangePercent": -0.43,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2383",
+          "name": "台光電",
+          "operationType": "持有",
+          "shares": 4723000,
+          "prevShares": 4723000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 8.45,
+          "weightChangePercent": -0.03,
+          "closingPrice": 5120.0,
+          "priceChangePercent": 1.29,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5347",
+          "name": "世界",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 168.0,
+          "priceChangePercent": 4.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6805",
+          "name": "富世達",
+          "operationType": "持有",
+          "shares": 1761000,
+          "prevShares": 1761000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.19,
+          "weightChangePercent": 0.09,
+          "closingPrice": 1930.0,
+          "priceChangePercent": 9.35,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6510",
+          "name": "精測",
+          "operationType": "持有",
+          "shares": 930000,
+          "prevShares": 930000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.02,
+          "weightChangePercent": -0.06,
+          "closingPrice": 3140.0,
+          "priceChangePercent": -4.27,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2313",
+          "name": "華通",
+          "operationType": "持有",
+          "shares": 329000,
+          "prevShares": 329000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": 0.0,
+          "closingPrice": 284.5,
+          "priceChangePercent": 9.85,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3443",
+          "name": "創意",
+          "operationType": "持有",
+          "shares": 96000,
+          "prevShares": 96000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.16,
+          "weightChangePercent": 0.0,
+          "closingPrice": 4670.0,
+          "priceChangePercent": 1.74,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6147",
+          "name": "頎邦",
+          "operationType": "持有",
+          "shares": 4631000,
+          "prevShares": 4631000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.49,
+          "weightChangePercent": 0.03,
+          "closingPrice": 305.5,
+          "priceChangePercent": 9.89,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1815",
+          "name": "富喬",
+          "operationType": "持有",
+          "shares": 107000,
+          "prevShares": 107000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 106.0,
+          "priceChangePercent": 2.42,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5274",
+          "name": "信驊",
+          "operationType": "持有",
+          "shares": 422000,
+          "prevShares": 422000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.8,
+          "weightChangePercent": 0.13,
+          "closingPrice": 18950.0,
+          "priceChangePercent": 6.25,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2002",
+          "name": "中鋼",
+          "operationType": "持有",
+          "shares": 5163000,
+          "prevShares": 5163000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.03,
+          "weightChangePercent": 0.0,
+          "closingPrice": 19.1,
+          "priceChangePercent": 1.33,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6669",
+          "name": "緯穎",
+          "operationType": "股數加碼",
+          "shares": 2437000,
+          "prevShares": 2344000,
+          "sharesChangePercent": 3.97,
+          "currentWeightPercent": 4.64,
+          "weightChangePercent": 0.52,
+          "closingPrice": 5445.0,
+          "priceChangePercent": 10.0,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3017",
+          "name": "奇鋐",
+          "operationType": "股數加碼",
+          "shares": 5191000,
+          "prevShares": 5141000,
+          "sharesChangePercent": 0.97,
+          "currentWeightPercent": 4.84,
+          "weightChangePercent": 0.13,
+          "closingPrice": 2665.0,
+          "priceChangePercent": 3.29,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2327",
+          "name": "國巨*",
+          "operationType": "持有",
+          "shares": 18313000,
+          "prevShares": 18313000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.72,
+          "weightChangePercent": -0.11,
+          "closingPrice": 738.0,
+          "priceChangePercent": -0.54,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2449",
+          "name": "京元電子",
+          "operationType": "股數減碼",
+          "shares": 5208000,
+          "prevShares": 8268000,
+          "sharesChangePercent": -37.01,
+          "currentWeightPercent": 0.6,
+          "weightChangePercent": -0.34,
+          "closingPrice": 328.5,
+          "priceChangePercent": 2.66,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6191",
+          "name": "精成科",
+          "operationType": "持有",
+          "shares": 3988000,
+          "prevShares": 3988000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.14,
+          "weightChangePercent": 0.0,
+          "closingPrice": 97.0,
+          "priceChangePercent": -0.1,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8210",
+          "name": "勤誠",
+          "operationType": "持有",
+          "shares": 2167000,
+          "prevShares": 2167000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.03,
+          "weightChangePercent": 0.01,
+          "closingPrice": 1365.0,
+          "priceChangePercent": 3.02,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3533",
+          "name": "嘉澤",
+          "operationType": "持有",
+          "shares": 852000,
+          "prevShares": 852000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.79,
+          "weightChangePercent": 0.04,
+          "closingPrice": 2650.0,
+          "priceChangePercent": 6.64,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6274",
+          "name": "台燿",
+          "operationType": "股數加碼",
+          "shares": 4400000,
+          "prevShares": 4151000,
+          "sharesChangePercent": 6.0,
+          "currentWeightPercent": 2.6,
+          "weightChangePercent": 0.33,
+          "closingPrice": 1690.0,
+          "priceChangePercent": 9.74,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3008",
+          "name": "大立光",
+          "operationType": "持有",
+          "shares": 329000,
+          "prevShares": 329000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.4,
+          "weightChangePercent": 0.0,
+          "closingPrice": 3515.0,
+          "priceChangePercent": 2.63,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "5439",
+          "name": "高技",
+          "operationType": "持有",
+          "shares": 3528000,
+          "prevShares": 3528000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.47,
+          "weightChangePercent": 0.01,
+          "closingPrice": 383.0,
+          "priceChangePercent": 3.51,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8358",
+          "name": "金居",
+          "operationType": "持有",
+          "shares": 1980000,
+          "prevShares": 1980000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.42,
+          "weightChangePercent": 0.03,
+          "closingPrice": 608.0,
+          "priceChangePercent": 9.95,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2439",
+          "name": "美律",
+          "operationType": "持有",
+          "shares": 18000,
+          "prevShares": 18000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 91.8,
+          "priceChangePercent": 0.33,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1590",
+          "name": "亞德客-KY",
+          "operationType": "持有",
+          "shares": 530000,
+          "prevShares": 530000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.26,
+          "weightChangePercent": 0.0,
+          "closingPrice": 1400.0,
+          "priceChangePercent": 0.72,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "1319",
+          "name": "東陽",
+          "operationType": "持有",
+          "shares": 511000,
+          "prevShares": 511000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.02,
+          "weightChangePercent": 0.0,
+          "closingPrice": 95.1,
+          "priceChangePercent": 9.94,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6187",
+          "name": "萬潤",
+          "operationType": "持有",
+          "shares": 1334000,
+          "prevShares": 1334000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.52,
+          "weightChangePercent": -0.07,
+          "closingPrice": 1120.0,
+          "priceChangePercent": -9.68,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "6515",
+          "name": "穎崴",
+          "operationType": "持有",
+          "shares": 442000,
+          "prevShares": 442000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 1.34,
+          "weightChangePercent": -0.09,
+          "closingPrice": 8665.0,
+          "priceChangePercent": -4.99,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8996",
+          "name": "高力",
+          "operationType": "持有",
+          "shares": 1034000,
+          "prevShares": 1034000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.39,
+          "weightChangePercent": -0.01,
+          "closingPrice": 1090.0,
+          "priceChangePercent": -0.46,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2454",
+          "name": "聯發科",
+          "operationType": "持有",
+          "shares": 4263000,
+          "prevShares": 4263000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 6.42,
+          "weightChangePercent": -0.26,
+          "closingPrice": 4310.0,
+          "priceChangePercent": -2.27,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3653",
+          "name": "健策",
+          "operationType": "持有",
+          "shares": 2267000,
+          "prevShares": 2267000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 2.81,
+          "weightChangePercent": -0.01,
+          "closingPrice": 3545.0,
+          "priceChangePercent": 1.29,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3037",
+          "name": "欣興",
+          "operationType": "持有",
+          "shares": 12466000,
+          "prevShares": 12466000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 4.6,
+          "weightChangePercent": 0.06,
+          "closingPrice": 1055.0,
+          "priceChangePercent": 2.93,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8150",
+          "name": "南茂",
+          "operationType": "持有",
+          "shares": 11635000,
+          "prevShares": 11635000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.46,
+          "weightChangePercent": 0.03,
+          "closingPrice": 113.0,
+          "priceChangePercent": 9.71,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2345",
+          "name": "智邦",
+          "operationType": "持有",
+          "shares": 6231000,
+          "prevShares": 6231000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.29,
+          "weightChangePercent": -0.1,
+          "closingPrice": 2430.0,
+          "priceChangePercent": -0.21,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2308",
+          "name": "台達電",
+          "operationType": "持有",
+          "shares": 6572000,
+          "prevShares": 6572000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 5.62,
+          "weightChangePercent": 0.04,
+          "closingPrice": 2445.0,
+          "priceChangePercent": 2.3,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "8046",
+          "name": "南電",
+          "operationType": "股數減碼",
+          "shares": 10828000,
+          "prevShares": 11398000,
+          "sharesChangePercent": -5.0,
+          "currentWeightPercent": 3.21,
+          "weightChangePercent": -0.23,
+          "closingPrice": 848.0,
+          "priceChangePercent": -0.24,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "2368",
+          "name": "金像電",
+          "operationType": "持有",
+          "shares": 7769000,
+          "prevShares": 7769000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 3.59,
+          "weightChangePercent": -0.01,
+          "closingPrice": 1320.0,
+          "priceChangePercent": 1.15,
+          "currency": "TWD"
+        },
+        {
+          "symbol": "3661",
+          "name": "世芯-KY",
+          "operationType": "持有",
+          "shares": 1000,
+          "prevShares": 1000,
+          "sharesChangePercent": 0.0,
+          "currentWeightPercent": 0.0,
+          "weightChangePercent": 0.0,
+          "closingPrice": 4415.0,
+          "priceChangePercent": 2.67,
+          "currency": "TWD"
+        }
+      ],
+      "summaryCounts": {
+        "新增建倉": 1,
+        "股數加碼": 5,
+        "股數減碼": 2,
+        "全數清倉": 0
+      }
+    }
   }
 }

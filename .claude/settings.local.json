@@ -217,7 +217,27 @@
       "Bash(powershell -NoProfile -Command \"cd E:\\\\claude_money; git ls-files backend/data/\")",
       "Bash(powershell -NoProfile -Command \"cd E:\\\\claude_money; git ls-files backend/initial_data/ | head -20; Test-Path backend/initial_data\")",
       "Bash(powershell -NoProfile -Command \"cd E:\\\\claude_money\\\\backend; python push_etf_to_gist.py\")",
-      "Bash(powershell -NoProfile -Command 'cd E:\\\\claude_money; Remove-Item backend\\\\push_etf_to_gist.py; git add -A; git commit -m '\\\\''fix: push ETF history to Gist, trigger Railway redeploy *)"
+      "Bash(powershell -NoProfile -Command 'cd E:\\\\claude_money; Remove-Item backend\\\\push_etf_to_gist.py; git add -A; git commit -m '\\\\''fix: push ETF history to Gist, trigger Railway redeploy *)",
+      "Bash(powershell -NoProfile -Command \"cd E:\\\\claude_money; git rm -r --cached .playwright-mcp/ backend/data/alm_config.json.bak backend/data/test_sync.json backend/debug_out.txt backend/fsc_tmp.xlsx 2>&1\")",
+      "Bash(powershell -NoProfile -Command 'cd E:\\\\claude_money; git add .gitignore; git commit -m '\\\\''chore: remove junk files, update .gitignore *)",
+      "Bash(python -c \"import backend.main; print\\('OK'\\)\")",
+      "Bash(git commit *)",
+      "Bash(curl -sk \"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_24672.tw\")",
+      "Bash(curl -sk \"http://localhost:8000/api/cb-prices?symbols=24672\")",
+      "Bash(curl -sv \"http://localhost:8000/api/cb-prices?symbols=24672\")",
+      "Bash(findstr \"8000\\\\|LISTEN\")",
+      "Bash(findstr \"LISTEN\")",
+      "Bash(findstr -v \"0.0.0.0:0\")",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=24672\")",
+      "Bash(curl -s \"http://localhost:8765/api/important-info\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(k,':', v\\) for k,v in d.items\\(\\) if 'wtx' in k.lower\\(\\) or 'WTX' in str\\(v\\) or '台指' in str\\(v\\) or 'future' in k.lower\\(\\)]\")",
+      "Bash(curl -sk \"https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_23511.tw\")",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=23511\")",
+      "Bash(curl -s \"http://localhost:8765/api/cb-prices?symbols=23511,24672\")",
+      "Bash(curl -s \"http://localhost:8765/api/prices?tickers=NVDA,AAPL\")",
+      "Bash(curl -s \"http://localhost:8765/api/portfolio\")",
+      "Bash(curl -s \"http://localhost:8765/api/prices?tickers=NVDA,TSLA,COHR,COHX\")",
+      "Bash(curl -s \"http://localhost:8765/api/tw-prices?symbols=2327,2467,4931,6907,00988A&force=true\")"
     ]
   }
 }
