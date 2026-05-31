@@ -1139,6 +1139,58 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   .legend-value { font-size: 12px; }
 }
 
+/* ══ Mobile table readability (≤ 900px) ══════════════════════════════════════
+   On phones the data tables are wider than the screen. Instead of clipping the
+   right-hand columns off-screen, we: (1) signal that a table scrolls sideways,
+   (2) pin the identifier column so context never scrolls away, and (3) shrink
+   the 3-column 重要金融數據 table enough to fit with no horizontal scroll.   */
+@media (max-width: 900px) {
+  /* (1) Edge shadow that fades out at the scroll ends → "swipe me" affordance.
+     Classic background-attachment:local trick; covers track the content edges,
+     the radial shadows stay pinned to the wrap so they reveal as you scroll.  */
+  .table-wrap {
+    position: relative;
+    background:
+      linear-gradient(to right, var(--surface) 28%, rgba(13,21,48,0)) left center,
+      linear-gradient(to left,  var(--surface) 28%, rgba(13,21,48,0)) right center,
+      radial-gradient(farthest-side at 0 50%,   rgba(0,0,0,.5), transparent) left center,
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.5), transparent) right center;
+    background-repeat: no-repeat;
+    background-size: 24px 100%, 24px 100%, 12px 100%, 12px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* (2a) 重要資訊 tables (金融數據 / CB / 增資) — first col is the identifier
+     (指標 / CB代號 / 代號), pin it so it stays visible while swiping.        */
+  .important-table th:first-child,
+  .important-table td:first-child {
+    position: sticky; left: 0; z-index: 2;
+    background: var(--surface);
+  }
+
+  /* (3) 重要金融數據 is only 3 columns of short data — let it wrap and shrink
+     so the whole 前值/變化 column is readable without any horizontal scroll. */
+  .important-table:has(#important-tbody) th,
+  .important-table:has(#important-tbody) td {
+    white-space: normal;
+    word-break: break-word;
+    padding: 7px 6px;
+    font-size: 11.5px;
+  }
+
+  /* (2b) 投資部位 table is 13 cols wide; its first col is the ★ toggle, so pin
+     ★ + 代號 (fixed ★ width keeps the offset deterministic) to keep the stock
+     identifiable while the numeric columns scroll underneath.                 */
+  #inv-table th:nth-child(1), #inv-table td:nth-child(1) {
+    position: sticky; left: 0; z-index: 2; background: var(--surface);
+    width: 34px; min-width: 34px; max-width: 34px;
+    padding-left: 6px; padding-right: 4px; text-align: center;
+  }
+  #inv-table th:nth-child(2), #inv-table td:nth-child(2) {
+    position: sticky; left: 34px; z-index: 2; background: var(--surface);
+  }
+}
+
 /* Narrow portrait only (≤ 430px) */
 @media (max-width: 430px) {
   .kpi-grid { gap: 6px; }
