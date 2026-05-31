@@ -1139,6 +1139,14 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   .legend-value { font-size: 12px; }
 }
 
+/* ETF 重點關注 — 3-up on desktop, single column on phones (see ≤900px below) */
+.etf-focus-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
 /* ══ Mobile table readability (≤ 900px) ══════════════════════════════════════
    On phones the data tables are wider than the screen. Instead of clipping the
    right-hand columns off-screen, we: (1) signal that a table scrolls sideways,
@@ -1189,6 +1197,10 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   #inv-table th:nth-child(2), #inv-table td:nth-child(2) {
     position: sticky; left: 34px; z-index: 2; background: var(--surface);
   }
+
+  /* ETF 重點關注: stack the 3 sections vertically so each table is full-width
+     and readable instead of three crammed ~120px columns.                     */
+  .etf-focus-grid { grid-template-columns: 1fr; }
 }
 
 /* Narrow portrait only (≤ 430px) */

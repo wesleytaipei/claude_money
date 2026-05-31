@@ -1154,33 +1154,6 @@ def health():
     return {"ok": True}
 
 
-@app.get("/api/_netdiag")
-def _netdiag():
-    """TEMP: probe which TW data hosts are reachable from this server (Railway)."""
-    urls = {
-        "openapi_stock_day_all": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
-        "openapi_mi_margn":       "https://openapi.twse.com.tw/v1/exchangeReport/MI_MARGN",
-        "www_rwd_stock_day_all":  "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json",
-        "www_exchreport_mi_margn":"https://www.twse.com.tw/exchangeReport/MI_MARGN?response=json",
-        "www_rwd_margin_ms":      "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&selectType=MS",
-        "mis_twse_index":         "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_t00.tw",
-        "tpex_quotes":            "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
-    }
-    out = {}
-    for k, u in urls.items():
-        t0 = time.time()
-        try:
-            r = http_requests.get(u, headers={"User-Agent": "Mozilla/5.0"},
-                                  timeout=15, verify=False)
-            out[k] = {"status": r.status_code, "ms": int((time.time()-t0)*1000),
-                      "bytes": len(r.content), "final_url": r.url,
-                      "ctype": r.headers.get("content-type", ""),
-                      "preview": r.text[:200]}
-        except Exception as e:
-            out[k] = {"err": f"{type(e).__name__}: {e}", "ms": int((time.time()-t0)*1000)}
-    return out
-
-
 @app.get("/api/sync-from-gist")
 def api_sync_from_gist(force: bool = False):
     """Pull files from Gist that are newer than local (timestamp-based).

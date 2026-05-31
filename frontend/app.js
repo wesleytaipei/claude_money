@@ -3592,7 +3592,7 @@ async function _etfRenderFocusView() {
       ${etfDateTags}
       <span style="font-size:11px;color:var(--text-muted);margin-left:auto">取得時間 ${fetchedAt}</span>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:stretch">
+    <div class="etf-focus-grid">
       ${mkSection('★', '多檔共同入選', tMulti, '#fbbf24')}
       ${mkSection('📈', '新增建倉 / 加碼', tOther, '#38bdf8')}
       ${mkSection('⚠️', '減碼 / 清倉', tSell, '#f43f5e')}
