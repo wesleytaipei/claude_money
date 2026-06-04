@@ -336,6 +336,30 @@ def fetch_prices(tickers: list[str]) -> dict:
 
     if to_fetch:
         def _one(t: str) -> tuple[str, dict]:
+            # Primary: Yahoo chart API. Its meta.regularMarketPrice +
+            # meta.previousClose give the correct regular-session day change.
+            # (yfinance fast_info.previous_close is unreliable — e.g. COHX
+            # returned a stale 62.67 vs the real 68.79, inflating change% to
+            # ~12% instead of ~2%.)
+            try:
+                r = http_requests.get(
+                    f"https://query1.finance.yahoo.com/v8/finance/chart/{t}",
+                    headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+                m = r.json()["chart"]["result"][0]["meta"]
+                price = m.get("regularMarketPrice")
+                prev  = m.get("previousClose") or m.get("chartPreviousClose")
+                if price is not None:
+                    change_pct = (round((float(price) - float(prev)) / float(prev) * 100, 2)
+                                  if prev and float(prev) > 0 else None)
+                    return t, {
+                        "price":      round(float(price), 4),
+                        "change_pct": change_pct,
+                        "currency":   m.get("currency") or "USD",
+                        "ts":         now,
+                    }
+            except Exception:
+                pass
+            # Fallback: yfinance fast_info
             try:
                 fi = yf.Ticker(t).fast_info
                 price = fi.last_price
