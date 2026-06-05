@@ -1748,6 +1748,11 @@ function _setChartRange(prefix, type) {
     const prev = new Date(now);
     prev.setDate(prev.getDate() - 1);
     start = prev.toISOString().slice(0, 10);
+  } else if (type === 'week') {
+    const d = new Date(now);
+    const dow = (d.getDay() + 6) % 7;   // days since Monday (0=Mon … 6=Sun)
+    d.setDate(d.getDate() - dow);
+    start = d.toISOString().slice(0, 10);
   } else if (type === 'month') {
     start = `${y}-${String(mo + 1).padStart(2, '0')}-01`;
   } else if (type === 'prevmonth') {
