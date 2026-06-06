@@ -3144,23 +3144,30 @@ function _etfRender(data) {
   }
   const totalWt = Object.values(mktMap).reduce((s, v) => s + v, 0);
   const mktEntries = Object.entries(mktMap).sort((a, b) => b[1] - a[1]);
-  const mktBarsHtml = mktEntries.map(([cur, wt]) => {
+  // Stacked horizontal bar segments
+  const mktSegments = mktEntries.map(([cur, wt]) => {
     const pct  = totalWt > 0 ? (wt / totalWt * 100) : 0;
-    const label = _mktLabel[cur] || cur;
     const color = _mktColor[cur] || '#94a3b8';
-    return `<div style="display:flex;align-items:center;gap:8px;min-width:0">
-      <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;width:76px;flex-shrink:0">${label}</div>
-      <div style="flex:1;background:var(--surface-2);border-radius:4px;height:7px;overflow:hidden">
-        <div style="width:${pct.toFixed(1)}%;height:100%;background:${color};border-radius:4px;transition:width .4s"></div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:${color};width:42px;text-align:right;flex-shrink:0">${pct.toFixed(1)}%</div>
-    </div>`;
+    return `<div title="${(_mktLabel[cur]||cur).replace(/\uD83C[\uDDE0-\uDDFF]\uD83C[\uDDE0-\uDDFF]\s*/,'')} ${pct.toFixed(1)}%"
+              style="width:${pct.toFixed(2)}%;background:${color};height:100%"></div>`;
+  }).join('');
+  // Legend chips: flag + name + pct, wrapping
+  const mktChips = mktEntries.map(([cur, wt]) => {
+    const pct   = totalWt > 0 ? (wt / totalWt * 100) : 0;
+    const color = _mktColor[cur] || '#94a3b8';
+    const label = _mktLabel[cur] || cur;
+    return `<span style="display:inline-flex;align-items:center;gap:3px;white-space:nowrap">
+      <span style="width:8px;height:8px;border-radius:2px;background:${color};flex-shrink:0;display:inline-block"></span>
+      <span style="font-size:10px;color:var(--text-muted)">${label}</span>
+      <span style="font-size:10px;font-weight:700;color:${color}">${pct.toFixed(1)}%</span>
+    </span>`;
   }).join('');
   const mktBlockHtml = mktEntries.length ? `
     <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
-                padding:10px 14px;min-width:200px">
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">市場佔比</div>
-      <div style="display:flex;flex-direction:column;gap:5px">${mktBarsHtml}</div>
+                padding:8px 14px;min-width:220px;flex:1">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">市場佔比</div>
+      <div style="height:10px;border-radius:5px;overflow:hidden;display:flex;margin-bottom:7px">${mktSegments}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px 10px">${mktChips}</div>
     </div>` : '';
 
   body.innerHTML = `
