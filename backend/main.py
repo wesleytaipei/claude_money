@@ -2330,6 +2330,10 @@ def _resolve_foreign_sym(raw_sym: str) -> tuple[str, str]:
         if exch in _EXCH_TO_YAHOO:
             suffix, currency = _EXCH_TO_YAHOO[exch]
             return f"{base}{suffix}", currency
+        # China A-shares: code starting with 6 → Shanghai (.SS), 0/3 → Shenzhen (.SZ)
+        if exch == "CH":
+            suffix = ".SS" if base.startswith("6") else ".SZ"
+            return f"{base}{suffix}", "CNY"
     return raw_sym.replace(' ', '-'), "USD"
 
 
