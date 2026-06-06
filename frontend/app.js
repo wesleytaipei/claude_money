@@ -3130,31 +3130,31 @@ function _etfRender(data) {
         ⚠️ 無前一日資料可比對，操作類型全部顯示為「持有」。明日起將自動顯示買賣變化。
       </div>` : '';
 
-  // ── Market breakdown by exchange code (from symbol field) ────────────────
-  // symbol format: "TICKER EXCH" for foreign, no space for Taiwan
+  // ── Market breakdown by exchange code → region ───────────────────────────
+  // symbol format: "TICKER EXCH" for foreign, no space for Taiwan.
+  // European exchanges (GY/FP/LN/SW/SM/SS/NA/BB/AV/DC/HE…) are all grouped
+  // into one 歐洲 bucket; markets with normalised weight < 1% → 其他.
+  const _EU = new Set(['GY','FP','LN','SW','SM','SS','NA','BB','AV','DC','HE','VI','LS','PL','IR']);
+  const _exchToRegion = exch => _EU.has(exch) ? 'EU' : exch;
   const _mktLabel = { TW:'🇹🇼 台灣', US:'🇺🇸 美國', JP:'🇯🇵 日本', KS:'🇰🇷 韓國',
-                      GY:'🇩🇪 德國', FP:'🇫🇷 法國', HK:'🇭🇰 香港', CH:'🇨🇳 中國',
-                      LN:'🇬🇧 英國', AU:'🇦🇺 澳洲', SP:'🇸🇬 新加坡', SW:'🇨🇭 瑞士',
-                      SM:'🇮🇹 義大利', SS:'🇸🇪 瑞典', NA:'🇳🇱 荷蘭', BB:'🇧🇪 比利時',
-                      OTHER:'其他' };
+                      EU:'🌍 歐洲',   HK:'🇭🇰 香港', CH:'🇨🇳 中國', SP:'🇸🇬 新加坡',
+                      AU:'🇦🇺 澳洲',  OTHER:'其他' };
   const _mktColor = { TW:'#38bdf8', US:'#818cf8', JP:'#f43f5e', KS:'#10b981',
-                      GY:'#f59e0b', FP:'#a78bfa', HK:'#ec4899', CH:'#ef4444',
-                      LN:'#8b5cf6', AU:'#fb923c', SP:'#14b8a6', SW:'#e879f9',
-                      SM:'#0ea5e9', SS:'#22d3ee', NA:'#fbbf24', BB:'#4ade80',
-                      OTHER:'#64748b' };
+                      EU:'#f59e0b',  HK:'#ec4899', CH:'#ef4444', SP:'#14b8a6',
+                      AU:'#fb923c',  OTHER:'#64748b' };
   const mktRaw = {};
   for (const h of holdings.filter(x => (x.currentWeightPercent || 0) > 0)) {
-    const sym   = h.symbol || '';
-    const parts = sym.rsplit ? sym.rsplit(' ', 1) : sym.split(' ');
-    const exch  = sym.includes(' ') ? sym.split(' ').pop() : 'TW';
-    mktRaw[exch] = (mktRaw[exch] || 0) + (h.currentWeightPercent || 0);
+    const sym    = h.symbol || '';
+    const exch   = sym.includes(' ') ? sym.split(' ').pop() : 'TW';
+    const region = _exchToRegion(exch);
+    mktRaw[region] = (mktRaw[region] || 0) + (h.currentWeightPercent || 0);
   }
   const totalWt = Object.values(mktRaw).reduce((s, v) => s + v, 0);
-  // Merge markets with normalised weight < 1% into 'OTHER'
+  // Merge regions with normalised weight < 1% into 'OTHER'
   const mktMap = {};
-  for (const [exch, wt] of Object.entries(mktRaw)) {
+  for (const [region, wt] of Object.entries(mktRaw)) {
     const pctNorm = totalWt > 0 ? wt / totalWt * 100 : 0;
-    const key = pctNorm < 1 ? 'OTHER' : exch;
+    const key = pctNorm < 1 ? 'OTHER' : region;
     mktMap[key] = (mktMap[key] || 0) + wt;
   }
   const mktEntries = Object.entries(mktMap).sort((a, b) =>
