@@ -3130,12 +3130,45 @@ function _etfRender(data) {
         ⚠️ 無前一日資料可比對，操作類型全部顯示為「持有」。明日起將自動顯示買賣變化。
       </div>` : '';
 
+  // ── Market breakdown by currency ─────────────────────────────────────────
+  const _mktLabel = { TWD:'🇹🇼 台灣', JPY:'🇯🇵 日本', KRW:'🇰🇷 韓國', USD:'🇺🇸 美國',
+                      EUR:'🇪🇺 歐洲', HKD:'🇭🇰 香港', CNY:'🇨🇳 中國', SGD:'🇸🇬 新加坡',
+                      GBP:'🇬🇧 英國', AUD:'🇦🇺 澳洲' };
+  const _mktColor = { TWD:'#38bdf8', JPY:'#f43f5e', KRW:'#10b981', USD:'#818cf8',
+                      EUR:'#f59e0b', HKD:'#ec4899', CNY:'#ef4444', SGD:'#14b8a6',
+                      GBP:'#a78bfa', AUD:'#fb923c' };
+  const mktMap = {};
+  for (const h of holdings.filter(x => (x.currentWeightPercent || 0) > 0)) {
+    const c = h.currency || 'OTHER';
+    mktMap[c] = (mktMap[c] || 0) + (h.currentWeightPercent || 0);
+  }
+  const totalWt = Object.values(mktMap).reduce((s, v) => s + v, 0);
+  const mktEntries = Object.entries(mktMap).sort((a, b) => b[1] - a[1]);
+  const mktBarsHtml = mktEntries.map(([cur, wt]) => {
+    const pct  = totalWt > 0 ? (wt / totalWt * 100) : 0;
+    const label = _mktLabel[cur] || cur;
+    const color = _mktColor[cur] || '#94a3b8';
+    return `<div style="display:flex;align-items:center;gap:8px;min-width:0">
+      <div style="font-size:11px;color:var(--text-muted);white-space:nowrap;width:76px;flex-shrink:0">${label}</div>
+      <div style="flex:1;background:var(--surface-2);border-radius:4px;height:7px;overflow:hidden">
+        <div style="width:${pct.toFixed(1)}%;height:100%;background:${color};border-radius:4px;transition:width .4s"></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:${color};width:42px;text-align:right;flex-shrink:0">${pct.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+  const mktBlockHtml = mktEntries.length ? `
+    <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
+                padding:10px 14px;min-width:200px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">市場佔比</div>
+      <div style="display:flex;flex-direction:column;gap:5px">${mktBarsHtml}</div>
+    </div>` : '';
+
   body.innerHTML = `
     <!-- Fund header -->
     <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px">
         <div style="font-size:15px;font-weight:700;margin-bottom:6px">${fundName}${staleNote}</div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
           <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;
                       padding:8px 14px;min-width:110px">
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">規模</div>
@@ -3151,6 +3184,7 @@ function _etfRender(data) {
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">資料日期</div>
             <div style="font-size:13px;font-weight:600">${date}${compNote}</div>
           </div>
+          ${mktBlockHtml}
         </div>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">${cardHtml}</div>
