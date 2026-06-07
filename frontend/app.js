@@ -2630,6 +2630,38 @@ function _drawAdlChart(rows) {
   });
 }
 
+// Estimate next trading day's TAIEX (加權指數) opening level from overnight markets.
+// 方法一 台指期夜盤逆推 (primary, most accurate): 加權開盤 ≈ 台指期夜盤 − 基差，
+//   基差 = 台指期日盤結算 − 加權現貨；台指期日盤結算由夜盤價與其漲跌%反推。
+// 方法三 權重修正 (range): 用富台指漲跌% + 台積電ADR%，校正台積電在兩指數的權重差。
+function _estimateTaiexOpen(data) {
+  const taiex = state.indices?.taiex?.price;
+  if (!taiex) return null;
+  const num = s => parseFloat(String(s ?? '').replace(/[,%+\s]/g, ''));
+  const ests = [];
+  // 方法一：台指期(WTX)夜盤逆推
+  const wtxP = num(data.wtx?.price), wtxPct = num(data.wtx?.change_pct);
+  if (isFinite(wtxP) && isFinite(wtxPct) && wtxPct > -100) {
+    const txDaySettle = wtxP / (1 + wtxPct / 100);   // 台指期日盤結算
+    const basis = txDaySettle - taiex;               // 期現基差
+    ests.push({ name: '台指期夜盤逆推', val: wtxP - basis });
+  }
+  // 方法三：富台指 + 台積電ADR 權重修正
+  const fpct = num(data.twncon?.change_pct), cpct = num(data.tsm_adr?.change_pct);
+  if (isFinite(fpct)) {
+    const wt = 0.35, wf = 0.20;                      // 台積電權重：加權35% / 富台指20%
+    const dT = isFinite(cpct)
+      ? fpct * (1 - wt) / (1 - wf) + cpct * (wt - wf) / (1 - wf)
+      : fpct;
+    ests.push({ name: '權重修正', val: taiex * (1 + dT / 100) });
+  }
+  if (!ests.length) return null;
+  const vals = ests.map(e => e.val);
+  const primary = ests[0].val;                       // 方法一優先
+  return { primary, low: Math.min(...vals), high: Math.max(...vals),
+           pct: (primary - taiex) / taiex * 100, taiex, methods: ests };
+}
+
 async function renderImportantInfo(force = false) {
   const tbody = document.getElementById('important-tbody');
   if(!tbody) return;
@@ -2665,7 +2697,8 @@ async function renderImportantInfo(force = false) {
         metric: data.twncon,
         fmt: o => o.price,
         sub: o => `${o.change} (${o.change_pct})`,
-        changeKey: 'change' },
+        changeKey: 'change',
+        estTaiex: true },
 
       { name: '🇺🇸 台積電 ADR (TSM)', src: 'Yahoo Finance',
         metric: data.tsm_adr,
@@ -2751,6 +2784,24 @@ async function renderImportantInfo(force = false) {
         <td style="font-size:15px; font-weight:600; font-family:'JetBrains Mono',monospace">${v1}${staleBadge}</td>
         <td style="color:${subColor}; font-weight:500; font-family:'JetBrains Mono',monospace">${v2}</td>
       </tr>`;
+
+      // 富台指下方：推估隔一交易日加權指數開盤
+      if (r.estTaiex) {
+        const e = _estimateTaiexOpen(data);
+        if (e) {
+          const col  = e.pct > 0 ? 'var(--green)' : e.pct < 0 ? 'var(--red)' : 'var(--text)';
+          const sign = e.pct >= 0 ? '+' : '';
+          const fmt0 = n => Math.round(n).toLocaleString('en-US');
+          const range = Math.abs(e.high - e.low) > 1
+            ? `<span style="color:var(--text-muted);font-weight:400;font-size:12px">　區間 ${fmt0(e.low)}~${fmt0(e.high)}</span>` : '';
+          const tip = e.methods.map(m => `${m.name}：${fmt0(m.val)}`).join('&#10;');
+          html += `<tr title="推估隔一交易日加權指數(現貨)開盤位置&#10;基準加權收盤 ${fmt0(e.taiex)}&#10;${tip}">
+            <td style="padding-left:20px;color:var(--text-dim)">↳ 推估加權開盤 <span style="font-size:11px;color:var(--text-muted)">(隔日)</span></td>
+            <td style="font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;color:${col}">${fmt0(e.primary)}</td>
+            <td style="color:${col};font-weight:600;font-family:'JetBrains Mono',monospace">${sign}${e.pct.toFixed(2)}%${range}</td>
+          </tr>`;
+        }
+      }
     }
 
     // Footer row with update time
