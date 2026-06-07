@@ -2700,6 +2700,13 @@ async function renderImportantInfo(force = false) {
         changeKey: 'change',
         estTaiex: true },
 
+      { name: '😱 台指VIX (TAIWANVIX)', src: 'TAIFEX',
+        metric: data.vixtwn,
+        fmt: o => o.price,
+        sub: o => `${o.change} (${o.change_pct})`,
+        // VIX 上升=恐慌升溫 → 顯示紅色（與漲跌相反）
+        colorFn: o => -parseFloat(String(o.change ?? '').replace(/[+%]/g, '')) },
+
       { name: '🇺🇸 台積電 ADR (TSM)', src: 'Yahoo Finance',
         metric: data.tsm_adr,
         fmt: o => `$${o.price}`,

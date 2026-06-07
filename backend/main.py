@@ -2608,6 +2608,18 @@ def get_important_info(force: bool = False):
             if lg and lg.get("current") is not None:
                 data["taiex_margin_ratio"] = {"current": lg["current"],
                                               "prev": lg.get("prev"), "stale": True}
+
+        # 台指VIX (TAIFEX mis is IP-blocked on Railway) — relay via Gist last-good
+        vix = data.get("vixtwn") or {}
+        if vix.get("price") not in (None, "-"):
+            _save_lastgood("vixtwn_lastgood.json",
+                           {"price": vix.get("price"), "change": vix.get("change"),
+                            "change_pct": vix.get("change_pct")})
+        elif IS_RAILWAY:
+            lg = _load_lastgood("vixtwn_lastgood.json")
+            if lg and lg.get("price") not in (None, "-"):
+                data["vixtwn"] = {"price": lg["price"], "change": lg.get("change"),
+                                  "change_pct": lg.get("change_pct"), "stale": True}
         return data
     except Exception as e:
         logger.error(f"[important-info] failed: {e}")

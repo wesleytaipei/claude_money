@@ -294,6 +294,32 @@ def fetch_cnyes_twncon():
         print(f"Error fetching TWNCON: {e}")
     return {"price": "-", "change": "-", "change_pct": "-"}
 
+def fetch_taiwan_vix():
+    """Fetch 臺指選擇權波動率指數 (TAIWANVIX / 台指VIX) from TAIFEX MIS realtime quote.
+    Note: mis.taifex.com.tw is likely IP-blocked on Railway — relayed via Gist."""
+    try:
+        r = requests.post(
+            "https://mis.taifex.com.tw/futures/api/getQuoteDetail",
+            json={"SymbolID": ["TAIWANVIX"]},
+            headers={"User-Agent": "Mozilla/5.0", "Content-Type": "application/json",
+                     "Origin": "https://mis.taifex.com.tw",
+                     "Referer": "https://mis.taifex.com.tw/futures/"},
+            timeout=10, verify=False)
+        q = r.json().get("RtData", {}).get("QuoteList", [{}])[0]
+        last = _safe_float(q.get("CLastPrice"))
+        ref  = _safe_float(q.get("CRefPrice"))
+        if last is not None and last > 0:
+            change = round(last - ref, 2) if ref else 0.0
+            pct    = round(change / ref * 100, 2) if ref else 0.0
+            return {
+                "price": f"{last:.2f}",
+                "change": f"+{change}" if change > 0 else str(change),
+                "change_pct": f"{pct}%",
+            }
+    except Exception as e:
+        print(f"Error fetching TAIWANVIX: {e}")
+    return {"price": "-", "change": "-", "change_pct": "-"}
+
 def fetch_stwn_robust():
     """Fetch FTSE Taiwan futures (STWN) from multiple sources."""
     headers = HEADERS
@@ -840,6 +866,7 @@ def scrape_important_info(force=False):
         f_wtx         = executor.submit(_fetch_wtx)
         f_twncon      = executor.submit(fetch_cnyes_twncon)
         f_tsm         = executor.submit(fetch_tsm_adr)
+        f_vix         = executor.submit(fetch_taiwan_vix)
         f_margin_tse  = executor.submit(fetch_twse_margin, force)
         f_margin_otc  = executor.submit(fetch_tpex_margin, force)
 
@@ -851,6 +878,7 @@ def scrape_important_info(force=False):
             "wtx":                f_wtx.result(),
             "twncon":             f_twncon.result(),
             "tsm_adr":            f_tsm.result(),
+            "vixtwn":             f_vix.result(),
             "margin_balance_tse": f_margin_tse.result(),
             "margin_balance_otc": f_margin_otc.result(),
         }
