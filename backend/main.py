@@ -990,15 +990,19 @@ def _fetch_mis_cb_prices(symbols: list[str]) -> dict:
 
             # Only trust MIS price when there is a real trade:
             # 1. z field (latest/closing trade price)
-            # 2. h == u with volume (hit 漲停 — last trade was at upper limit)
-            # 3. l == w with volume (hit 跌停 — last trade was at lower limit)
+            # 2. h == u with volume (LOCKED at 漲停 — only while market is open;
+            #    post-market h==u just means it *touched* the ceiling intraday,
+            #    not that it closed there — fall through to z/Yahoo for the close)
+            # 3. l == w with volume (LOCKED at 跌停 — same caveat; e.g. 47602 had
+            #    low==floor 152 intraday but actually closed at 163)
             # Do NOT use bid (b) — it's a resting order, not a trade price.
+            mkt_open = _is_tw_market_open()
             price = None
             if z_f is not None:
                 price = z_f
-            elif h_f is not None and u_f is not None and abs(h_f - u_f) < 0.01 and v_f > 0:
+            elif mkt_open and h_f is not None and u_f is not None and abs(h_f - u_f) < 0.01 and v_f > 0:
                 price = u_f
-            elif l_f is not None and w_f is not None and abs(l_f - w_f) < 0.01 and v_f > 0:
+            elif mkt_open and l_f is not None and w_f is not None and abs(l_f - w_f) < 0.01 and v_f > 0:
                 price = w_f
 
             # Persist valid z prices as intraday cache (survives post-market z="-" period).
