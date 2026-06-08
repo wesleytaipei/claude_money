@@ -1132,12 +1132,16 @@ def fetch_cb_prices(symbols: list[str]) -> dict:
                 prev = mis.get("prev_close")
                 if prev and prev > 0:
                     entry["change_pct"] = round((yp_p - prev) / prev * 100, 2)
-        elif mis.get("price") is not None:
-            # Intraday cache only (Yahoo also failed) — best available
+        elif mis.get("price") is not None and (_is_tw_market_open() or entry.get("price") is None):
+            # Intraday cache: trust during market hours. Post-market the cached z
+            # can be a stale mid-session trade (not the close), so only use it as a
+            # last resort when CBAS has no closing price — otherwise prefer CBAS
+            # below. (e.g. 47602: cache held 152 but the real close was 163.)
             entry["price"]      = mis["price"]
             entry["change_pct"] = mis.get("change_pct")
         else:
-            # No real MIS trade, no Yahoo — keep CBAS closing price, compute change_pct from MIS y
+            # Post-market with an authoritative CBAS close (or no MIS at all):
+            # keep the CBAS closing price, compute change_pct from MIS prev close.
             prev = mis.get("prev_close")
             cbas_p = entry.get("price")
             if cbas_p is not None and prev and prev > 0:
