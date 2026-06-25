@@ -1,6 +1,7 @@
 """HC Finance Web — FastAPI backend"""
 import json
 import logging
+import shutil
 import time
 import re
 from datetime import datetime, timedelta
@@ -101,6 +102,30 @@ ensure_data_seeded()
 CONFIG_FILE = DATA_DIR / "alm_config.json"
 HISTORY_FILE = DATA_DIR / "history.json"
 MANUAL_HISTORY_FILE = DATA_DIR / "manual_history.json"
+BACKUP_DIR = DATA_DIR / "backups"
+_BACKUP_FILES = [CONFIG_FILE, HISTORY_FILE, MANUAL_HISTORY_FILE]
+
+
+def _backup_local():
+    """Copy critical data files to backups/YYYY-MM-DD/. One snapshot per day;
+    calling multiple times on the same day overwrites with the latest state.
+    Prunes backups older than 14 days automatically."""
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    dest = BACKUP_DIR / date_str
+    dest.mkdir(parents=True, exist_ok=True)
+    for src in _BACKUP_FILES:
+        if src.exists():
+            shutil.copy2(src, dest / src.name)
+    # Prune backups older than 14 days
+    cutoff = datetime.now() - timedelta(days=14)
+    for d in BACKUP_DIR.iterdir():
+        if d.is_dir():
+            try:
+                if datetime.strptime(d.name, "%Y-%m-%d") < cutoff:
+                    shutil.rmtree(d)
+            except (ValueError, OSError):
+                pass
+    logger.info(f"[backup] local snapshot saved → {dest}")
 
 _price_cache: dict = {}
 _tw_mis_cache: dict = {}   # symbol → {price, change_pct, name, ts}
@@ -1697,14 +1722,57 @@ async def save_snapshot(request: Request):
     date_key = body.get("date") or datetime.now().strftime("%Y-%m-%d")
     history[date_key] = {k: v for k, v in body.items() if k != "date"}
     save_json(HISTORY_FILE, history)
-    # 儲存資料 = confirmed version → push alm_config + history to Gist
-    _gist_push_confirmed()
+    _backup_local()                 # local versioned backup (14-day window)
+    _gist_push_confirmed()          # confirmed version → push alm_config + history to Gist
     return {"ok": True, "date": date_key}
 
 
 @app.get("/api/history")
 def get_history():
     return load_json(HISTORY_FILE, {})
+
+
+@app.get("/api/backups")
+def list_backups():
+    """Return available local backup dates (newest first), each with file list and sizes."""
+    if not BACKUP_DIR.exists():
+        return {"dates": []}
+    dates = []
+    for d in sorted(BACKUP_DIR.iterdir(), reverse=True):
+        if not d.is_dir():
+            continue
+        try:
+            datetime.strptime(d.name, "%Y-%m-%d")
+        except ValueError:
+            continue
+        files = [
+            {"name": f.name, "size": f.stat().st_size}
+            for f in sorted(d.iterdir())
+            if f.suffix == ".json"
+        ]
+        dates.append({"date": d.name, "files": files})
+    return {"dates": dates}
+
+
+@app.post("/api/restore/{date}")
+def restore_backup(date: str):
+    """Restore data files from backup/{date}. Before restoring, saves a backup of
+    today's current state so the operation is reversible (restore → restore to today)."""
+    from fastapi import HTTPException
+    backup_path = BACKUP_DIR / date
+    if not backup_path.exists():
+        raise HTTPException(status_code=404, detail=f"No backup found for {date}")
+    # Save current state first so user can undo by restoring today's backup
+    _backup_local()
+    restored = []
+    for src in sorted(backup_path.iterdir()):
+        if src.suffix == ".json":
+            shutil.copy2(src, DATA_DIR / src.name)
+            restored.append(src.name)
+    # Sync restored state to Gist
+    _gist_push_confirmed()
+    logger.info(f"[restore] restored from {date}: {restored}")
+    return {"ok": True, "date": date, "restored": restored}
 
 
 @app.get("/api/manual-history")
@@ -2638,14 +2706,14 @@ _cb_listed_cache: dict = {"date": "", "data": None}
 CB_LISTED_URL = "https://cbas16889.pscnet.com.tw/api/MiDownloadExcel/GetExcel_RecentlyCB"
 
 @app.get("/api/cb-listed")
-def get_cb_listed():
+def get_cb_listed(force: bool = False):
     """Return recent listed CBs from cbas pscnet Excel. Cached per calendar day."""
     global _cb_listed_cache
     import io, pandas as pd
     from datetime import date
 
     today = date.today().isoformat()
-    if _cb_listed_cache["data"] is not None and _cb_listed_cache["date"] == today:
+    if not force and _cb_listed_cache["data"] is not None and _cb_listed_cache["date"] == today:
         return _cb_listed_cache["data"]
 
     try:
@@ -2809,7 +2877,7 @@ def _cb_subtype(cat: str) -> str:
     return ''
 
 @app.get("/api/fsc-offerings")
-def get_fsc_offerings():
+def get_fsc_offerings(force: bool = False):
     """Return approved 現金增資 / 轉換公司債 from FSC annual Excel. Cached per calendar day."""
     global _fsc_cache
     import io, pandas as pd
@@ -2818,7 +2886,7 @@ def get_fsc_offerings():
 
     today = _tw_today()
     cached = _fsc_cache["data"]
-    if cached is not None and _fsc_cache["date"] == today and cached.get("excel_date"):
+    if not force and cached is not None and _fsc_cache["date"] == today and cached.get("excel_date"):
         return cached
 
     try:
