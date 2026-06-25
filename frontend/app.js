@@ -1921,6 +1921,7 @@ function goPage(name) {
   else if (name === 'important') { renderImportantInfo(false); renderAdlChart(false); }
   else if (name === 'etf') renderEtfPage(false);
   else if (name === 'ranking') renderRanking(false);
+  else if (name === 'cb-be') _initCbBookentryMyCbs();
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -1931,7 +1932,8 @@ function goPage(name) {
     dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
     growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊',
     etf: 'ETF追蹤',
-    ranking: '成交值排行'
+    ranking: '成交值排行',
+    'cb-be': 'CB 餘額圖'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -4232,7 +4234,6 @@ function _renderRankingData(data) {
       <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? _staleBadge : ''))}${buildList(data.twse)}</div>
       <div>${hdr('🏪', '上櫃 TPEX' + (data.tpex_stale ? _staleBadge : ''))}${buildList(data.tpex)}</div>
     </div>`;
-  _initCbBookentryMyCbs();
 }
 
 // ── CB 餘額 vs 現股股價 ────────────────────────────────────────────────────────

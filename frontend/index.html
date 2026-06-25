@@ -52,6 +52,9 @@
         <button class="nav-item" data-page="ranking">
           <span class="nav-ico">🏆</span><span>成交值排行</span>
         </button>
+        <button class="nav-item" data-page="cb-be">
+          <span class="nav-ico">📉</span><span>CB 餘額圖</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -484,9 +487,11 @@
         <div id="ranking-body">
           <div class="empty-state">點擊側邊欄「成交值排行」載入資料</div>
         </div>
+      </section>
 
-        <!-- ── CB 餘額 vs 股價 ── -->
-        <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+      <!-- ══ CB 餘額圖 ══ -->
+      <section class="page" id="page-cb-be">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
           <div class="panel-head">
             <h3>📉 可轉債餘額 vs 現股股價</h3>
             <div style="display:flex;gap:6px;align-items:center">
@@ -501,7 +506,7 @@
           <div id="cb-be-stats" style="display:none;padding:10px 14px;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)"></div>
           <div id="cb-be-msg" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">輸入可轉債代號查詢（資料來源：money-104.com）</div>
           <div id="cb-be-chart-wrap" style="display:none;padding:12px 14px 14px">
-            <canvas id="cb-be-canvas" style="height:320px"></canvas>
+            <canvas id="cb-be-canvas" style="height:360px"></canvas>
           </div>
         </div>
       </section>
