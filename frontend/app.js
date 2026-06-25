@@ -12,6 +12,8 @@ const state = {
   history: {},       // daily snapshots from alm_history
   privacy: false,
   currentInv: 'stock',  // stock | cb | us
+  currentAssetTab: null,
+  currentLiabTab: null,
   pnlYear: new Date().getFullYear(),
   usdTwd: 31.77,
   jpyTwd: 0.2,
@@ -31,6 +33,31 @@ function itemKey(section, gi, ii) { return `${section}.${gi}.${ii}`; }
 function groupKey(section, gi) { return `${section}.${gi}.*`; }
 function isExcluded(section, gi, ii) {
   return state.excluded.has(groupKey(section, gi)) || state.excluded.has(itemKey(section, gi, ii));
+}
+
+// Returns Set of group names currently excluded (from assets + investments)
+function getExcludedGroupNames() {
+  const names = new Set();
+  const p = state.portfolio;
+  if (!p) return names;
+  [['assets', p.assets], ['investments', p.investments]].forEach(([sec, groups]) => {
+    (groups || []).forEach((g, gi) => {
+      if (state.excluded.has(groupKey(sec, gi))) names.add(g.group);
+    });
+  });
+  return names;
+}
+
+// Adjust a history snapshot's net_worth / total_assets by subtracting currently excluded groups.
+// Liabilities are left unchanged (no per-group breakdown in history).
+function adjSnap(snap) {
+  const exNames = getExcludedGroupNames();
+  if (!exNames.size) return snap;
+  const ag = snap.asset_groups || {};
+  let subtract = 0;
+  for (const name of exNames) subtract += ag[name] || 0;
+  if (!subtract) return snap;
+  return { ...snap, net_worth: (snap.net_worth || 0) - subtract, total_assets: (snap.total_assets || 0) - subtract };
 }
 
 const charts = {};
@@ -101,7 +128,7 @@ const minMaxPlugin = {
         const pt = meta.data[idx];
         if (!pt) return;
         const px = pt.x, py = pt.y;
-        const txt = fmt(val);
+        const txt = state.privacy ? '●●●' : fmt(val);
 
         ctx.font = 'bold 10px Inter,sans-serif';
         const tw = ctx.measureText(txt).width;
@@ -681,7 +708,8 @@ const _INV_HIST_GROUPS = ['股票', '可轉債', '美國股市'];
 
 function _invMVFromSnap(snap) {
   if (!snap?.asset_groups) return 0;
-  return _INV_HIST_GROUPS.reduce((s, g) => s + (snap.asset_groups[g] || 0), 0);
+  const exNames = getExcludedGroupNames();
+  return _INV_HIST_GROUPS.reduce((s, g) => exNames.has(g) ? s : s + (snap.asset_groups[g] || 0), 0);
 }
 
 async function renderPnLGrid(year) {
@@ -710,15 +738,16 @@ async function renderPnLGrid(year) {
   if (year === curYear) {
     // ── Current year: 5 cards ─────────────────────────────────────────
     let allInvMV = 0, allInvCost = 0, allInvPnL = 0, allMargin = 0;
-    for (const g of state.portfolio.investments) {
+    state.portfolio.investments.forEach((g, gi) => {
       const isTWSt = g.group === '股票';
-      for (const item of g.items) {
+      g.items.forEach((item, ii) => {
+        if (isExcluded('investments', gi, ii)) return;
         allInvMV   += item._mv_twd  || 0;
-        allInvCost += item._cost_twd || 0;   // 自備款合計
-        allInvPnL  += item._pnl_twd || 0;   // Σ (現價-均價)×股數，正確損益
+        allInvCost += item._cost_twd || 0;
+        allInvPnL  += item._pnl_twd || 0;
         if (isTWSt) allMargin += item._margin || 0;
-      }
-    }
+      });
+    });
     const allTotalCost  = allInvCost + allMargin;   // 自備款 + 融資 = 總買入成本
     const unrealized    = allInvPnL;                // 正確：不受融資金額影響
     const unrealizedPct = allTotalCost > 0 ? unrealized / allTotalCost * 100 : 0;
@@ -727,7 +756,7 @@ async function renderPnLGrid(year) {
     const curYearSnaps = Object.keys(state.history)
       .filter(d => d.startsWith(year + '-')).sort();
     const startKey  = curYearSnaps[0];
-    const startNW   = startKey ? (state.history[startKey].net_worth || 0) : 0;
+    const startNW   = startKey ? (adjSnap(state.history[startKey]).net_worth || 0) : 0;
 
     // 累計損益 = 目前淨資產 - 起始淨資產
     const curNW   = calcTotals().netWorth;
@@ -852,8 +881,53 @@ function renderIndices() {
 
 // ══ Render: Assets & Liabilities ════════════════════════════════════════
 function renderAssetsPage() {
-  renderGroupList('assets', 'assets-groups');
-  renderGroupList('liabilities', 'liabilities-groups');
+  document.getElementById('fx-usd').textContent = state.usdTwd.toFixed(3);
+  document.getElementById('fx-jpy').textContent = state.jpyTwd.toFixed(4);
+  _renderAllGroups('assets-groups',      'assets');
+  _renderAllGroups('liabilities-groups', 'liabilities');
+}
+
+function _renderAllGroups(containerId, section) {
+  const groups    = state.portfolio[section] || [];
+  const container = document.getElementById(containerId);
+  const isLiab    = section === 'liabilities';
+
+  if (groups.length === 0) {
+    container.innerHTML = '<div class="empty-state">尚無群組，點擊「＋ 新增群組」開始</div>';
+    return;
+  }
+
+  const renderCol = (g, gi) => {
+    const total = g.items.reduce((s, it) => s + toTWD(Number(it.amount) || 0, it.currency), 0);
+    const rows  = g.items.map((item, ii) => renderItemRow(section, gi, ii, item, isLiab)).join('');
+    const hdrRight = isLiab ? '餘額 / 利率' : '金額 / 幣別';
+    return `<div class="alm-col">
+      <div class="alm-col-head">
+        <span class="alm-col-title">${g.group}</span>
+        <span class="alm-col-total ${total >= 0 ? '' : 'red'}">${fmt(total)}</span>
+      </div>
+      <div class="alm-col-hdr"><span>名稱</span><span>${hdrRight}</span><span>台幣</span></div>
+      <div class="group-body">${rows || '<div class="empty-state" style="padding:10px 14px">無項目</div>'}</div>
+      <div class="alm-col-footer">
+        <button class="btn-primary" onclick="addItemToGroup('${section}',${gi})">＋ 項目</button>
+        <button class="btn-icon" onclick="deleteGroup('${section}',${gi})">✕</button>
+      </div>
+    </div>`;
+  };
+
+  if (!isLiab && groups.length > 1) {
+    // 資產：第一組獨立左欄，其餘堆疊在右欄
+    const left  = renderCol(groups[0], 0);
+    const right = groups.slice(1).map((g, i) => renderCol(g, i + 1)).join('');
+    container.innerHTML = `
+      <div class="alm-cols" style="grid-template-columns:1fr 1fr">
+        ${left}
+        <div class="alm-stack">${right}</div>
+      </div>`;
+  } else {
+    // 負債：全部垂直堆疊
+    container.innerHTML = `<div class="alm-stack">${groups.map((g, gi) => renderCol(g, gi)).join('')}</div>`;
+  }
 }
 
 function renderGroupList(section, containerId) {
@@ -891,45 +965,62 @@ function renderGroupList(section, containerId) {
 }
 
 function renderItemRow(section, gi, ii, item, isLiab) {
-  const rowCls = isLiab ? 'group-row group-row-liab' : 'group-row';
-  const curOpts = ['TWD', 'USD', 'JPY'].map(c => `<option value="${c}" ${item.currency === c ? 'selected' : ''}>${c}</option>`).join('');
-  const twd = toTWD(Number(item.amount) || 0, item.currency);
+  const curOpts = ['TWD', 'USD', 'JPY'].map(c =>
+    `<option value="${c}" ${item.currency === c ? 'selected' : ''}>${c}</option>`).join('');
+  const twd    = toTWD(Number(item.amount) || 0, item.currency);
+  const twdCls = `alm-twd${isLiab ? ' red' : ''} priv-amt`;
+  const cur    = item.currency || 'TWD';
+  // amount display: show in original currency
+  const amtFmt = cur === 'TWD' ? Math.round(item.amount ?? 0).toLocaleString()
+               : cur === 'USD' ? 'US$' + Number(item.amount ?? 0).toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2})
+               : '¥'  + Math.round(item.amount ?? 0).toLocaleString();
 
-  if (isLiab) {
-    // Auto-margin entry: read-only display, not manually editable
-    if (item._auto_margin) {
-      return `<div class="${rowCls}" style="opacity:.75">
-        <input value="${escapeAttr(item.name || '')}" disabled style="color:var(--primary-2)" />
-        <input class="num-input priv-num" type="text" value="${item.amount ?? 0}" disabled />
-        <select disabled>${curOpts}</select>
-        <input class="num-input priv-num" type="text" value="1" disabled />
-        <input class="num-input" type="text" value="" placeholder="自動" disabled />
-        <input value="" placeholder="自動" disabled />
-        <input class="num-input" type="text" value="" placeholder="自動" disabled />
-        <div class="calc-value red">${fmtFull(twd)}</div>
-        <button class="btn-icon" title="由股票融資金額自動計算" style="cursor:default;opacity:.4">🔒</button>
-      </div>`;
-    }
-    return `<div class="${rowCls}">
-      <input value="${escapeAttr(item.name || '')}" placeholder="名稱" onchange="updateItem('${section}',${gi},${ii},'name',this.value)" />
-      <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
-      <select onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
-      <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
-      <input class="num-input" type="text" inputmode="decimal" value="${item.rate_pct ?? ''}" placeholder="利率%" onchange="updateItem('${section}',${gi},${ii},'rate_pct',parseFloat(this.value)||0)" />
-      <input value="${escapeAttr(item.start_date || '')}" placeholder="YYYY/MM" onchange="updateItem('${section}',${gi},${ii},'start_date',this.value)" />
-      <input class="num-input" type="text" inputmode="decimal" value="${item.years ?? ''}" placeholder="期數" onchange="updateItem('${section}',${gi},${ii},'years',parseFloat(this.value)||0)" />
-      <div class="calc-value red">${fmtFull(twd)}</div>
-      <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
+  if (isLiab && item._auto_margin) {
+    return `<div class="alm-item" style="opacity:.75">
+      <div class="alm-item-top">
+        <span class="alm-iname-dis" style="color:var(--primary-2);flex:1">${escapeAttr(item.name||'')}</span>
+        <span class="${twdCls}">${fmt(twd)}</span>
+        <button class="btn-icon" style="cursor:default;opacity:.4" title="由股票融資自動計算">🔒</button>
+      </div>
+      <div class="alm-item-bot"><span class="alm-amt-dis">${amtFmt}</span><span class="alm-cur-tag">${cur}</span></div>
     </div>`;
   }
 
-  return `<div class="${rowCls}">
-    <input value="${escapeAttr(item.name || '')}" placeholder="名稱" onchange="updateItem('${section}',${gi},${ii},'name',this.value)" />
-    <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.amount ?? 0}" onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)" />
-    <select onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
-    <input class="num-input priv-num" type="text" inputmode="decimal" value="${item.rate ?? 1}" onchange="updateItem('${section}',${gi},${ii},'rate',parseFloat(this.value)||1)" />
-    <div class="calc-value">${fmtFull(twd)}</div>
-    <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
+  if (!isLiab) {
+    return `<div class="alm-item">
+      <div class="alm-item-top">
+        <input class="alm-iname" value="${escapeAttr(item.name||'')}" placeholder="名稱"
+               onchange="updateItem('${section}',${gi},${ii},'name',this.value)"/>
+        <span class="${twdCls}">${fmt(twd)}</span>
+        <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
+      </div>
+      <div class="alm-item-bot">
+        <input class="alm-iamt num-input priv-num" type="text" inputmode="decimal" value="${item.amount??0}"
+               onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)"/>
+        <select class="alm-icur" onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="alm-item">
+    <div class="alm-item-top">
+      <input class="alm-iname" value="${escapeAttr(item.name||'')}" placeholder="名稱"
+             onchange="updateItem('${section}',${gi},${ii},'name',this.value)"/>
+      <span class="${twdCls}">${fmt(twd)}</span>
+      <button class="btn-icon" onclick="deleteItem('${section}',${gi},${ii})">✕</button>
+    </div>
+    <div class="alm-item-bot">
+      <input class="alm-iamt num-input priv-num" type="text" inputmode="decimal" value="${item.amount??0}"
+             onchange="updateItem('${section}',${gi},${ii},'amount',parseFloat(this.value)||0)"/>
+      <select class="alm-icur" onchange="updateItemCurrency('${section}',${gi},${ii},this.value)">${curOpts}</select>
+      <span class="alm-sep">·</span>
+      <span class="alm-sub-lbl">利率 <input type="text" inputmode="decimal" value="${item.rate_pct??''}" placeholder="—"
+            onchange="updateItem('${section}',${gi},${ii},'rate_pct',parseFloat(this.value)||0)"/>%</span>
+      <span class="alm-sub-lbl"><input type="text" value="${escapeAttr(item.start_date||'')}" placeholder="YYYY/MM"
+            onchange="updateItem('${section}',${gi},${ii},'start_date',this.value)"/> 起</span>
+      <span class="alm-sub-lbl"><input type="text" inputmode="decimal" value="${item.years??''}" placeholder="—"
+            onchange="updateItem('${section}',${gi},${ii},'years',parseFloat(this.value)||0)"/> 期</span>
+    </div>
   </div>`;
 }
 
@@ -973,7 +1064,14 @@ async function deleteItem(section, gi, ii) {
 async function deleteGroup(section, gi) {
   const g = state.portfolio[section][gi];
   if (!confirm(`確定刪除群組「${g.group}」及其 ${g.items.length} 個項目？`)) return;
+  const wasActive = section === 'assets' ? state.currentAssetTab === g.group
+                                         : state.currentLiabTab === g.group;
   state.portfolio[section].splice(gi, 1);
+  if (wasActive) {
+    const first = state.portfolio[section][0]?.group ?? null;
+    if (section === 'assets') state.currentAssetTab = first;
+    else state.currentLiabTab = first;
+  }
   await savePortfolio();
   renderAssetsPage();
 }
@@ -991,6 +1089,8 @@ function openAddGroup(section) {
   const name = prompt(`新群組名稱：`);
   if (!name) return;
   state.portfolio[section].push({ group: name, items: [] });
+  if (section === 'assets') state.currentAssetTab = name;
+  else state.currentLiabTab = name;
   savePortfolio();
   renderAssetsPage();
 }
@@ -1043,6 +1143,19 @@ function renderInvestmentsPage() {
   const pnl    = totalPnL;
   const pnlPct = totalCost > 0 ? (pnl / totalCost * 100) : 0;
 
+  // Per-broker 整戶維持率 (stock tab only, for positions with 融資)
+  const _bm = {};
+  if (state.currentInv === 'stock') {
+    for (const item of items) {
+      if (!(item._margin > 0)) continue;
+      const b = (item.broker || '').trim() || '(未設定)';
+      if (!_bm[b]) _bm[b] = { mv: 0, margin: 0 };
+      _bm[b].mv += item._mv_twd || 0;
+      _bm[b].margin += item._margin || 0;
+    }
+  }
+  const _bmEntries = Object.entries(_bm);
+
   document.getElementById('inv-summary').innerHTML = `
     <div class="inv-stat">
       <div class="inv-stat-label">總市值</div>
@@ -1052,6 +1165,14 @@ function renderInvestmentsPage() {
       <div class="inv-stat-label">總成本</div>
       <div class="inv-stat-value">${fmtFull(totalCost)}</div>
     </div>
+    ${_bmEntries.length > 0 ? `<div class="inv-stat">
+      <div class="inv-stat-label">整戶維持率</div>
+      <div class="inv-stat-value" style="font-size:15px">${_bmEntries.map(([b, d]) => {
+        const r = d.margin > 0 ? d.mv / d.margin * 100 : 0;
+        const color = r < 130 ? 'var(--red-2)' : r < 150 ? 'var(--orange)' : 'var(--green)';
+        return `${b}&nbsp;<span style="color:${color}">${r.toFixed(0)}%</span>`;
+      }).join('&ensp;&ensp;')}</div>
+    </div>` : ''}
     <div class="inv-stat">
       <div class="inv-stat-label">損益</div>
       <div class="inv-stat-value ${pnlClass(pnl)}">${pnl >= 0 ? '+' : '-'}${fmtFull(Math.abs(pnl))}&nbsp;<span style="font-size:13px">(${fmtPct(pnlPct)})</span></div>
@@ -1070,9 +1191,9 @@ function renderInvestmentsPage() {
   const baseHeaders = isCB
     ? ['代號', '名稱', '股數', '買入均價', '目前價格', '投入成本', '預估損益', '損益%']
     : isStock
-      ? ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%', '大戶籌碼']
-      : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%'];
-  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '大戶籌碼', '今日漲幅%', '停止轉換'];
+      ? ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%', '大戶籌碼', '購入券商']
+      : ['代號', '名稱', '股數', '買入均價', '目前價格', '今日漲幅%', '投入成本', '預估市值', '預估損益', '損益%', '購入券商'];
+  const cbHeaders = ['CB到期日', 'CBAS到期日', '剩餘張數', '餘額%', '轉換價', '溢價率%', '現股價格', '大戶籌碼', '今日漲幅%', '停止轉換', '購入券商'];
   const headers = isCB ? ['★', ...baseHeaders, ...cbHeaders] : (isStock ? ['★', ...baseHeaders] : baseHeaders);
 
   // '代號' & '名稱' are non-numeric; everything else is right-aligned
@@ -1285,8 +1406,10 @@ function renderInvestmentsPage() {
       ? `<td><span class="star-btn ${starCls}"${starTitle} onclick="event.stopPropagation(); toggleHighlight(${idx})">${showFilled ? '★' : '☆'}</span></td>`
       : '';
 
+    const brokerTd = `<td class="small muted">${item.broker || '—'}</td>`;
+
     return `<tr class="${rowCls}" onclick="openEditPosition(${idx})" style="cursor:pointer">
-      ${starCell}${baseCells}${cbCells}
+      ${starCell}${baseCells}${cbCells}${brokerTd}
       <td><button class="btn-icon" onclick="event.stopPropagation(); deletePosition(${idx})">✕</button></td>
     </tr>`;
   }).join('');
@@ -1329,6 +1452,19 @@ async function toggleHighlight(idx) {
 }
 
 // ══ Position modal ══════════════════════════════════════════════════════
+const _DEFAULT_BROKERS = ['永豐', '富邦', '國泰', '元大', '凱基', '玉山', '中信', '台新', '兆豐', '第一', '日盛', '群益', '統一'];
+
+function _brokerOptions() {
+  const used = new Set();
+  for (const g of (state.portfolio?.investments || [])) {
+    for (const item of g.items) {
+      if (item.broker) used.add(item.broker.trim());
+    }
+  }
+  const all = [...new Set([...used, ..._DEFAULT_BROKERS.filter(b => !used.has(b))])];
+  return all.map(b => `<option value="${escapeAttr(b)}">`).join('');
+}
+
 function openAddPosition() { showPositionModal(null); }
 function openEditPosition(idx) {
   const groupName = INV_GROUP_MAP[state.currentInv];
@@ -1378,7 +1514,10 @@ function showPositionModal(idx, item = null) {
     </div>
     <div class="form-row">
       <div class="form-group"><label>持有股數 *</label><input id="f-shares" type="text" inputmode="decimal" value="${v('shares')}" /></div>
-      <div class="form-group"><label>買入均價 *</label><input id="f-entry" type="text" inputmode="decimal" value="${v('entry_price')}" /></div>
+      <div class="form-group">
+        <label>買入均價 <span style="color:var(--muted);font-weight:400">（選填）</span></label>
+        <input id="f-entry" type="text" inputmode="decimal" value="${v('entry_price')}" placeholder="留空由成本/股數自動計算" />
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group"><label>目前價格（存檔後自動更新）</label>
@@ -1396,9 +1535,18 @@ function showPositionModal(idx, item = null) {
       </div>
     </div>` : ''}
     ${cbFields}
-    <div class="form-group" style="margin-top:14px">
-      <label>備註 <span style="color:var(--muted);font-weight:400">（選填，滑鼠移到名稱顯示）</span></label>
-      <input id="f-note" value="${escapeAttr(v('note'))}" placeholder="例：低溢價、觀察中..." />
+    <datalist id="broker-list">
+      ${_brokerOptions()}
+    </datalist>
+    <div class="form-row" style="margin-top:14px">
+      <div class="form-group">
+        <label>購入券商 <span style="color:var(--muted);font-weight:400">（選填）</span></label>
+        <input id="f-broker" list="broker-list" value="${escapeAttr(v('broker'))}" placeholder="輸入或選擇..." autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>備註 <span style="color:var(--muted);font-weight:400">（選填，滑鼠移到名稱顯示）</span></label>
+        <input id="f-note" value="${escapeAttr(v('note'))}" placeholder="例：低溢價、觀察中..." />
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">取消</button>
@@ -1469,7 +1617,52 @@ function showPositionModal(idx, item = null) {
         document.getElementById('f-cost')?.addEventListener('input', updateHint);
         updateHint();
       }
+
+      // Entry price hint: auto-calculate from (cost + margin) / shares
+      const updateEntryHint = () => {
+        const entryEl  = document.getElementById('f-entry');
+        if (!entryEl || entryEl.value.trim()) return;
+        const shares = parseFloat(document.getElementById('f-shares')?.value.replace(/,/g, '')) || 0;
+        const cost   = parseFloat(document.getElementById('f-cost')?.value.replace(/,/g, ''))   || 0;
+        const margin = parseFloat(document.getElementById('f-margin')?.value.replace(/,/g, '')) || 0;
+        if (shares > 0 && cost > 0) {
+          const calc = (cost + margin) / shares;
+          entryEl.placeholder = `自動計算: ${calc % 1 === 0 ? calc.toLocaleString() : calc.toFixed(2)}`;
+        } else {
+          entryEl.placeholder = '留空由成本/股數自動計算';
+        }
+      };
+      ['f-shares','f-cost','f-margin'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', updateEntryHint);
+      });
+      document.getElementById('f-entry')?.addEventListener('input', () => {
+        if (!document.getElementById('f-entry').value.trim())
+          updateEntryHint();
+        else
+          document.getElementById('f-entry').placeholder = '留空由成本/股數自動計算';
+      });
+      updateEntryHint();
     }
+  }
+
+  // Entry hint for US / CB (no margin field)
+  if (isUS || isCB) {
+    const updateEntryHint = () => {
+      const entryEl = document.getElementById('f-entry');
+      if (!entryEl || entryEl.value.trim()) return;
+      const shares = parseFloat(document.getElementById('f-shares')?.value.replace(/,/g, '')) || 0;
+      const cost   = parseFloat(document.getElementById('f-cost')?.value.replace(/,/g, ''))   || 0;
+      if (shares > 0 && cost > 0) {
+        const calc = cost / shares;
+        entryEl.placeholder = `自動計算: ${calc % 1 === 0 ? calc.toLocaleString() : calc.toFixed(2)}`;
+      } else {
+        entryEl.placeholder = '留空由成本/股數自動計算';
+      }
+    };
+    ['f-shares', 'f-cost'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updateEntryHint);
+    });
+    updateEntryHint();
   }
 }
 
@@ -1523,15 +1716,24 @@ async function savePosition(idx) {
     } catch (_) {}
   }
 
+  const shares    = num('f-shares');
+  const cost      = num('f-cost');
+  const marginAmt = isStock ? (num('f-margin') || 0) : 0;
+  let entryPrice  = num('f-entry');
+  if (!entryPrice && shares > 0 && cost > 0) {
+    entryPrice = (cost + marginAmt) / shares;
+  }
+
   const data = {
     symbol: sym,
     name: nameVal,
-    shares: num('f-shares'),
-    entry_price: num('f-entry'),
+    shares,
+    entry_price: entryPrice,
     current_price: num('f-cur'),
-    cost: num('f-cost'),
+    cost,
+    broker: val('f-broker').trim() || undefined,
     note: val('f-note').trim() || undefined,
-    ...(isStock ? { margin_amount: num('f-margin') || 0 } : {}),
+    ...(isStock ? { margin_amount: marginAmt } : {}),
   };
 
   if (isCB) {
@@ -1687,6 +1889,8 @@ function togglePrivacy() {
   document.getElementById('privacy-txt').textContent = state.privacy ? '隱藏中' : '顯示中';
   const mobileIco = document.getElementById('mobile-privacy-ico');
   if (mobileIco) mobileIco.textContent = state.privacy ? '🙈' : '👁';
+  charts.growth?.update();
+  charts.trend?.update();
 }
 
 function toggleSidebar() {
@@ -1747,22 +1951,23 @@ function _setChartRange(prefix, type) {
   if (type === 'day') {
     const prev = new Date(now);
     prev.setDate(prev.getDate() - 1);
-    start = prev.toISOString().slice(0, 10);
+    start = prev.toISOString().slice(0, 10);          // 前一日收盤
   } else if (type === 'week') {
-    const d = new Date(now);
-    const dow = (d.getDay() + 6) % 7;   // days since Monday (0=Mon … 6=Sun)
-    d.setDate(d.getDate() - dow);
-    start = d.toISOString().slice(0, 10);
+    const dow = (now.getDay() + 6) % 7;              // days since Monday
+    const prevFri = new Date(now);
+    prevFri.setDate(now.getDate() - dow - 3);         // 上週五收盤
+    start = prevFri.toISOString().slice(0, 10);
   } else if (type === 'month') {
-    start = `${y}-${String(mo + 1).padStart(2, '0')}-01`;
+    const lastDayPrevMonth = new Date(y, mo, 0);      // 上個月最後一天收盤
+    start = lastDayPrevMonth.toISOString().slice(0, 10);
   } else if (type === 'prevmonth') {
-    const pm = new Date(y, mo, 0);           // last day of prev month
+    const pm = new Date(y, mo, 0);                   // last day of prev month
     const pmy = pm.getFullYear();
     const pmm = String(pm.getMonth() + 1).padStart(2, '0');
     start = `${pmy}-${pmm}-01`;
     end   = `${pmy}-${pmm}-${String(pm.getDate()).padStart(2, '0')}`;
   } else { // year
-    start = `${y}-01-01`;
+    start = `${y - 1}-12-31`;                        // 去年 12/31 收盤
   }
   document.getElementById(prefix + '-start').value = start;
   document.getElementById(prefix + '-end').value = end;
@@ -1812,11 +2017,12 @@ async function renderGrowthChart() {
 
   _showChart();
 
-  // Collect all asset group names across range
+  // Collect all asset group names across range (excluding currently excluded groups)
+  const _exNamesGrowth = getExcludedGroupNames();
   const allGroups = new Set();
   for (const d of filtered) {
     const g = state.history[d].asset_groups;
-    if (g) Object.keys(g).forEach(k => allGroups.add(k));
+    if (g) Object.keys(g).filter(k => !_exNamesGrowth.has(k)).forEach(k => allGroups.add(k));
   }
   // Order: fixed priority with known groups first, then extras
   const priority = ['現金', '不動產', '其他', '股票', '可轉債', '美國股市'];
@@ -1851,11 +2057,57 @@ async function renderGrowthChart() {
     categoryPercentage: 0.9,
   }));
 
+  // Investment exposure line — 投資市值 / 淨資產 (同資產總覽公式)
+  const INV_GROUPS = ['股票', '可轉債', '美國股市'];
+  const _exNames = getExcludedGroupNames();
+  const exposureLine = {
+    type: 'line',
+    label: '投資曝險',
+    data: filtered.map(d => {
+      const snap = adjSnap(state.history[d]);
+      const ag = snap.asset_groups || {};
+      const invSum = INV_GROUPS.reduce((a, g) => _exNames.has(g) ? a : a + (ag[g] || 0), 0);
+      return snap.net_worth > 0 ? +(invSum / snap.net_worth).toFixed(4) : null;
+    }),
+    borderColor: '#38bdf8',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderDash: [5, 3],
+    pointRadius: filtered.length > 60 ? 0 : 2,
+    pointHoverRadius: 5,
+    tension: 0.35,
+    fill: false,
+    yAxisID: 'y2',
+    order: 0,
+    _minMaxFmt: v => (v * 100).toFixed(1) + '%',
+  };
+
+  // Asset leverage line (total_assets / net_worth) — secondary right Y axis
+  const leverageLine = {
+    type: 'line',
+    label: '資產槓桿',
+    data: filtered.map(d => {
+      const s = adjSnap(state.history[d]);
+      return s.net_worth > 0 ? +(s.total_assets / s.net_worth).toFixed(3) : null;
+    }),
+    borderColor: '#fb923c',
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderDash: [3, 3],
+    pointRadius: filtered.length > 60 ? 0 : 2,
+    pointHoverRadius: 5,
+    tension: 0.35,
+    fill: false,
+    yAxisID: 'y2',
+    order: 0,
+    _minMaxFmt: v => v.toFixed(2) + 'x',
+  };
+
   // Net worth line overlay
   const netWorthLine = {
     type: 'line',
     label: '淨資產',
-    data: filtered.map(d => toWan(state.history[d].net_worth || 0)),
+    data: filtered.map(d => toWan(adjSnap(state.history[d]).net_worth || 0)),
     borderColor: '#ffffff',
     backgroundColor: 'rgba(255,255,255,.08)',
     borderWidth: 4,
@@ -1887,8 +2139,8 @@ async function renderGrowthChart() {
   };
 
   // Summary stats
-  const first = state.history[filtered[0]];
-  const last  = state.history[filtered[filtered.length - 1]];
+  const first = adjSnap(state.history[filtered[0]]);
+  const last  = adjSnap(state.history[filtered[filtered.length - 1]]);
   const nwChange = (last.net_worth || 0) - (first.net_worth || 0);
   const nwPct = first.net_worth > 0 ? (nwChange / first.net_worth * 100) : 0;
   const daysSpan = filtered.length;
@@ -1896,17 +2148,17 @@ async function renderGrowthChart() {
   document.getElementById('growth-summary').innerHTML = `
     <div class="pnl-card">
       <div class="pnl-card-label">期間淨資產變化</div>
-      <div class="pnl-card-value ${pnlClass(nwChange)}">${nwChange >= 0 ? '+' : ''}${fmtFull(Math.abs(nwChange))}</div>
-      <div class="pnl-card-sub ${pnlClass(nwPct)}">${fmtPct(nwPct)} (${daysSpan} 筆資料)</div>
+      <div class="pnl-card-value priv-amt ${pnlClass(nwChange)}">${nwChange >= 0 ? '+' : ''}${fmtFull(Math.abs(nwChange))}</div>
+      <div class="pnl-card-sub priv-amt ${pnlClass(nwPct)}">${fmtPct(nwPct)} (${daysSpan} 筆資料)</div>
     </div>
     <div class="pnl-card">
       <div class="pnl-card-label">起始淨資產</div>
-      <div class="pnl-card-value">${fmtFull(first.net_worth)}</div>
+      <div class="pnl-card-value priv-amt">${fmtFull(first.net_worth)}</div>
       <div class="pnl-card-sub">${filtered[0]}</div>
     </div>
     <div class="pnl-card">
       <div class="pnl-card-label">目前淨資產</div>
-      <div class="pnl-card-value">${fmtFull(last.net_worth)}</div>
+      <div class="pnl-card-value priv-amt">${fmtFull(last.net_worth)}</div>
       <div class="pnl-card-sub">${filtered[filtered.length - 1]}</div>
     </div>
   `;
@@ -1919,7 +2171,7 @@ async function renderGrowthChart() {
     type: 'bar',
     data: {
       labels: filtered,
-      datasets: [netWorthLine, liabLine, ...stackedDatasets],
+      datasets: [netWorthLine, liabLine, exposureLine, leverageLine, ...stackedDatasets],
     },
     plugins: [minMaxPlugin],
     options: {
@@ -1941,6 +2193,9 @@ async function renderGrowthChart() {
           padding: 12,
           callbacks: {
             label: (c) => {
+              if (state.privacy) return ` ${c.dataset.label}: ●●●`;
+              if (c.dataset.label === '投資曝險') return ` ${c.dataset.label}: ${((c.raw || 0) * 100).toFixed(1)}%`;
+              if (c.dataset.yAxisID === 'y2') return ` ${c.dataset.label}: ${c.raw?.toFixed(2)}x`;
               const v = c.raw * 1e4;
               return ` ${c.dataset.label}: ${fmtFull(v)}`;
             }
@@ -1958,9 +2213,25 @@ async function renderGrowthChart() {
           // on top of bar totals. Bars stack via their per-dataset stack:'assets'.
           ticks: {
             color: '#a7b0c8',
-            callback: v => v.toLocaleString() + ' 萬',
+            callback: v => state.privacy ? '●●●' : v.toLocaleString() + ' 萬',
           },
           grid: { color: 'rgba(255,255,255,.05)' },
+        },
+        y2: {
+          type: 'linear',
+          position: 'right',
+          ticks: {
+            color: '#fb923c',
+            callback: v => state.privacy ? '●' : v.toFixed(2) + 'x',
+            maxTicksLimit: 6,
+          },
+          grid: { display: false },
+          title: {
+            display: true,
+            text: '槓桿/曝險',
+            color: '#fb923c',
+            font: { size: 10 },
+          },
         },
       }
     }
@@ -2011,6 +2282,7 @@ async function renderTrendChart() {
 
   const labels = filtered;
   const first = state.history[filtered[0]];
+  const firstAdj = adjSnap(first);
 
   // 6 series: personal net worth + 5 market indices
   const series = [
@@ -2023,9 +2295,10 @@ async function renderTrendChart() {
   ];
 
   const datasets = series.map(s => {
-    const base = first[s.key];
+    const isNW = s.key === 'net_worth';
+    const base = isNW ? firstAdj.net_worth : first[s.key];
     const data = filtered.map(d => {
-      const v = state.history[d][s.key];
+      const v = isNW ? adjSnap(state.history[d]).net_worth : state.history[d][s.key];
       return (base && v) ? ((v - base) / base * 100) : null;
     });
     return {
@@ -2243,6 +2516,63 @@ function toggleItem(section, gi, ii, checked) {
 function closeModal(event) {
   if (!event || event.target === document.getElementById('modal-overlay')) {
     document.getElementById('modal-overlay').classList.add('hidden');
+  }
+}
+
+// ══ Restore Modal ═══════════════════════════════════════════════════════
+async function openRestoreModal() {
+  document.getElementById('modal-title').textContent = '⏪ 資料回溯';
+  document.getElementById('modal-body').innerHTML = '<div style="padding:20px;color:var(--text-2)">載入備份清單…</div>';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+
+  let data;
+  try {
+    data = await api('/api/backups');
+  } catch (e) {
+    document.getElementById('modal-body').innerHTML = `<div style="padding:20px;color:var(--red-2)">無法取得備份清單：${e.message}</div>`;
+    return;
+  }
+
+  if (!data.dates || data.dates.length === 0) {
+    document.getElementById('modal-body').innerHTML = `
+      <div style="padding:20px;color:var(--text-2);text-align:center">
+        尚無本地備份。點擊「儲存資料」後會自動建立每日備份。
+      </div>`;
+    return;
+  }
+
+  const rows = data.dates.map(b => {
+    const filesInfo = b.files.map(f => {
+      const kb = (f.size / 1024).toFixed(1);
+      return `<span style="color:var(--text-2);font-size:11px">${f.name} (${kb} KB)</span>`;
+    }).join(' &nbsp;·&nbsp; ');
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)">
+        <div>
+          <div style="font-weight:600;color:var(--text-1)">${b.date}</div>
+          <div style="margin-top:3px">${filesInfo}</div>
+        </div>
+        <button class="btn-action" style="padding:6px 14px;font-size:12px;background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)"
+          onclick="restoreBackup('${b.date}')">回復此版本</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML = `
+    <div style="padding:4px 0 12px;color:var(--amber);font-size:12px">
+      ⚠️ 回復前會先備份目前狀態，可再次回復到今天的版本來撤銷操作。回復後頁面將重新載入。
+    </div>
+    ${rows}`;
+}
+
+async function restoreBackup(date) {
+  if (!confirm(`確定回復到 ${date} 的備份？\n\n目前資料會先備份（可撤銷），然後用 ${date} 的版本覆蓋。`)) return;
+  try {
+    const r = await api(`/api/restore/${date}`, { method: 'POST' });
+    if (!r.ok) throw new Error(r.detail || '回復失敗');
+    toast(`✅ 已回復至 ${date}，重新載入中…`);
+    setTimeout(() => location.reload(), 1200);
+  } catch (e) {
+    toast(`回復失敗：${e.message}`, 'error');
   }
 }
 
@@ -2824,8 +3154,8 @@ async function renderImportantInfo(force = false) {
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--danger)">❌ 資料載入失敗</td></tr>';
   }
   // Also render sub-panels (fire-and-forget, each has its own cache)
-  renderCbListed();
-  renderFscOfferings();
+  renderCbListed(force);
+  renderFscOfferings(force);
 }
 
 // ── CB Listed ──────────────────────────────────────────────────────────────
@@ -2833,18 +3163,18 @@ const _cbListedCache = { date: '', data: null };
 let _cbSortKey = 'date';
 let _cbSortAsc = true;
 
-async function renderCbListed() {
+async function renderCbListed(force = false) {
   const tbody = document.getElementById('cb-tbody');
   if (!tbody) return;
 
   const today = new Date().toISOString().slice(0, 10);
-  if (_cbListedCache.data && _cbListedCache.date === today) {
+  if (!force && _cbListedCache.data && _cbListedCache.date === today) {
     _renderCbTable(_cbListedCache.data);
     return;
   }
 
   try {
-    const data = await api('/api/cb-listed');
+    const data = await api('/api/cb-listed' + (force ? '?force=true' : ''));
     _cbListedCache.data = data;
     _cbListedCache.date = today;
     _renderCbTable(data);
@@ -2918,18 +3248,18 @@ const _punishCache = { date: '', data: null };
 let _fscSortKey = 'date';   // 'date' | 'code'
 let _fscSortAsc = true;     // true = oldest first (default)
 
-async function renderFscOfferings() {
+async function renderFscOfferings(force = false) {
   const tbody = document.getElementById('fsc-tbody');
   if (!tbody) return;
 
   const today = new Date().toISOString().slice(0, 10);
-  if (_fscCache.data && _fscCache.date === today) {
+  if (!force && _fscCache.data && _fscCache.date === today) {
     _renderFscTable(_fscCache.data);
     return;
   }
 
   try {
-    const data = await api('/api/fsc-offerings');
+    const data = await api('/api/fsc-offerings' + (force ? '?force=true' : ''));
     _fscCache.data = data;
     _fscCache.date = today;
     _renderFscTable(data);
