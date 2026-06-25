@@ -37,9 +37,6 @@
         <button class="nav-item" data-page="growth">
           <span class="nav-ico">📊</span><span>資產成長圖</span>
         </button>
-        <button class="nav-item" data-page="trend">
-          <span class="nav-ico">📉</span><span>資產趨勢圖</span>
-        </button>
         <button class="nav-item" data-page="history">
           <span class="nav-ico">📅</span><span>歷史紀錄</span>
         </button>
@@ -53,7 +50,7 @@
           <span class="nav-ico">🏆</span><span>成交值排行</span>
         </button>
         <button class="nav-item" data-page="cb-be">
-          <span class="nav-ico">📉</span><span>CB 餘額圖</span>
+          <span class="nav-ico">📉</span><span>CB餘額對照</span>
         </button>
       </nav>
 
@@ -351,58 +348,35 @@
         <div class="page-header">
           <div>
             <h1>資產成長圖</h1>
-            <p class="page-sub">每日資料堆疊圖 + 淨資產走勢</p>
+            <p class="page-sub">每日資料堆疊圖 + 淨資產走勢 + 報酬率比較</p>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>資產組成堆疊圖</h3>
-            <div class="trend-controls">
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','day')">當日</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','week')">當週</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','month')">當月</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','prevmonth')">前月</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','year')">今年</button>
-              <label style="margin-left:4px">起始：</label>
-              <input type="date" id="growth-start" />
-              <label>結束：</label>
-              <input type="date" id="growth-end" />
-              <button class="btn-primary" onclick="renderGrowthChart()">更新圖表</button>
-            </div>
+        <div class="panel" style="padding:10px 16px">
+          <div class="trend-controls">
+            <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','day')">當日</button>
+            <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','week')">當週</button>
+            <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','month')">當月</button>
+            <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','prevmonth')">前月</button>
+            <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('growth','year')">今年</button>
+            <label style="margin-left:4px">起始：</label>
+            <input type="date" id="growth-start" />
+            <label>結束：</label>
+            <input type="date" id="growth-end" />
+            <button class="btn-primary" onclick="renderGrowthChart();renderTrendChart()">更新圖表</button>
           </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-head"><h3>資產組成堆疊圖</h3></div>
           <div class="chart-container" id="growth-chart-container" style="height:480px">
             <canvas id="growth-chart"></canvas>
           </div>
           <div id="growth-summary" class="pnl-grid" style="margin-top:20px"></div>
         </div>
-      </section>
 
-      <!-- ══ TREND CHART ══ -->
-      <section class="page" id="page-trend">
-        <div class="page-header">
-          <div>
-            <h1>資產趨勢圖</h1>
-            <p class="page-sub">個人報酬率 vs 市場指數</p>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <h3>報酬率比較</h3>
-            <div class="trend-controls">
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','day')">當日</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','week')">當週</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','month')">當月</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','prevmonth')">前月</button>
-              <button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartRange('trend','year')">今年</button>
-              <label style="margin-left:4px">起始：</label>
-              <input type="date" id="trend-start" />
-              <label>結束：</label>
-              <input type="date" id="trend-end" />
-              <button class="btn-primary" onclick="renderTrendChart()">分析趨勢</button>
-            </div>
-          </div>
+        <div class="panel" style="margin-top:16px">
+          <div class="panel-head"><h3>報酬率比較</h3></div>
           <div class="chart-container" id="trend-chart-container">
             <canvas id="trend-chart"></canvas>
           </div>
@@ -493,13 +467,17 @@
       <section class="page" id="page-cb-be">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
           <div class="panel-head">
-            <h3>📉 可轉債餘額 vs 現股股價</h3>
+            <h3>📉 CB餘額對照</h3>
             <div style="display:flex;gap:6px;align-items:center">
               <input id="cb-be-input" type="text" maxlength="6" placeholder="CB 代號，如 47602"
                 style="width:130px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none"
                 onkeydown="if(event.key==='Enter') renderCbBookentryChart()" />
               <button class="btn-primary" style="padding:4px 10px;font-size:12px" onclick="renderCbBookentryChart()">查詢</button>
               <button class="btn-ghost" style="font-size:11px" onclick="renderCbBookentryChart(true)" title="強制重新抓取">🔄</button>
+              <span style="font-size:11px;color:var(--muted);white-space:nowrap">轉換價</span>
+              <input id="cb-be-conv" type="number" step="0.1" min="0" placeholder="元"
+                style="width:72px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none"
+                onchange="_cbBeRedrawConv()" />
             </div>
           </div>
           <div id="cb-be-my" style="padding:6px 14px;border-bottom:1px solid var(--border);min-height:28px;display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>

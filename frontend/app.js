@@ -1793,8 +1793,7 @@ async function saveSnapshot() {
     // Reload history so charts & PnL grid reflect the new snapshot immediately
     await loadHistory();
     const page = currentPage();
-    if (page === 'growth') renderGrowthChart();
-    else if (page === 'trend') renderTrendChart();
+    if (page === 'growth') { renderGrowthChart(); renderTrendChart(); }
     else if (page === 'dashboard') renderPnLGrid(state.pnlYear);
     toast('✅ 資料已儲存');
   } catch (e) { toast('資料儲存失敗', 'error'); }
@@ -1915,8 +1914,7 @@ function goPage(name) {
   if (name === 'dashboard') renderDashboard();
   else if (name === 'assets') renderAssetsPage();
   else if (name === 'investments') renderInvestmentsPage();
-  else if (name === 'growth') renderGrowthChart();
-  else if (name === 'trend') renderTrendChart();
+  else if (name === 'growth') { renderGrowthChart(); renderTrendChart(); }
   else if (name === 'history') renderHistoryPage();
   else if (name === 'important') { renderImportantInfo(false); renderAdlChart(false); }
   else if (name === 'etf') renderEtfPage(false);
@@ -1930,10 +1928,10 @@ function goPage(name) {
   // Update mobile title and close sidebar
   const titles = {
     dashboard: '資產總覽', assets: '資產與負債', investments: '投資部位',
-    growth: '資產成長圖', trend: '資產趨勢圖', history: '歷史紀錄', important: '重要資訊',
+    growth: '資產成長圖', history: '歷史紀錄', important: '重要資訊',
     etf: 'ETF追蹤',
     ranking: '成交值排行',
-    'cb-be': 'CB 餘額圖'
+    'cb-be': 'CB餘額對照'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -1971,10 +1969,10 @@ function _setChartRange(prefix, type) {
   } else { // year
     start = `${y - 1}-12-31`;                        // 去年 12/31 收盤
   }
-  document.getElementById(prefix + '-start').value = start;
-  document.getElementById(prefix + '-end').value = end;
-  if (prefix === 'growth') renderGrowthChart();
-  else renderTrendChart();
+  document.getElementById('growth-start').value = start;
+  document.getElementById('growth-end').value = end;
+  renderGrowthChart();
+  renderTrendChart();
 }
 
 // ══ Growth Chart ════════════════════════════════════════════════════════
@@ -2266,8 +2264,8 @@ async function renderTrendChart() {
     return;
   }
 
-  const startEl = document.getElementById('trend-start');
-  const endEl = document.getElementById('trend-end');
+  const startEl = document.getElementById('growth-start');
+  const endEl = document.getElementById('growth-end');
   if (!startEl.value) startEl.value = new Date().getFullYear() + '-01-01';
   if (!endEl.value)   endEl.value   = today;
 
@@ -2658,8 +2656,7 @@ async function _autoSyncFromGist(retry = true) {
     if (page === 'dashboard')        renderDashboard();
     else if (page === 'investments') renderInvestmentsPage();
     else if (page === 'assets')      renderAssetsPage();
-    else if (page === 'growth')      renderGrowthChart();
-    else if (page === 'trend')       renderTrendChart();
+    else if (page === 'growth')      { renderGrowthChart(); renderTrendChart(); }
 
     const fileList = pulled.map(f => f.name.replace('.json', '')).join(', ');
     toast(`☁️ 已從雲端同步: ${fileList}`);
@@ -4238,6 +4235,7 @@ function _renderRankingData(data) {
 
 // ── CB 餘額 vs 現股股價 ────────────────────────────────────────────────────────
 let _cbBEChart = null;
+let _cbBELastData = null;
 
 function _initCbBookentryMyCbs() {
   const el = document.getElementById('cb-be-my');
@@ -4262,23 +4260,38 @@ function _initCbBookentryMyCbs() {
     }).join('');
 }
 
-async function renderCbBookentryChart(force = false) {
+async function renderCbBookentryChart(force = false, _useCache = false) {
   const code = (document.getElementById('cb-be-input')?.value || '').trim();
   if (!code) return;
 
   const msg  = document.getElementById('cb-be-msg');
   const wrap = document.getElementById('cb-be-chart-wrap');
   const stats= document.getElementById('cb-be-stats');
+  const convEl = document.getElementById('cb-be-conv');
 
-  msg.style.display  = 'block';
-  msg.textContent    = '⏳ 載入中…';
-  if (wrap)  wrap.style.display  = 'none';
-  if (stats) stats.style.display = 'none';
+  let data;
+  if (_useCache && _cbBELastData) {
+    data = _cbBELastData;
+    // _useCache = 使用者手動改轉換價重繪，不動 convEl
+  } else {
+    msg.style.display  = 'block';
+    msg.textContent    = '⏳ 載入中…';
+    if (wrap)  wrap.style.display  = 'none';
+    if (stats) stats.style.display = 'none';
+    try {
+      data = await api(`/api/cb-bookentry?code=${encodeURIComponent(code)}${force ? '&force=true' : ''}`);
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.textContent = `載入失敗：${e.message}`;
+      return;
+    }
+    if (!data.labels?.length) { msg.textContent = '查無資料，請確認 CB 代號'; return; }
+    _cbBELastData = data;
+    // 切換標的時從 API 更新轉換價；API 無值則清空
+    if (convEl) convEl.value = data.convPrice != null ? data.convPrice : '';
+  }
 
   try {
-    const data = await api(`/api/cb-bookentry?code=${encodeURIComponent(code)}${force ? '&force=true' : ''}`);
-    if (!data.labels?.length) throw new Error('查無資料，請確認 CB 代號');
-
     // ── Stats bar ──────────────────────────────────────────────────────────
     const initBE  = data.bookentry[0]  || 0;
     const lastBE  = data.bookentry[data.bookentry.length - 1] || 0;
@@ -4287,21 +4300,24 @@ async function renderCbBookentryChart(force = false) {
     const dateRng = `${data.labels[0]} ～ ${data.labels[data.labels.length - 1]}`;
     const convColor = parseFloat(convPct) >= 80 ? 'var(--green)' : parseFloat(convPct) >= 40 ? 'var(--orange)' : 'var(--text)';
 
-    const statCard = (label, value, color = 'var(--text)') => `
-      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;min-width:90px;flex:1">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${label}</div>
-        <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${color}">${value}</div>
+    const statCard = (label, value, color = 'var(--text)', nowrap = false) => `
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;min-width:0;flex:0 1 auto">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;white-space:nowrap">${label}</div>
+        <div style="font-size:13px;font-weight:700;font-family:var(--mono);color:${color};${nowrap ? 'white-space:nowrap' : ''}">${value}</div>
       </div>`;
+
+    const convPriceVal = parseFloat(convEl?.value) || null;
 
     if (stats) {
       stats.style.display = 'flex';
       stats.innerHTML =
-        statCard('CB 代號', data.code) +
+        statCard('CB 代號', data.cbName ? `${data.code} ${data.cbName}` : data.code) +
         statCard('發行量', `${initBE.toLocaleString()} 張`) +
         statCard('剩餘量', `${lastBE.toLocaleString()} 張`) +
         statCard('累計轉換', `${convPct}%`, convColor) +
         statCard('現股最新', `${lastPx} 元`) +
-        statCard('資料期間', dateRng);
+        (convPriceVal ? statCard('轉換價格', `${convPriceVal} 元`, 'var(--green)') : '') +
+        statCard('資料期間', dateRng, 'var(--text)', true);
     }
 
     // ── Chart ──────────────────────────────────────────────────────────────
@@ -4312,35 +4328,70 @@ async function renderCbBookentryChart(force = false) {
     const ctx = document.getElementById('cb-be-canvas')?.getContext('2d');
     if (!ctx) return;
 
+    // CB 餘額轉為百分比（以第一個數值為 100%）
+    const beBase = data.bookentry[0] || 1;
+    const bePct  = data.bookentry.map(v => v != null ? +(v / beBase * 100).toFixed(2) : null);
+
+    const datasets = [
+      {
+        label: '📉 CB 餘額（%）',
+        data: bePct,
+        borderColor: 'rgba(14,165,233,1)',
+        backgroundColor: 'rgba(14,165,233,.06)',
+        borderWidth: 2,
+        pointRadius: 0, pointHoverRadius: 4,
+        fill: true,
+        yAxisID: 'yL',
+        tension: 0.1,
+      },
+      {
+        label: '📈 現股股價（元）',
+        data: data.prices,
+        borderColor: 'rgba(239,68,68,1)',
+        backgroundColor: 'rgba(239,68,68,0)',
+        borderWidth: 2,
+        pointRadius: 0, pointHoverRadius: 4,
+        fill: false,
+        yAxisID: 'yR',
+        tension: 0.1,
+      },
+    ];
+
+    if (convPriceVal) {
+      datasets.push({
+        label: `💚 轉換價 ${convPriceVal} 元`,
+        data: Array(data.labels.length).fill(convPriceVal),
+        yAxisID: 'yR',
+        borderColor: 'rgba(34,197,94,.8)',
+        pointBackgroundColor: 'rgba(34,197,94,0)',
+        pointBorderColor: 'rgba(34,197,94,0)',
+        borderDash: [4, 4],
+        borderWidth: 1,
+        pointRadius: 0,
+        pointHoverRadius: 3,
+        fill: false,
+        tension: 0,
+      });
+      const convPrice130 = +(convPriceVal * 1.3).toFixed(2);
+      datasets.push({
+        label: `🟡 神秘價 ${convPrice130} 元`,
+        data: Array(data.labels.length).fill(convPrice130),
+        yAxisID: 'yR',
+        borderColor: 'rgba(234,179,8,.85)',
+        pointBackgroundColor: 'rgba(234,179,8,0)',
+        pointBorderColor: 'rgba(234,179,8,0)',
+        borderDash: [6, 3],
+        borderWidth: 1,
+        pointRadius: 0,
+        pointHoverRadius: 3,
+        fill: false,
+        tension: 0,
+      });
+    }
+
     _cbBEChart = new Chart(ctx, {
       type: 'line',
-      data: {
-        labels: data.labels,
-        datasets: [
-          {
-            label: '📉 CB 餘額（張）',
-            data: data.bookentry,
-            borderColor: 'rgba(14,165,233,1)',
-            backgroundColor: 'rgba(14,165,233,.06)',
-            borderWidth: 2,
-            pointRadius: 0, pointHoverRadius: 4,
-            fill: true,
-            yAxisID: 'yL',
-            tension: 0.1,
-          },
-          {
-            label: '📈 現股股價（元）',
-            data: data.prices,
-            borderColor: 'rgba(239,68,68,1)',
-            backgroundColor: 'rgba(239,68,68,0)',
-            borderWidth: 2,
-            pointRadius: 0, pointHoverRadius: 4,
-            fill: false,
-            yAxisID: 'yR',
-            tension: 0.1,
-          },
-        ],
-      },
+      data: { labels: data.labels, datasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -4353,18 +4404,22 @@ async function renderCbBookentryChart(force = false) {
             titleFont: { size: 12, weight: '700' },
             bodyFont: { size: 11 },
             callbacks: {
-              label: c => c.datasetIndex === 0
-                ? ` 餘額: ${(c.raw ?? 0).toLocaleString()} 張`
-                : ` 股價: ${c.raw} 元`,
+              label: c => {
+                if (c.datasetIndex === 0) return ` 餘額: ${c.raw?.toFixed(1)}%（${Math.round((c.raw ?? 0) / 100 * beBase).toLocaleString()} 張）`;
+                if (c.datasetIndex === 2) return ` 轉換價: ${c.raw} 元`;
+                if (c.datasetIndex === 3) return ` 神秘價: ${c.raw} 元`;
+                return ` 股價: ${c.raw} 元`;
+              },
             },
           },
         },
         scales: {
           yL: {
             type: 'linear', position: 'left',
-            title: { display: true, text: 'CB 餘額（張）', color: 'rgba(14,165,233,.9)', font: { size: 10 } },
+            min: 0, max: 100,
+            title: { display: true, text: 'CB 餘額（%）', color: 'rgba(14,165,233,.9)', font: { size: 10 } },
             grid: { color: 'rgba(148,163,184,.08)' },
-            ticks: { color: 'rgba(14,165,233,.8)', font: { size: 10 } },
+            ticks: { color: 'rgba(14,165,233,.8)', font: { size: 10 }, callback: v => v + '%' },
           },
           yR: {
             type: 'linear', position: 'right',
@@ -4391,4 +4446,9 @@ async function renderCbBookentryChart(force = false) {
     if (wrap)  wrap.style.display  = 'none';
     if (stats) stats.style.display = 'none';
   }
+}
+
+// 轉換價輸入框變更時：用快取資料重繪，不重新 fetch，不覆蓋輸入框
+function _cbBeRedrawConv() {
+  if (_cbBELastData) renderCbBookentryChart(false, true);
 }
