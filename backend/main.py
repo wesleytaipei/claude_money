@@ -3153,11 +3153,55 @@ def _parse_twse_date(raw: str) -> str:
 
 
 def _fetch_twse_turnover_ranking(n: int = 25) -> tuple[list[dict], str]:
-    """Returns (top-n items, trade_date_ymd like '20260526')."""
+    """Returns (top-n items, trade_date_ymd like '20260625').
+    TWSE changed STOCK_DAY_ALL from JSON to CSV in 2026-06; handles both formats.
+    CSV columns: [0]ROC日期 [1]代號 [2]名稱 [3]成交股數 [4]成交金額 [5]開 [6]高 [7]低 [8]收盤 [9]漲跌 [10]最後揭示買"""
+    import csv as _csv, io as _io
     try:
         r = http_requests.get(
             "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL?response=json",
             headers={"User-Agent": "Mozilla/5.0"}, timeout=15, verify=_TW_VERIFY)
+
+        ct = r.headers.get("content-type", "")
+        is_csv = "csv" in ct or not r.content.lstrip(b"\xef\xbb\xbf \t\r\n").startswith(b"{")
+
+        if is_csv:
+            text = None
+            for enc in ("big5", "cp950", "utf-8-sig", "utf-8"):
+                try:
+                    text = r.content.decode(enc)
+                    break
+                except (UnicodeDecodeError, LookupError):
+                    continue
+            if not text:
+                return [], ""
+            trade_date = ""
+            result = []
+            for row in _csv.reader(_io.StringIO(text)):
+                if len(row) < 10:
+                    continue
+                code = str(row[1]).strip()
+                if not re.match(r'^[1-9]\d{3}$', code):
+                    continue
+                try:
+                    if not trade_date:
+                        trade_date = _parse_twse_date(str(row[0]).strip())
+                    turnover = int(str(row[4]).replace(",", ""))
+                    if turnover <= 0:
+                        continue
+                    close = float(str(row[8]).replace(",", "")) if str(row[8]).strip() not in ("--", "") else None
+                    chg   = float(str(row[9]).replace(",", "").replace("+", "")) if str(row[9]).strip() not in ("--", "", "X", "除息", "除權") else None
+                    name  = str(row[2]).strip()
+                    prev_close = round(close - chg, 2) if close is not None and chg is not None else None
+                    chg_pct = round(chg / prev_close * 100, 2) if prev_close and prev_close > 0 else None
+                    result.append({"code": code, "name": name, "turnover": turnover,
+                                   "close": close, "chg": chg, "chg_pct": chg_pct})
+                except Exception:
+                    continue
+            result.sort(key=lambda x: x["turnover"], reverse=True)
+            return result[:n], trade_date
+
+        # Legacy JSON format
         d = json.loads(r.content.decode("utf-8"))
         trade_date = _parse_twse_date(d.get("date", ""))
         rows = d.get("data") or []
