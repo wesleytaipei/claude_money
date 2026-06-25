@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=43" />
+  <link rel="stylesheet" href="/static/style.css?v=49" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -58,6 +58,11 @@
         <div class="datetime" id="datetime">—</div>
         <div class="last-save" id="last-save"></div>
         <button class="btn-action btn-save" onclick="saveSnapshot()">💾 儲存資料</button>
+        <button class="btn-action" onclick="openRestoreModal()"
+          title="回復到指定日期的備份（14天內）"
+          style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">
+          ⏪ 回溯
+        </button>
         <button class="btn-action btn-refresh" onclick="refreshAll()">
           <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新數據</span>
         </button>
@@ -281,20 +286,29 @@
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>📗 資產項目</h3>
-            <button class="btn-primary" onclick="openAddGroup('assets')">＋ 新增群組</button>
-          </div>
-          <div id="assets-groups"></div>
+        <div class="fx-bar">
+          <span class="fx-label">匯率</span>
+          <span class="fx-item">USD/TWD <strong id="fx-usd">—</strong></span>
+          <span class="fx-sep">·</span>
+          <span class="fx-item">JPY/TWD <strong id="fx-jpy">—</strong></span>
         </div>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>📕 負債項目</h3>
-            <button class="btn-primary" onclick="openAddGroup('liabilities')">＋ 新增群組</button>
+        <div class="alm-page-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>📗 資產項目</h3>
+              <button class="btn-primary" onclick="openAddGroup('assets')">＋ 新增群組</button>
+            </div>
+            <div id="assets-groups"></div>
           </div>
-          <div id="liabilities-groups"></div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>📕 負債項目</h3>
+              <button class="btn-primary" onclick="openAddGroup('liabilities')">＋ 新增群組</button>
+            </div>
+            <div id="liabilities-groups"></div>
+          </div>
         </div>
       </section>
 
