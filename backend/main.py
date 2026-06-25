@@ -3442,11 +3442,27 @@ def _scrape_cb_bookentry(cb_code: str) -> dict:
     if not (labels_m and bookentry_m and prices_m):
         raise ValueError("頁面中找不到資料，請確認 CB 代號是否正確")
     return {
-        "code":     cb_code,
-        "labels":   json.loads(labels_m.group(1)),
-        "bookentry":json.loads(bookentry_m.group(1)),
-        "prices":   json.loads(prices_m.group(1)),
+        "code":      cb_code,
+        "labels":    json.loads(labels_m.group(1)),
+        "bookentry": json.loads(bookentry_m.group(1)),
+        "prices":    json.loads(prices_m.group(1)),
     }
+
+
+def _attach_conv_price(data: dict) -> dict:
+    """從 CBAS 快取查轉換價，附加到 data dict（不修改快取）。"""
+    code = data.get("code", "")
+    cbas = load_cbas_data()
+    # 嘗試原始 code、去前導零、補前導零等格式
+    cb_entry = (
+        cbas.get(code) or
+        cbas.get(code.lstrip("0")) or
+        cbas.get(code.zfill(6))
+    )
+    cp   = (cb_entry or {}).get("conversion_price")
+    name = (cb_entry or {}).get("name", "")
+    logger.info(f"[cb-bookentry conv] code={code!r} cbas_keys_sample={list(cbas.keys())[:5]} cp={cp} name={name!r}")
+    return {**data, "convPrice": cp, "cbName": name}
 
 
 @app.get("/api/cb-bookentry")
@@ -3456,17 +3472,17 @@ def get_cb_bookentry(code: str, force: bool = False):
     today = datetime.now().strftime("%Y-%m-%d")
     cached = _cb_bookentry_cache.get(code)
     if not force and cached and cached.get("date") == today:
-        return cached["data"]
+        return _attach_conv_price(cached["data"])
     try:
         data = _scrape_cb_bookentry(code)
         _cb_bookentry_cache[code] = {"date": today, "data": data}
         logger.info(f"[cb-bookentry] {code}: {len(data['labels'])} points, "
                     f"{data['labels'][0] if data['labels'] else '?'} ~ {data['labels'][-1] if data['labels'] else '?'}")
-        return data
+        return _attach_conv_price(data)
     except Exception as e:
         logger.error(f"[cb-bookentry] {code}: {e}")
         if cached:
-            return {**cached["data"], "stale": True}
+            return _attach_conv_price({**cached["data"], "stale": True})
         raise HTTPException(status_code=404, detail=str(e))
 
 
