@@ -4232,4 +4232,162 @@ function _renderRankingData(data) {
       <div>${hdr('🏛️', '上市 TWSE' + (data.twse_stale ? _staleBadge : ''))}${buildList(data.twse)}</div>
       <div>${hdr('🏪', '上櫃 TPEX' + (data.tpex_stale ? _staleBadge : ''))}${buildList(data.tpex)}</div>
     </div>`;
+  _initCbBookentryMyCbs();
+}
+
+// ── CB 餘額 vs 現股股價 ────────────────────────────────────────────────────────
+let _cbBEChart = null;
+
+function _initCbBookentryMyCbs() {
+  const el = document.getElementById('cb-be-my');
+  if (!el) return;
+  const cbGroup = state.portfolio?.investments?.find(g => g.group === '可轉債');
+  const codes = [...new Set(
+    (cbGroup?.items || []).map(i => String(i.symbol || '').trim()).filter(c => /^\d{5}$/.test(c))
+  )];
+  if (!codes.length) {
+    el.innerHTML = '<span style="font-size:11px;color:var(--muted)">（我的CB：尚無可轉債部位）</span>';
+    return;
+  }
+  el.innerHTML =
+    '<span style="font-size:11px;color:var(--muted);margin-right:4px">我的CB：</span>' +
+    codes.map(c => {
+      const item = cbGroup.items.find(i => i.symbol === c);
+      const label = item?.name ? `${c} ${item.name}` : c;
+      return `<button onclick="document.getElementById('cb-be-input').value='${c}';renderCbBookentryChart()"
+        style="padding:2px 9px;border-radius:12px;font-size:11px;cursor:pointer;
+               background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);color:var(--primary)"
+      >${label}</button>`;
+    }).join('');
+}
+
+async function renderCbBookentryChart(force = false) {
+  const code = (document.getElementById('cb-be-input')?.value || '').trim();
+  if (!code) return;
+
+  const msg  = document.getElementById('cb-be-msg');
+  const wrap = document.getElementById('cb-be-chart-wrap');
+  const stats= document.getElementById('cb-be-stats');
+
+  msg.style.display  = 'block';
+  msg.textContent    = '⏳ 載入中…';
+  if (wrap)  wrap.style.display  = 'none';
+  if (stats) stats.style.display = 'none';
+
+  try {
+    const data = await api(`/api/cb-bookentry?code=${encodeURIComponent(code)}${force ? '&force=true' : ''}`);
+    if (!data.labels?.length) throw new Error('查無資料，請確認 CB 代號');
+
+    // ── Stats bar ──────────────────────────────────────────────────────────
+    const initBE  = data.bookentry[0]  || 0;
+    const lastBE  = data.bookentry[data.bookentry.length - 1] || 0;
+    const convPct = initBE > 0 ? ((initBE - lastBE) / initBE * 100).toFixed(1) : '—';
+    const lastPx  = data.prices[data.prices.length - 1] ?? '—';
+    const dateRng = `${data.labels[0]} ～ ${data.labels[data.labels.length - 1]}`;
+    const convColor = parseFloat(convPct) >= 80 ? 'var(--green)' : parseFloat(convPct) >= 40 ? 'var(--orange)' : 'var(--text)';
+
+    const statCard = (label, value, color = 'var(--text)') => `
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;min-width:90px;flex:1">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${label}</div>
+        <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:${color}">${value}</div>
+      </div>`;
+
+    if (stats) {
+      stats.style.display = 'flex';
+      stats.innerHTML =
+        statCard('CB 代號', data.code) +
+        statCard('發行量', `${initBE.toLocaleString()} 張`) +
+        statCard('剩餘量', `${lastBE.toLocaleString()} 張`) +
+        statCard('累計轉換', `${convPct}%`, convColor) +
+        statCard('現股最新', `${lastPx} 元`) +
+        statCard('資料期間', dateRng);
+    }
+
+    // ── Chart ──────────────────────────────────────────────────────────────
+    msg.style.display = 'none';
+    if (wrap) wrap.style.display = 'block';
+
+    if (_cbBEChart) { _cbBEChart.destroy(); _cbBEChart = null; }
+    const ctx = document.getElementById('cb-be-canvas')?.getContext('2d');
+    if (!ctx) return;
+
+    _cbBEChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: '📉 CB 餘額（張）',
+            data: data.bookentry,
+            borderColor: 'rgba(14,165,233,1)',
+            backgroundColor: 'rgba(14,165,233,.06)',
+            borderWidth: 2,
+            pointRadius: 0, pointHoverRadius: 4,
+            fill: true,
+            yAxisID: 'yL',
+            tension: 0.1,
+          },
+          {
+            label: '📈 現股股價（元）',
+            data: data.prices,
+            borderColor: 'rgba(239,68,68,1)',
+            backgroundColor: 'rgba(239,68,68,0)',
+            borderWidth: 2,
+            pointRadius: 0, pointHoverRadius: 4,
+            fill: false,
+            yAxisID: 'yR',
+            tension: 0.1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', labels: { font: { size: 11, weight: '600' }, boxWidth: 12, padding: 16 } },
+          tooltip: {
+            padding: 10,
+            backgroundColor: 'rgba(15,23,42,.92)',
+            titleFont: { size: 12, weight: '700' },
+            bodyFont: { size: 11 },
+            callbacks: {
+              label: c => c.datasetIndex === 0
+                ? ` 餘額: ${(c.raw ?? 0).toLocaleString()} 張`
+                : ` 股價: ${c.raw} 元`,
+            },
+          },
+        },
+        scales: {
+          yL: {
+            type: 'linear', position: 'left',
+            title: { display: true, text: 'CB 餘額（張）', color: 'rgba(14,165,233,.9)', font: { size: 10 } },
+            grid: { color: 'rgba(148,163,184,.08)' },
+            ticks: { color: 'rgba(14,165,233,.8)', font: { size: 10 } },
+          },
+          yR: {
+            type: 'linear', position: 'right',
+            title: { display: true, text: '現股股價（元）', color: 'rgba(239,68,68,.9)', font: { size: 10 } },
+            grid: { drawOnChartArea: false },
+            ticks: { color: 'rgba(239,68,68,.8)', font: { size: 10 } },
+          },
+          x: {
+            grid: { display: false },
+            ticks: { maxTicksLimit: 10, font: { size: 10 }, color: 'rgba(148,163,184,.5)' },
+          },
+        },
+      },
+    });
+
+    if (data.stale) {
+      msg.style.display = 'block';
+      msg.innerHTML = '<span style="color:var(--orange);font-size:11px">⚠️ 使用快取資料（今日抓取失敗）</span>';
+    }
+
+  } catch (e) {
+    msg.style.display = 'block';
+    msg.textContent = `載入失敗：${e.message}`;
+    if (wrap)  wrap.style.display  = 'none';
+    if (stats) stats.style.display = 'none';
+  }
 }

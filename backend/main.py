@@ -3424,6 +3424,52 @@ def seed_ranking_history(date: str):
     return {"ok": True, "seeded_date": date, "twse_count": len(twse_map), "tpex_count": len(tpex_map)}
 
 
+# ── CB 餘額 vs 股價 (money-104.com proxy) ────────────────────────────────────
+_cb_bookentry_cache: dict = {}   # code → {"date": "YYYY-MM-DD", "data": {...}}
+
+
+def _scrape_cb_bookentry(cb_code: str) -> dict:
+    """POST to money-104.com, extract labelsData / cbBookentryData / stockPriceData."""
+    r = http_requests.post(
+        "http://money-104.com/chart_bookentry.php",
+        data={"cb_id": cb_code},
+        headers={"User-Agent": "Mozilla/5.0", "Referer": "http://money-104.com/"},
+        timeout=25)
+    html = r.content.decode("utf-8", errors="replace")
+    labels_m    = re.search(r'const labelsData\s*=\s*(\[[^\]]+\])', html)
+    bookentry_m = re.search(r'const cbBookentryData\s*=\s*(\[[^\]]+\])', html)
+    prices_m    = re.search(r'const stockPriceData\s*=\s*(\[[^\]]+\])', html)
+    if not (labels_m and bookentry_m and prices_m):
+        raise ValueError("頁面中找不到資料，請確認 CB 代號是否正確")
+    return {
+        "code":     cb_code,
+        "labels":   json.loads(labels_m.group(1)),
+        "bookentry":json.loads(bookentry_m.group(1)),
+        "prices":   json.loads(prices_m.group(1)),
+    }
+
+
+@app.get("/api/cb-bookentry")
+def get_cb_bookentry(code: str, force: bool = False):
+    """CB 餘額 vs 現股股價歷史（資料來源 money-104.com）。快取至今日午夜。"""
+    from fastapi import HTTPException
+    today = datetime.now().strftime("%Y-%m-%d")
+    cached = _cb_bookentry_cache.get(code)
+    if not force and cached and cached.get("date") == today:
+        return cached["data"]
+    try:
+        data = _scrape_cb_bookentry(code)
+        _cb_bookentry_cache[code] = {"date": today, "data": data}
+        logger.info(f"[cb-bookentry] {code}: {len(data['labels'])} points, "
+                    f"{data['labels'][0] if data['labels'] else '?'} ~ {data['labels'][-1] if data['labels'] else '?'}")
+        return data
+    except Exception as e:
+        logger.error(f"[cb-bookentry] {code}: {e}")
+        if cached:
+            return {**cached["data"], "stale": True}
+        raise HTTPException(status_code=404, detail=str(e))
+
+
 # ── Serve frontend ───────────────────────────────────────────────────────────
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=49" />
+  <link rel="stylesheet" href="/static/style.css?v=50" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -483,6 +483,26 @@
         </div>
         <div id="ranking-body">
           <div class="empty-state">點擊側邊欄「成交值排行」載入資料</div>
+        </div>
+
+        <!-- ── CB 餘額 vs 股價 ── -->
+        <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+          <div class="panel-head">
+            <h3>📉 可轉債餘額 vs 現股股價</h3>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="cb-be-input" type="text" maxlength="6" placeholder="CB 代號，如 47602"
+                style="width:130px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none"
+                onkeydown="if(event.key==='Enter') renderCbBookentryChart()" />
+              <button class="btn-primary" style="padding:4px 10px;font-size:12px" onclick="renderCbBookentryChart()">查詢</button>
+              <button class="btn-ghost" style="font-size:11px" onclick="renderCbBookentryChart(true)" title="強制重新抓取">🔄</button>
+            </div>
+          </div>
+          <div id="cb-be-my" style="padding:6px 14px;border-bottom:1px solid var(--border);min-height:28px;display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div>
+          <div id="cb-be-stats" style="display:none;padding:10px 14px;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border)"></div>
+          <div id="cb-be-msg" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">輸入可轉債代號查詢（資料來源：money-104.com）</div>
+          <div id="cb-be-chart-wrap" style="display:none;padding:12px 14px 14px">
+            <canvas id="cb-be-canvas" style="height:320px"></canvas>
+          </div>
         </div>
       </section>
 
