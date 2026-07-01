@@ -1128,6 +1128,7 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .privacy #kpi-net-worth-usd,
 .privacy #kpi-total-assets-usd,
 .privacy #alloc-total,
+.privacy #trend-chart-new,
 .privacy .priv-amt {
   filter: blur(8px);
   transition: filter .2s;
@@ -1363,6 +1364,20 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   /* 成交值排行: stack 上市/上櫃 so each list gets full width (names + all
      columns visible) instead of two crammed half-width columns.               */
   .ranking-2col { grid-template-columns: 1fr; }
+}
+
+/* ══ 資產與負債管理 mobile ═══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* 資產/負債兩欄 → 單欄 */
+  .alm-page-grid { grid-template-columns: 1fr; }
+  /* assets-groups 內的 2-col alm-cols (inline style) → 單欄 */
+  .alm-cols { grid-template-columns: 1fr !important; }
+  /* alm-item-bot 的子欄位在手機換行顯示 */
+  .alm-item-bot { flex-wrap: wrap; }
+  .alm-iamt { width: 80px; }
+  /* CB 餘額對照控制列 */
+  #page-cb-be .panel-head { flex-wrap: wrap; gap: 8px; }
+  #page-cb-be .panel-head > div:last-child { flex-wrap: wrap; width: 100%; gap: 6px; }
 }
 
 /* Narrow portrait only (≤ 430px) */
