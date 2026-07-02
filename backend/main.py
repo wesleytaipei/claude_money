@@ -3429,17 +3429,28 @@ _cb_bookentry_cache: dict = {}   # code → {"date": "YYYY-MM-DD", "data": {...}
 
 
 def _scrape_cb_bookentry(cb_code: str) -> dict:
-    """POST to money-104.com, extract labelsData / cbBookentryData / stockPriceData."""
+    """POST to money-104.com, extract labelsData / cbBookentryData / stockPriceData.
+    需要登入 cookie：在 .env 或 Railway 環境變數設定 MONEY104_COOKIE=<cookie string>。"""
+    cookie = os.getenv("MONEY104_COOKIE", "").strip()
+    if not cookie:
+        raise ValueError("money-104.com 需要登入。請在 Railway 環境變數設定 MONEY104_COOKIE（從瀏覽器 DevTools → Network 複製 Cookie header）")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "http://money-104.com/",
+        "Cookie": cookie,
+    }
     r = http_requests.post(
         "http://money-104.com/chart_bookentry.php",
         data={"cb_id": cb_code},
-        headers={"User-Agent": "Mozilla/5.0", "Referer": "http://money-104.com/"},
+        headers=headers,
         timeout=25)
     html = r.content.decode("utf-8", errors="replace")
     labels_m    = re.search(r'const labelsData\s*=\s*(\[[^\]]+\])', html)
     bookentry_m = re.search(r'const cbBookentryData\s*=\s*(\[[^\]]+\])', html)
     prices_m    = re.search(r'const stockPriceData\s*=\s*(\[[^\]]+\])', html)
     if not (labels_m and bookentry_m and prices_m):
+        if "尚未登入" in html or "login" in html.lower():
+            raise ValueError("Cookie 已失效或不正確，請重新從瀏覽器複製 MONEY104_COOKIE")
         raise ValueError("頁面中找不到資料，請確認 CB 代號是否正確")
     return {
         "code":      cb_code,
