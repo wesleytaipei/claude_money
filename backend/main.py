@@ -3424,39 +3424,129 @@ def seed_ranking_history(date: str):
     return {"ok": True, "seeded_date": date, "twse_count": len(twse_map), "tpex_count": len(tpex_map)}
 
 
-# ── CB 餘額 vs 股價 (money-104.com proxy) ────────────────────────────────────
+# ── CB 餘額 vs 股價 (TDCC 集保結算所) ─────────────────────────────────────────
+_CB_TDCC_HISTORY_FILE = DATA_DIR / "cb_tdcc_history.json"
 _cb_bookentry_cache: dict = {}   # code → {"date": "YYYY-MM-DD", "data": {...}}
 
 
+def _load_cb_tdcc_history() -> dict:
+    try:
+        return json.loads(_CB_TDCC_HISTORY_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_cb_tdcc_history(h: dict):
+    try:
+        _CB_TDCC_HISTORY_FILE.write_text(
+            json.dumps(h, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _roc_to_iso(roc: str) -> str:
+    """民國日期 '1150626' → ISO '2026-06-26'"""
+    return f"{1911 + int(roc[:3])}-{roc[3:5]}-{roc[5:7]}"
+
+
+def _fetch_tdcc_weekly_row(cb_code: str) -> dict | None:
+    """下載集保週餘額 CSV，回傳 cb_code 對應的 row（找不到則 None）。"""
+    import csv, io
+    r = http_requests.get(
+        "https://opendata.tdcc.com.tw/getOD.ashx?id=2-26",
+        headers={"User-Agent": "Mozilla/5.0"},
+        timeout=30)
+    r.raise_for_status()
+    for enc in ("utf-8-sig", "utf-8", "big5", "cp950"):
+        try:
+            text = r.content.decode(enc)
+            break
+        except Exception:
+            continue
+    else:
+        return None
+    for row in csv.DictReader(io.StringIO(text)):
+        if row.get("股票代號", "").strip() == cb_code:
+            return row
+    return None
+
+
+def _cb_underlying_stock(cb_code: str) -> str:
+    """從 CB 代號推算標的股票代號（如 47602 → '4760'）。"""
+    digits = ''.join(c for c in cb_code if c.isdigit())
+    return digits[:4]
+
+
+def _yf_weekly_prices(stock_code: str, dates: list) -> list:
+    """從 Yahoo Finance 抓各日期對應的現股收盤價（週為單位）。"""
+    if not dates:
+        return []
+    try:
+        start = dates[0]
+        end = (datetime.strptime(dates[-1], "%Y-%m-%d") + timedelta(days=10)).strftime("%Y-%m-%d")
+        price_map: dict = {}
+        for suffix in (".TW", ".TWO"):
+            hist = yf.Ticker(f"{stock_code}{suffix}").history(start=start, end=end)
+            if hist.empty:
+                continue
+            for idx in hist.index:
+                price_map[idx.strftime("%Y-%m-%d")] = round(float(hist.loc[idx, "Close"]), 2)
+            if price_map:
+                break
+        if not price_map:
+            return [None] * len(dates)
+        result = []
+        for d in dates:
+            if d in price_map:
+                result.append(price_map[d])
+            else:
+                dt = datetime.strptime(d, "%Y-%m-%d")
+                best = min(price_map, key=lambda x: abs((datetime.strptime(x, "%Y-%m-%d") - dt).days))
+                diff = abs((datetime.strptime(best, "%Y-%m-%d") - dt).days)
+                result.append(price_map[best] if diff <= 7 else None)
+        return result
+    except Exception:
+        return [None] * len(dates)
+
+
 def _scrape_cb_bookentry(cb_code: str) -> dict:
-    """POST to money-104.com, extract labelsData / cbBookentryData / stockPriceData.
-    需要登入 cookie：在 .env 或 Railway 環境變數設定 MONEY104_COOKIE=<cookie string>。"""
-    cookie = os.getenv("MONEY104_COOKIE", "").strip()
-    if not cookie:
-        raise ValueError("money-104.com 需要登入。請在 Railway 環境變數設定 MONEY104_COOKIE（從瀏覽器 DevTools → Network 複製 Cookie header）")
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Referer": "http://money-104.com/",
-        "Cookie": cookie,
-    }
-    r = http_requests.post(
-        "http://money-104.com/chart_bookentry.php",
-        data={"cb_id": cb_code},
-        headers=headers,
-        timeout=25)
-    html = r.content.decode("utf-8", errors="replace")
-    labels_m    = re.search(r'const labelsData\s*=\s*(\[[^\]]+\])', html)
-    bookentry_m = re.search(r'const cbBookentryData\s*=\s*(\[[^\]]+\])', html)
-    prices_m    = re.search(r'const stockPriceData\s*=\s*(\[[^\]]+\])', html)
-    if not (labels_m and bookentry_m and prices_m):
-        if "尚未登入" in html or "login" in html.lower():
-            raise ValueError("Cookie 已失效或不正確，請重新從瀏覽器複製 MONEY104_COOKIE")
-        raise ValueError("頁面中找不到資料，請確認 CB 代號是否正確")
+    """CB 餘額 vs 現股 — 資料來源：TDCC 集保結算所，每週更新，歷史自動累積。"""
+    hist = _load_cb_tdcc_history()
+    cb_hist = dict(hist.get(cb_code, {}))   # {iso_date: balance_張}
+
+    row = _fetch_tdcc_weekly_row(cb_code)
+    updated = False
+    if row:
+        date_str = row.get("資料日期", "").strip()
+        this_bal = int(row.get("本週餘額", "0").replace(",", "") or 0)
+        prev_bal = int(row.get("上週餘額", "0").replace(",", "") or 0)
+        if len(date_str) == 7:
+            this_iso = _roc_to_iso(date_str)
+            if this_bal:
+                cb_hist[this_iso] = this_bal
+                updated = True
+            if prev_bal:
+                prev_iso = (datetime.strptime(this_iso, "%Y-%m-%d") - timedelta(days=7)).strftime("%Y-%m-%d")
+                if prev_iso not in cb_hist:
+                    cb_hist[prev_iso] = prev_bal
+                    updated = True
+
+    if not cb_hist:
+        raise ValueError(f"在集保結算所找不到 CB 代號「{cb_code}」。請確認代號（可轉債通常為 5-6 位數字）。")
+
+    if updated:
+        hist[cb_code] = cb_hist
+        _save_cb_tdcc_history(hist)
+
+    dates = sorted(cb_hist.keys())
+    balances = [cb_hist[d] for d in dates]
+    prices = _yf_weekly_prices(_cb_underlying_stock(cb_code), dates)
+
     return {
         "code":      cb_code,
-        "labels":    json.loads(labels_m.group(1)),
-        "bookentry": json.loads(bookentry_m.group(1)),
-        "prices":    json.loads(prices_m.group(1)),
+        "labels":    dates,
+        "bookentry": balances,
+        "prices":    prices,
     }
 
 
@@ -3478,7 +3568,7 @@ def _attach_conv_price(data: dict) -> dict:
 
 @app.get("/api/cb-bookentry")
 def get_cb_bookentry(code: str, force: bool = False):
-    """CB 餘額 vs 現股股價歷史（資料來源 money-104.com）。快取至今日午夜。"""
+    """CB 餘額 vs 現股股價歷史（資料來源：TDCC 集保結算所，週為單位）。快取至今日午夜。"""
     from fastapi import HTTPException
     today = datetime.now().strftime("%Y-%m-%d")
     cached = _cb_bookentry_cache.get(code)
