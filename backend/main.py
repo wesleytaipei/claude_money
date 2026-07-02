@@ -1390,8 +1390,14 @@ def _gist_pull_one(name: str) -> None:
         if not content:
             return
         path = DATA_DIR / name
-        gist_ts  = _parse_ts(json.loads(content).get(_TS_KEY))
-        local_ts = _parse_ts(load_json(path, {}).get(_TS_KEY))
+        gist_parsed  = json.loads(content)
+        local_parsed = load_json(path, {})
+        gist_ts  = _parse_ts(gist_parsed.get(_TS_KEY))
+        local_ts = _parse_ts(local_parsed.get(_TS_KEY))
+        # Don't let a Gist copy with price="-" overwrite a good local copy
+        if ("price" in local_parsed and local_parsed.get("price") not in (None, "-") and
+                "price" in gist_parsed and gist_parsed.get("price") in (None, "-")):
+            return
         if gist_ts >= local_ts:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
@@ -2691,7 +2697,7 @@ def get_important_info(force: bool = False):
             _save_lastgood("vixtwn_lastgood.json",
                            {"price": vix.get("price"), "change": vix.get("change"),
                             "change_pct": vix.get("change_pct")})
-        elif IS_RAILWAY:
+        else:
             lg = _load_lastgood("vixtwn_lastgood.json")
             if lg and lg.get("price") not in (None, "-"):
                 data["vixtwn"] = {"price": lg["price"], "change": lg.get("change"),
