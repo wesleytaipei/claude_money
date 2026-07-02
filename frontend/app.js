@@ -3,6 +3,15 @@
    ══════════════════════════════════════════════════════════════════════════ */
 const API = '';  // same origin
 
+// Globally unregister datalabels to prevent lifecycle errors on other charts
+if (typeof ChartDataLabels !== 'undefined') {
+  try {
+    Chart.unregister(ChartDataLabels);
+  } catch (e) {
+    console.warn('Datalabels unregister error:', e);
+  }
+}
+
 // ── State ────────────────────────────────────────────────────────────────
 const state = {
   portfolio: { assets: [], liabilities: [], investments: [] },
@@ -700,7 +709,164 @@ function renderDashboard() {
 
   renderPnLGrid();  // async, uses history — fire and forget
 
+  renderDashboardTrendChart(); // async, uses history — fire and forget
+
   document.getElementById('dash-time').textContent = '更新於 ' + new Date().toLocaleString('zh-TW');
+}
+
+async function renderDashboardTrendChart() {
+  if (Object.keys(state.history).length === 0) {
+    await loadHistory();
+  }
+
+  const canvas = document.getElementById('trend-chart-new');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Merge live totals as the latest snapshot point
+  const t = calcTotals();
+  const historyWithToday = { ...state.history };
+  const todayStr = new Date().toISOString().slice(0, 10);
+  
+  const currentAssetGroups = {};
+  for (const [gName, gVal] of Object.entries(t.groupTotals)) {
+    currentAssetGroups[gName] = gVal;
+  }
+  
+  historyWithToday[todayStr] = {
+    net_worth: t.netWorth,
+    total_assets: t.totalAssets,
+    total_liabilities: t.totalDebts,
+    asset_groups: currentAssetGroups
+  };
+
+  // Filter dates >= 2026-01-01
+  const dates = Object.keys(historyWithToday)
+    .filter(d => !d.startsWith('_') && d >= '2026-01-01')
+    .sort();
+  
+  if (dates.length === 0) return;
+
+  // Group by YYYY-MM and pick the last date of each month
+  const monthGroups = {};
+  for (const d of dates) {
+    const yyyymm = d.slice(0, 7);
+    if (!monthGroups[yyyymm]) monthGroups[yyyymm] = [];
+    monthGroups[yyyymm].push(d);
+  }
+  
+  const monthlyDates = [];
+  for (const yyyymm of Object.keys(monthGroups).sort()) {
+    const groupDates = monthGroups[yyyymm].sort();
+    monthlyDates.push(groupDates[groupDates.length - 1]);
+  }
+
+  if (charts.dashboardTrend) {
+    charts.dashboardTrend.destroy();
+  }
+
+  const labels = monthlyDates.map(d => {
+    const parts = d.split('-');
+    return `${parts[0]}.${parseInt(parts[1], 10)}`;
+  });
+
+  const toMillion = v => v / 1e6;
+  const plugins = [];
+  if (typeof ChartDataLabels !== 'undefined') {
+    plugins.push(ChartDataLabels);
+  }
+
+  charts.dashboardTrend = new Chart(ctx, {
+    type: 'line',
+    plugins: plugins,
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: '總資產',
+          data: monthlyDates.map(d => toMillion(historyWithToday[d].total_assets)),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 2.5,
+          tension: 0.2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: false,
+        },
+        {
+          label: '淨資產',
+          data: monthlyDates.map(d => toMillion(historyWithToday[d].net_worth)),
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 2.5,
+          tension: 0.2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: false,
+        },
+        {
+          label: '總負債',
+          data: monthlyDates.map(d => toMillion(historyWithToday[d].total_liabilities)),
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          borderWidth: 2.5,
+          tension: 0.2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            color: '#a7b0c8',
+            font: { size: 12, family: 'Inter, sans-serif' },
+            boxWidth: 12,
+            boxHeight: 12,
+            useBorderRadius: true,
+            borderRadius: 6
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1a2547',
+          borderColor: '#334b82',
+          borderWidth: 1,
+          titleColor: '#e8ecf6',
+          bodyColor: '#a7b0c8',
+          callbacks: {
+            label: (context) => {
+              return ` ${context.dataset.label}: ${context.raw.toFixed(2)} 百萬元`;
+            }
+          }
+        },
+        datalabels: {
+          display: true,
+          align: 'top',
+          anchor: 'end',
+          color: (context) => context.dataset.borderColor,
+          font: { weight: 'bold', size: 10, family: 'Inter, sans-serif' },
+          formatter: (value) => value.toFixed(2),
+          offset: 4
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: { color: '#a7b0c8', font: { size: 11 } }
+        },
+        y: {
+          grid: { color: 'rgba(255, 255, 255, 0.04)' },
+          ticks: { color: '#a7b0c8', font: { size: 11 } },
+          min: 0
+        }
+      }
+    }
+  });
 }
 
 // ══ PnL Grid (year-based) ════════════════════════════════════════════════
@@ -1890,6 +2056,7 @@ function togglePrivacy() {
   if (mobileIco) mobileIco.textContent = state.privacy ? '🙈' : '👁';
   charts.growth?.update();
   charts.trend?.update();
+  charts.dashboardTrend?.update();
 }
 
 function toggleSidebar() {
@@ -1967,7 +2134,7 @@ function _setChartRange(prefix, type) {
     start = `${pmy}-${pmm}-01`;
     end   = `${pmy}-${pmm}-${String(pm.getDate()).padStart(2, '0')}`;
   } else { // year
-    start = `${y - 1}-12-31`;                        // 去年 12/31 收盤
+    start = `${y}-01-01`;
   }
   document.getElementById('growth-start').value = start;
   document.getElementById('growth-end').value = end;
