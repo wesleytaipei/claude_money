@@ -639,13 +639,6 @@ function renderDashboard() {
   const debtRatio = t.totalAssets > 0 ? (t.totalDebts / t.totalAssets * 100) : 0;
   document.getElementById('kpi-debt-ratio').textContent = '負債率 ' + debtRatio.toFixed(1) + '%';
 
-  const levEl = document.getElementById('kpi-leverage');
-  levEl.textContent = t.leverage.toFixed(2) + 'x';
-  levEl.style.color = t.leverage > 2 ? 'var(--red-2)' : '';
-
-  const expEl = document.getElementById('kpi-exposure');
-  expEl.textContent = t.exposure.toFixed(1) + '%';
-  expEl.style.color = t.exposure > 100 ? 'var(--amber)' : '';
 
   // Allocation
   const entries = Object.entries(t.groupTotals)
@@ -2226,51 +2219,6 @@ async function renderGrowthChart() {
     categoryPercentage: 0.9,
   }));
 
-  // Investment exposure line — 投資市值 / 淨資產 (同資產總覽公式)
-  const INV_GROUPS = ['股票', '可轉債', '美國股市'];
-  const _exNames = getExcludedGroupNames();
-  const exposureLine = {
-    type: 'line',
-    label: '投資曝險',
-    data: filtered.map(d => {
-      const snap = adjSnap(state.history[d]);
-      const ag = snap.asset_groups || {};
-      const invSum = INV_GROUPS.reduce((a, g) => _exNames.has(g) ? a : a + (ag[g] || 0), 0);
-      return snap.net_worth > 0 ? +(invSum / snap.net_worth).toFixed(4) : null;
-    }),
-    borderColor: '#38bdf8',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderDash: [5, 3],
-    pointRadius: filtered.length > 60 ? 0 : 2,
-    pointHoverRadius: 5,
-    tension: 0.35,
-    fill: false,
-    yAxisID: 'y2',
-    order: 0,
-    _minMaxFmt: v => (v * 100).toFixed(1) + '%',
-  };
-
-  // Asset leverage line (total_assets / net_worth) — secondary right Y axis
-  const leverageLine = {
-    type: 'line',
-    label: '資產槓桿',
-    data: filtered.map(d => {
-      const s = adjSnap(state.history[d]);
-      return s.net_worth > 0 ? +(s.total_assets / s.net_worth).toFixed(3) : null;
-    }),
-    borderColor: '#fb923c',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderDash: [3, 3],
-    pointRadius: filtered.length > 60 ? 0 : 2,
-    pointHoverRadius: 5,
-    tension: 0.35,
-    fill: false,
-    yAxisID: 'y2',
-    order: 0,
-    _minMaxFmt: v => v.toFixed(2) + 'x',
-  };
 
   // Net worth line overlay
   const netWorthLine = {
@@ -2340,7 +2288,7 @@ async function renderGrowthChart() {
     type: 'bar',
     data: {
       labels: filtered,
-      datasets: [netWorthLine, liabLine, exposureLine, leverageLine, ...stackedDatasets],
+      datasets: [netWorthLine, liabLine, ...stackedDatasets],
     },
     plugins: [minMaxPlugin],
     options: {
@@ -2363,7 +2311,6 @@ async function renderGrowthChart() {
           callbacks: {
             label: (c) => {
               if (state.privacy) return ` ${c.dataset.label}: ●●●`;
-              if (c.dataset.label === '投資曝險') return ` ${c.dataset.label}: ${((c.raw || 0) * 100).toFixed(1)}%`;
               if (c.dataset.yAxisID === 'y2') return ` ${c.dataset.label}: ${c.raw?.toFixed(2)}x`;
               const v = c.raw * 1e4;
               return ` ${c.dataset.label}: ${fmtFull(v)}`;
