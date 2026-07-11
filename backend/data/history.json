@@ -30,9 +30,9 @@
     "sox": 1705.54
   },
   "2020-04-01": {
-    "net_worth": -1902495,
+    "net_worth": -1882495,
     "total_assets": 1097505,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2980000,
     "taiex": 9663.63,
     "otc": 118.6,
     "dji": 20943.51,
@@ -40,9 +40,9 @@
     "sox": 1427.73
   },
   "2020-05-01": {
-    "net_worth": -1813419,
+    "net_worth": -1773419,
     "total_assets": 1186581,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2960000,
     "taiex": 10992.14,
     "otc": 137.7,
     "dji": 23723.69,
@@ -50,9 +50,9 @@
     "sox": 1644.4
   },
   "2020-06-01": {
-    "net_worth": -1675274,
+    "net_worth": -1615274,
     "total_assets": 1324726,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2940000,
     "taiex": 11079.02,
     "otc": 149.34,
     "dji": 25475.02,
@@ -60,9 +60,9 @@
     "sox": 1843.24
   },
   "2020-07-01": {
-    "net_worth": -900276,
+    "net_worth": -820276,
     "total_assets": 2099724,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2920000,
     "taiex": 11703.42,
     "otc": 162.3,
     "dji": 25734.97,
@@ -70,9 +70,9 @@
     "sox": 1966.98
   },
   "2020-08-01": {
-    "net_worth": -704259,
+    "net_worth": -604259,
     "total_assets": 2295741,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2900000,
     "taiex": 12664.8,
     "otc": 163.21,
     "dji": 26428.32,
@@ -80,9 +80,9 @@
     "sox": 2136.41
   },
   "2020-09-01": {
-    "net_worth": -595429,
+    "net_worth": -475429,
     "total_assets": 2404571,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2880000,
     "taiex": 12703.28,
     "otc": 166.35,
     "dji": 28645.66,
@@ -90,9 +90,9 @@
     "sox": 2304.68
   },
   "2020-10-01": {
-    "net_worth": 584669,
+    "net_worth": 724669,
     "total_assets": 3584669,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2860000,
     "taiex": 12515.61,
     "otc": 162.05,
     "dji": 27816.9,
@@ -100,9 +100,9 @@
     "sox": 2291.77
   },
   "2020-11-01": {
-    "net_worth": 1501911,
+    "net_worth": 1661911,
     "total_assets": 4501911,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2840000,
     "taiex": 12546.34,
     "otc": 161.93,
     "dji": 26501.6,
@@ -110,9 +110,9 @@
     "sox": 2246.15
   },
   "2020-12-01": {
-    "net_worth": 1775453,
+    "net_worth": 1955453,
     "total_assets": 4775453,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2820000,
     "taiex": 13885.67,
     "otc": 177.93,
     "dji": 29823.92,
@@ -120,9 +120,9 @@
     "sox": 2709.73
   },
   "2021-01-01": {
-    "net_worth": 9338571,
+    "net_worth": 9538571,
     "total_assets": 12338571,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2800000,
     "taiex": 14732.53,
     "otc": 184.1,
     "dji": 30606.48,
@@ -130,9 +130,9 @@
     "sox": 2795.5
   },
   "2021-02-01": {
-    "net_worth": 10201499,
+    "net_worth": 10421499,
     "total_assets": 13201499,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2780000,
     "taiex": 15410.09,
     "otc": 180.39,
     "dji": 30211.91,
@@ -140,9 +140,9 @@
     "sox": 2999.99
   },
   "2021-03-01": {
-    "net_worth": 10665781,
+    "net_worth": 10905781,
     "total_assets": 13665781,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2760000,
     "taiex": 15953.8,
     "otc": 195.07,
     "dji": 31535.51,
@@ -150,9 +150,9 @@
     "sox": 3169.11
   },
   "2021-04-01": {
-    "net_worth": 10830028,
+    "net_worth": 11090028,
     "total_assets": 13830028,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2740000,
     "taiex": 16571.28,
     "otc": 207.39,
     "dji": 33153.21,
@@ -160,9 +160,9 @@
     "sox": 3240.17
   },
   "2021-05-01": {
-    "net_worth": 13373928,
+    "net_worth": 13653928,
     "total_assets": 16373928,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2720000,
     "taiex": 17566.66,
     "otc": 215.08,
     "dji": 33874.85,
@@ -170,9 +170,9 @@
     "sox": 3108.99
   },
   "2021-06-01": {
-    "net_worth": 14612164,
+    "net_worth": 14912164,
     "total_assets": 17612164,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2700000,
     "taiex": 17162.38,
     "otc": 203.26,
     "dji": 34575.31,
@@ -180,9 +180,9 @@
     "sox": 3174.32
   },
   "2021-07-01": {
-    "net_worth": 17044135,
+    "net_worth": 17364135,
     "total_assets": 20044135,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2680000,
     "taiex": 17713.94,
     "otc": 211.32,
     "dji": 34633.53,
@@ -190,9 +190,9 @@
     "sox": 3295.06
   },
   "2021-08-01": {
-    "net_worth": 17791070,
+    "net_worth": 18131070,
     "total_assets": 20791070,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2660000,
     "taiex": 17247.41,
     "otc": 217.39,
     "dji": 34935.47,
@@ -200,9 +200,9 @@
     "sox": 3356.53
   },
   "2021-09-01": {
-    "net_worth": 18478094,
+    "net_worth": 18838094,
     "total_assets": 21478094,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2640000,
     "taiex": 17473.99,
     "otc": 216.43,
     "dji": 35312.53,
@@ -210,9 +210,9 @@
     "sox": 3399.95
   },
   "2021-10-01": {
-    "net_worth": 18499166,
+    "net_worth": 18879166,
     "total_assets": 21499166,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2620000,
     "taiex": 16570.89,
     "otc": 201.19,
     "dji": 34326.46,
@@ -220,9 +220,9 @@
     "sox": 3261.18
   },
   "2021-11-01": {
-    "net_worth": 18491936,
+    "net_worth": 18891936,
     "total_assets": 21491936,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2600000,
     "taiex": 17068.24,
     "otc": 217.52,
     "dji": 35913.84,
@@ -230,9 +230,9 @@
     "sox": 3506.28
   },
   "2021-12-01": {
-    "net_worth": 18678222,
+    "net_worth": 19098222,
     "total_assets": 21678222,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2580000,
     "taiex": 17585.99,
     "otc": 226.56,
     "dji": 34022.04,
@@ -240,9 +240,9 @@
     "sox": 3810.75
   },
   "2022-01-01": {
-    "net_worth": 18410107,
+    "net_worth": 18850107,
     "total_assets": 21410107,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2560000,
     "taiex": 18218.84,
     "otc": 237.55,
     "dji": 36338.3,
@@ -250,9 +250,9 @@
     "sox": 3946.17
   },
   "2022-02-01": {
-    "net_worth": 17098562,
+    "net_worth": 17558562,
     "total_assets": 20098562,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2540000,
     "taiex": 17674.4,
     "otc": 215.03,
     "dji": 35405.24,
@@ -260,9 +260,9 @@
     "sox": 3510.86
   },
   "2022-03-01": {
-    "net_worth": 17134385,
+    "net_worth": 17614385,
     "total_assets": 20134385,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2520000,
     "taiex": 17898.25,
     "otc": 218.4,
     "dji": 33294.95,
@@ -270,9 +270,9 @@
     "sox": 3304.85
   },
   "2022-04-01": {
-    "net_worth": 17351246,
+    "net_worth": 17851246,
     "total_assets": 20351246,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2500000,
     "taiex": 17625.59,
     "otc": 216.55,
     "dji": 34818.27,
@@ -280,9 +280,9 @@
     "sox": 3366.64
   },
   "2022-05-01": {
-    "net_worth": 16501550,
+    "net_worth": 17021550,
     "total_assets": 19501550,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2480000,
     "taiex": 16592.18,
     "otc": 194.82,
     "dji": 32977.21,
@@ -290,9 +290,9 @@
     "sox": 2919.74
   },
   "2022-06-01": {
-    "net_worth": 15528316,
+    "net_worth": 16068316,
     "total_assets": 18528316,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2460000,
     "taiex": 16675.09,
     "otc": 203.57,
     "dji": 32813.23,
@@ -300,9 +300,9 @@
     "sox": 3049.03
   },
   "2022-07-01": {
-    "net_worth": 15448166,
+    "net_worth": 16008166,
     "total_assets": 18448166,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2440000,
     "taiex": 14343.08,
     "otc": 173.03,
     "dji": 31097.26,
@@ -310,9 +310,9 @@
     "sox": 2458.46
   },
   "2022-08-01": {
-    "net_worth": 15313132,
+    "net_worth": 15893132,
     "total_assets": 18313132,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2420000,
     "taiex": 14981.69,
     "otc": 182.75,
     "dji": 32798.4,
@@ -320,9 +320,9 @@
     "sox": 2978.32
   },
   "2022-09-01": {
-    "net_worth": 15445562,
+    "net_worth": 16045562,
     "total_assets": 18445562,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2400000,
     "taiex": 14801.86,
     "otc": 196.53,
     "dji": 31656.42,
@@ -330,9 +330,9 @@
     "sox": 2625.95
   },
   "2022-10-01": {
-    "net_worth": 13583834,
+    "net_worth": 14203834,
     "total_assets": 16583834,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2380000,
     "taiex": 13424.58,
     "otc": 173.42,
     "dji": 28725.51,
@@ -340,9 +340,9 @@
     "sox": 2306.7
   },
   "2022-11-01": {
-    "net_worth": 13094031,
+    "net_worth": 13734031,
     "total_assets": 16094031,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2360000,
     "taiex": 13037.21,
     "otc": 166.82,
     "dji": 32653.2,
@@ -350,9 +350,9 @@
     "sox": 2402.75
   },
   "2022-12-01": {
-    "net_worth": 13373780,
+    "net_worth": 14033780,
     "total_assets": 16373780,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2340000,
     "taiex": 15012.8,
     "otc": 190.33,
     "dji": 34395.01,
@@ -360,9 +360,9 @@
     "sox": 2804.7
   },
   "2023-01-01": {
-    "net_worth": 14274031,
+    "net_worth": 14954031,
     "total_assets": 17274031,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2320000,
     "taiex": 14137.69,
     "otc": 180.34,
     "dji": 33147.25,
@@ -370,9 +370,9 @@
     "sox": 2532.11
   },
   "2023-02-01": {
-    "net_worth": 14494128,
+    "net_worth": 15194128,
     "total_assets": 17494128,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2300000,
     "taiex": 15420.13,
     "otc": 196.54,
     "dji": 34092.96,
@@ -380,9 +380,9 @@
     "sox": 3073.47
   },
   "2023-03-01": {
-    "net_worth": 16776295,
+    "net_worth": 17496295,
     "total_assets": 19776295,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2280000,
     "taiex": 15598.49,
     "otc": 206.99,
     "dji": 32661.84,
@@ -390,9 +390,9 @@
     "sox": 2955.83
   },
   "2023-04-01": {
-    "net_worth": 18641447,
+    "net_worth": 19381447,
     "total_assets": 21641447,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2260000,
     "taiex": 15868.06,
     "otc": 212.65,
     "dji": 33274.15,
@@ -400,9 +400,9 @@
     "sox": 3230.86
   },
   "2023-05-01": {
-    "net_worth": 17856129,
+    "net_worth": 18616129,
     "total_assets": 20856129,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2240000,
     "taiex": 15579.18,
     "otc": 209.33,
     "dji": 34051.7,
@@ -410,9 +410,9 @@
     "sox": 3019.09
   },
   "2023-06-01": {
-    "net_worth": 16669484,
+    "net_worth": 17449484,
     "total_assets": 19669484,
-    "total_liabilities": 3000000,
+    "total_liabilities": 2220000,
     "taiex": 16512.65,
     "otc": 216.72,
     "dji": 33061.57,
@@ -420,9 +420,9 @@
     "sox": 3506.74
   },
   "2023-07-01": {
-    "net_worth": 17931271,
+    "net_worth": 18731271,
     "total_assets": 32181271,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13450000,
     "taiex": 16915.54,
     "otc": 223.94,
     "dji": 34407.6,
@@ -430,9 +430,9 @@
     "sox": 3673.06
   },
   "2023-08-01": {
-    "net_worth": 18655065,
+    "net_worth": 19475065,
     "total_assets": 32905065,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13430000,
     "taiex": 17212.87,
     "otc": 220.26,
     "dji": 35630.68,
@@ -440,9 +440,9 @@
     "sox": 3858.21
   },
   "2023-09-01": {
-    "net_worth": 19048402,
+    "net_worth": 19888402,
     "total_assets": 33298402,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13410000,
     "taiex": 16644.94,
     "otc": 213.68,
     "dji": 34837.71,
@@ -450,9 +450,9 @@
     "sox": 3682.84
   },
   "2023-10-01": {
-    "net_worth": 18244376,
+    "net_worth": 19104376,
     "total_assets": 32494376,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13390000,
     "taiex": 16353.74,
     "otc": 213.1,
     "dji": 33507.5,
@@ -460,9 +460,9 @@
     "sox": 3434.29
   },
   "2023-11-01": {
-    "net_worth": 17784207,
+    "net_worth": 18664207,
     "total_assets": 32034207,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13370000,
     "taiex": 16038.56,
     "otc": 211.82,
     "dji": 33274.58,
@@ -470,9 +470,9 @@
     "sox": 3290.95
   },
   "2023-12-01": {
-    "net_worth": 18232942,
+    "net_worth": 19132942,
     "total_assets": 32482942,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13350000,
     "taiex": 17438.35,
     "otc": 232.11,
     "dji": 36245.5,
@@ -480,9 +480,9 @@
     "sox": 3738.27
   },
   "2024-01-01": {
-    "net_worth": 18238312,
+    "net_worth": 19158312,
     "total_assets": 32488312,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13330000,
     "taiex": 17930.81,
     "otc": 234.01,
     "dji": 37689.54,
@@ -490,9 +490,9 @@
     "sox": 4175.47
   },
   "2024-02-01": {
-    "net_worth": 18378730,
+    "net_worth": 19318730,
     "total_assets": 32628730,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13310000,
     "taiex": 17968.11,
     "otc": 237.35,
     "dji": 38519.84,
@@ -500,9 +500,9 @@
     "sox": 4280.48
   },
   "2024-03-01": {
-    "net_worth": 20663548,
+    "net_worth": 21623548,
     "total_assets": 34913548,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13290000,
     "taiex": 18935.93,
     "otc": 251.37,
     "dji": 39087.38,
@@ -510,9 +510,9 @@
     "sox": 4929.58
   },
   "2024-04-01": {
-    "net_worth": 22085913,
+    "net_worth": 23065913,
     "total_assets": 36335913,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13270000,
     "taiex": 20222.33,
     "otc": 254.03,
     "dji": 39566.85,
@@ -520,9 +520,9 @@
     "sox": 4962.1
   },
   "2024-05-01": {
-    "net_worth": 22115164,
+    "net_worth": 23115164,
     "total_assets": 36365164,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13250000,
     "taiex": 20396.6,
     "otc": 248.53,
     "dji": 37903.29,
@@ -530,9 +530,9 @@
     "sox": 4507.68
   },
   "2024-06-01": {
-    "net_worth": 22731966,
+    "net_worth": 23751966,
     "total_assets": 36981966,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13230000,
     "taiex": 21174.22,
     "otc": 257.84,
     "dji": 38686.32,
@@ -540,9 +540,9 @@
     "sox": 5123.36
   },
   "2024-07-01": {
-    "net_worth": 21476206,
+    "net_worth": 22516206,
     "total_assets": 35726206,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13210000,
     "taiex": 23058.57,
     "otc": 275.57,
     "dji": 39169.52,
@@ -550,9 +550,9 @@
     "sox": 5477.15
   },
   "2024-08-01": {
-    "net_worth": 20037096,
+    "net_worth": 21097096,
     "total_assets": 34287096,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13190000,
     "taiex": 22642.1,
     "otc": 266.91,
     "dji": 40347.97,
@@ -560,9 +560,9 @@
     "sox": 4859.59
   },
   "2024-09-01": {
-    "net_worth": 17664516,
+    "net_worth": 18744516,
     "total_assets": 31914516,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13170000,
     "taiex": 22268.09,
     "otc": 274.58,
     "dji": 41563.08,
@@ -570,9 +570,9 @@
     "sox": 5158.82
   },
   "2024-10-01": {
-    "net_worth": 17910944,
+    "net_worth": 19010944,
     "total_assets": 32160944,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13150000,
     "taiex": 22390.39,
     "otc": 270.28,
     "dji": 42156.97,
@@ -580,9 +580,9 @@
     "sox": 5024.94
   },
   "2024-11-01": {
-    "net_worth": 17573319,
+    "net_worth": 18693319,
     "total_assets": 31823319,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13130000,
     "taiex": 22780.08,
     "otc": 264.94,
     "dji": 42052.19,
@@ -590,9 +590,9 @@
     "sox": 5001.43
   },
   "2024-12-01": {
-    "net_worth": 17503739,
+    "net_worth": 18643739,
     "total_assets": 31753739,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13110000,
     "taiex": 22262.5,
     "otc": 256.72,
     "dji": 44910.65,
@@ -600,9 +600,9 @@
     "sox": 4926.56
   },
   "2025-01-01": {
-    "net_worth": 17617445,
+    "net_worth": 18777445,
     "total_assets": 31867445,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13090000,
     "taiex": 23035.1,
     "otc": 255.84,
     "dji": 42544.22,
@@ -610,9 +610,9 @@
     "sox": 4979.93
   },
   "2025-02-01": {
-    "net_worth": 15655321,
+    "net_worth": 16835321,
     "total_assets": 29905321,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13070000,
     "taiex": 23525.41,
     "otc": 252.95,
     "dji": 44544.66,
@@ -620,9 +620,9 @@
     "sox": 5015.85
   },
   "2025-03-01": {
-    "net_worth": 15246356,
+    "net_worth": 16446356,
     "total_assets": 29496356,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13050000,
     "taiex": 23053.18,
     "otc": 259.92,
     "dji": 43840.91,
@@ -630,9 +630,9 @@
     "sox": 4766.75
   },
   "2025-04-01": {
-    "net_worth": 13574947,
+    "net_worth": 14794947,
     "total_assets": 27824947,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13030000,
     "taiex": 21280.17,
     "otc": 235.78,
     "dji": 41989.96,
@@ -640,9 +640,9 @@
     "sox": 4282.46
   },
   "2025-05-01": {
-    "net_worth": 10368834,
+    "net_worth": 11608834,
     "total_assets": 24618834,
-    "total_liabilities": 14250000,
+    "total_liabilities": 13010000,
     "taiex": 20235.03,
     "otc": 219.98,
     "dji": 40752.96,
@@ -650,9 +650,9 @@
     "sox": 4247.66
   },
   "2025-06-01": {
-    "net_worth": 10560368,
+    "net_worth": 11820368,
     "total_assets": 24810368,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12990000,
     "taiex": 21347.3,
     "otc": 227.27,
     "dji": 42270.07,
@@ -660,9 +660,9 @@
     "sox": 4758.06
   },
   "2025-07-01": {
-    "net_worth": 11742543,
+    "net_worth": 13022543,
     "total_assets": 25992543,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12970000,
     "taiex": 22553.72,
     "otc": 232.21,
     "dji": 44494.94,
@@ -670,9 +670,9 @@
     "sox": 5507.5
   },
   "2025-08-01": {
-    "net_worth": 14136518,
+    "net_worth": 15436518,
     "total_assets": 28386518,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12950000,
     "taiex": 23434.38,
     "otc": 234.03,
     "dji": 43588.58,
@@ -680,9 +680,9 @@
     "sox": 5527.61
   },
   "2025-09-01": {
-    "net_worth": 18005660,
+    "net_worth": 19325660,
     "total_assets": 32255660,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12930000,
     "taiex": 24071.73,
     "otc": 252.37,
     "dji": 45544.88,
@@ -690,9 +690,9 @@
     "sox": 5668.94
   },
   "2025-10-01": {
-    "net_worth": 20399063,
+    "net_worth": 21739063,
     "total_assets": 34649063,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12910000,
     "taiex": 25982.91,
     "otc": 261.47,
     "dji": 46441.1,
@@ -700,9 +700,9 @@
     "sox": 6500.28
   },
   "2025-11-01": {
-    "net_worth": 22016690,
+    "net_worth": 23376690,
     "total_assets": 36266690,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12890000,
     "taiex": 28233.35,
     "otc": 264.31,
     "dji": 47562.87,
@@ -710,9 +710,9 @@
     "sox": 7228.66
   },
   "2025-12-01": {
-    "net_worth": 25602658,
+    "net_worth": 26982658,
     "total_assets": 39852658,
-    "total_liabilities": 14250000,
+    "total_liabilities": 12870000,
     "taiex": 27342.53,
     "otc": 259.72,
     "dji": 47289.33,
