@@ -2682,6 +2682,12 @@ function toggleItem(section, gi, ii, checked) {
 }
 
 // ══ Modal ═══════════════════════════════════════════════════════════════
+function openModal(title, html) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
 function closeModal(event) {
   if (!event || event.target === document.getElementById('modal-overlay')) {
     document.getElementById('modal-overlay').classList.add('hidden');
@@ -4686,39 +4692,32 @@ function _renderIndGroupCard(g, gi) {
     const up = (s.change_pct ?? 0) >= 0;
     const clr = s.ok ? (up ? 'var(--green-2)' : 'var(--red-2)') : 'var(--muted)';
     const pStr = s.ok ? _fmtIndPrice(s.price, s.currency) : '—';
-    const cStr = s.ok
-      ? `${up ? '+' : ''}${s.change_pct?.toFixed(2)}%`
-      : '—';
+    const cStr = s.ok ? `${up ? '+' : ''}${s.change_pct?.toFixed(2)}%` : '—';
     return `<tr>
-      <td style="font-size:15px;text-align:center;padding:6px 4px">${s.flag || ''}</td>
-      <td class="ind-code">${s.code}</td>
-      <td style="font-size:13px">${s.name}</td>
-      <td class="num ind-price">${pStr}</td>
-      <td class="num ind-chg" style="color:${clr}">${cStr}</td>
-      <td><button class="btn-icon" onclick="deleteIndStock(${gi},${si})" title="移除">✕</button></td>
+      <td class="ind-flag-code">${s.flag || ''}<span class="ind-code">${s.code}</span></td>
+      <td class="ind-name">${s.name}</td>
+      <td class="num ind-price" style="color:${clr}">${pStr}</td>
+      <td class="num ind-chg"   style="color:${clr}">${cStr}</td>
+      <td><button class="btn-icon ind-del" onclick="deleteIndStock(${gi},${si})" title="移除">✕</button></td>
     </tr>`;
   }).join('');
 
   return `<div class="panel ind-group">
     <div class="panel-head">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px;line-height:1">${g.icon || '📊'}</span>
-        <h3>${g.name}</h3>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:18px;line-height:1">${g.icon || '📊'}</span>
+        <h3 style="font-size:14px">${g.name}</h3>
         <span class="panel-sub">${(g.stocks||[]).length} 檔</span>
       </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn-primary" style="font-size:12px;padding:5px 10px"
-          onclick="openAddIndStock(${gi})">＋ 個股</button>
+      <div style="display:flex;gap:4px">
+        <button class="btn-primary ind-add-btn" onclick="openAddIndStock(${gi})">＋ 個股</button>
         <button class="btn-icon" onclick="deleteIndGroup(${gi})" title="刪除族群">✕</button>
       </div>
     </div>
     <div class="table-wrap ind-group-stocks">
-      <table><thead><tr>
-        <th></th><th>代號</th><th>名稱</th>
-        <th class="num">股價</th><th class="num">漲跌%</th><th></th>
-      </tr></thead>
-      <tbody>${rows || '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px">尚無個股</td></tr>'}</tbody>
-      </table>
+      <table><tbody>
+        ${rows || '<tr><td colspan="5" class="muted" style="text-align:center;padding:10px">尚無個股</td></tr>'}
+      </tbody></table>
     </div>
   </div>`;
 }
@@ -4763,7 +4762,7 @@ function openAddIndustryGroup() {
 async function _addIndGroup() {
   const name = document.getElementById('ig-name')?.value.trim();
   const icon = document.getElementById('ig-icon')?.value.trim() || '📊';
-  if (!name) { showToast('請輸入族群名稱', 'error'); return; }
+  if (!name) { toast('請輸入族群名稱', 'error'); return; }
   if (!_indData) _indData = {groups: []};
   _indData.groups.push({id: Date.now().toString(), name, icon, stocks: []});
   closeModal();
@@ -4790,7 +4789,7 @@ async function _addIndStock(gi) {
   const market = document.getElementById('is-market')?.value;
   const code   = document.getElementById('is-code')?.value.trim().toUpperCase();
   const name   = document.getElementById('is-name')?.value.trim();
-  if (!code || !name) { showToast('請填寫代號與名稱', 'error'); return; }
+  if (!code || !name) { toast('請填寫代號與名稱', 'error'); return; }
   _indData.groups[gi].stocks.push({code, name, market});
   closeModal();
   await _saveIndConfig();

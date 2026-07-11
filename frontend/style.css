@@ -1384,13 +1384,21 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .industry-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
   align-items: start;
 }
-.ind-group-stocks td:first-child { font-size: 16px; width: 24px; text-align: center; }
-.ind-price   { font-family: var(--mono); font-size: 13px; font-weight: 700; }
-.ind-chg     { font-family: var(--mono); font-size: 12px; font-weight: 600; }
-.ind-code    { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--primary-2); }
+.ind-group .panel-head { padding: 8px 12px; }
+.ind-group-stocks table { width: 100%; border-collapse: collapse; }
+.ind-group-stocks td { padding: 3px 6px; font-size: 12px; vertical-align: middle; }
+.ind-group-stocks tr:hover td { background: var(--hover); }
+.ind-flag-code { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 13px; }
+.ind-name  { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ind-price { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.ind-chg   { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.ind-code  { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--primary-2); }
+.ind-del   { padding: 0 4px; font-size: 10px; opacity: 0.4; }
+.ind-del:hover { opacity: 1; }
+.ind-add-btn { font-size: 11px; padding: 3px 8px; }
 
 @media (max-width: 900px) {
   .industry-grid { grid-template-columns: 1fr; }
