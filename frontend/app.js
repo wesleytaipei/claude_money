@@ -4571,6 +4571,11 @@ const _IND_MARKETS = [
   {value:'HK',      label:'🇭🇰 香港 (HKEX)'},
 ];
 const _IND_MARKET_ORDER = ['TW_AUTO','TW','TWO','JP','KR','US','HK','CN_SZ','CN_SS'];
+const _IND_MARKET_META = {
+  TW_AUTO:{flag:'🇹🇼',currency:'TWD'}, TW:{flag:'🇹🇼',currency:'TWD'}, TWO:{flag:'🇹🇼',currency:'TWD'},
+  JP:{flag:'🇯🇵',currency:'JPY'}, KR:{flag:'🇰🇷',currency:'KRW'}, US:{flag:'🇺🇸',currency:'USD'},
+  CN_SZ:{flag:'🇨🇳',currency:'CNY'}, CN_SS:{flag:'🇨🇳',currency:'CNY'}, HK:{flag:'🇭🇰',currency:'HKD'},
+};
 function _sortIndStocks(stocks) {
   return [...stocks].sort((a, b) => {
     const oa = _IND_MARKET_ORDER.indexOf(a.market), ob = _IND_MARKET_ORDER.indexOf(b.market);
@@ -4641,7 +4646,7 @@ function _renderIndGroupCard(g, gi) {
     </tr>`;
   }).join('');
 
-  return `<div class="panel ind-group">
+  return `<div class="panel ind-group" id="ind-group-${gi}">
     <div class="panel-head">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:18px;line-height:1">${g.icon || '📊'}</span>
@@ -4673,15 +4678,28 @@ function _indConfigFromData() {
   };
 }
 
-async function _saveIndConfig() {
-  const cfg = _indConfigFromData();
-  await fetch('/api/industry-map/config', {
+function _reRenderIndGroup(gi) {
+  const el = document.getElementById(`ind-group-${gi}`);
+  if (!el) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = _renderIndGroupCard(_indData.groups[gi], gi);
+  el.replaceWith(tmp.firstChild);
+}
+
+function _putIndConfig() {
+  return fetch('/api/industry-map/config', {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(cfg),
+    body: JSON.stringify(_indConfigFromData()),
   });
-  // Force re-fetch prices on next render
-  await renderIndustryMap(true);
+}
+
+function _bgRefreshIndPrices() {
+  // Silently refresh all stock prices after save — no spinner
+  fetch('/api/industry-map?force=true')
+    .then(r => r.json())
+    .then(data => { _indData = data; _renderIndGroups(); })
+    .catch(() => {});
 }
 
 function openAddIndustryGroup() {
@@ -4705,7 +4723,8 @@ async function _addIndGroup() {
   if (!_indData) _indData = {groups: []};
   _indData.groups.push({id: Date.now().toString(), name, icon, stocks: []});
   closeModal();
-  await _saveIndConfig();
+  _renderIndGroups();
+  _putIndConfig().catch(() => {});
 }
 
 function openAddIndStock(gi) {
@@ -4725,24 +4744,31 @@ function openAddIndStock(gi) {
 }
 
 async function _addIndStock(gi) {
-  const market = document.getElementById('is-market')?.value;
+  const market = document.getElementById('is-market')?.value || 'TW_AUTO';
   const code   = document.getElementById('is-code')?.value.trim().toUpperCase();
   const name   = document.getElementById('is-name')?.value.trim();
   if (!code || !name) { toast('請填寫代號與名稱', 'error'); return; }
-  _indData.groups[gi].stocks.push({code, name, market});
+  const meta = _IND_MARKET_META[market] || _IND_MARKET_META['US'];
+  // Optimistic: add with placeholder price, sort immediately
+  _indData.groups[gi].stocks.push({code, name, market, flag: meta.flag, currency: meta.currency, ok: false});
+  _indData.groups[gi].stocks = _sortIndStocks(_indData.groups[gi].stocks);
   closeModal();
-  await _saveIndConfig();
+  _reRenderIndGroup(gi);
+  // Save config, then silently refresh prices for this group
+  _putIndConfig().then(_bgRefreshIndPrices).catch(() => {});
 }
 
 async function deleteIndStock(gi, si) {
   if (!confirm('確定移除此個股？')) return;
   _indData.groups[gi].stocks.splice(si, 1);
-  await _saveIndConfig();
+  _reRenderIndGroup(gi);
+  _putIndConfig().catch(() => {});
 }
 
 async function deleteIndGroup(gi) {
   const name = _indData?.groups[gi]?.name || '';
   if (!confirm(`確定刪除族群「${name}」及其所有個股？`)) return;
   _indData.groups.splice(gi, 1);
-  await _saveIndConfig();
+  _renderIndGroups();
+  _putIndConfig().catch(() => {});
 }
