@@ -2054,6 +2054,12 @@ function goPage(name) {
 }
 
 // ── Date range shortcuts for Growth / Trend charts ──────────────────────────
+function _setChartAll() {
+  document.getElementById('growth-start').value = '2020-01-01';
+  document.getElementById('growth-end').value = new Date().toISOString().slice(0, 10);
+  renderGrowthChart(); renderTrendChart();
+}
+
 function _setChartYear(yr) {
   const today = new Date().toISOString().slice(0, 10);
   const curYear = new Date().getFullYear();
@@ -2700,9 +2706,11 @@ async function init() {
   const _yearBtnEl = document.getElementById('growth-year-btns');
   if (_yearBtnEl) {
     const _curYr = new Date().getFullYear();
-    _yearBtnEl.innerHTML = Array.from({length: _curYr - 2020 + 1}, (_, i) => 2020 + i)
+    const _allBtn = `<button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartAll()">All</button>`;
+    const _yrBtns = Array.from({length: _curYr - 2020 + 1}, (_, i) => 2020 + i)
       .map(y => `<button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartYear(${y})">${y}</button>`)
       .join('');
+    _yearBtnEl.innerHTML = _allBtn + _yrBtns;
   }
 
   // Auto-sync from Gist on page load (silent, timestamp-based — only pulls if Gist is newer)
