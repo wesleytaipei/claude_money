@@ -4576,9 +4576,16 @@ const _IND_MARKET_META = {
   JP:{flag:'🇯🇵',currency:'JPY'}, KR:{flag:'🇰🇷',currency:'KRW'}, US:{flag:'🇺🇸',currency:'USD'},
   CN_SZ:{flag:'🇨🇳',currency:'CNY'}, CN_SS:{flag:'🇨🇳',currency:'CNY'}, HK:{flag:'🇭🇰',currency:'HKD'},
 };
+const _IND_SORT_ORDER = ['TW','JP','KR','US','HK','CN_SZ','CN_SS'];
+function _mktSortKey(m) {
+  if (!m) return 'ZZ';
+  if (m === 'TW_AUTO' || m === 'TW' || m === 'TWO') return 'TW';
+  return m;
+}
 function _sortIndStocks(stocks) {
   return [...stocks].sort((a, b) => {
-    const oa = _IND_MARKET_ORDER.indexOf(a.market), ob = _IND_MARKET_ORDER.indexOf(b.market);
+    const oa = _IND_SORT_ORDER.indexOf(_mktSortKey(a.market));
+    const ob = _IND_SORT_ORDER.indexOf(_mktSortKey(b.market));
     if (oa !== ob) return (oa < 0 ? 99 : oa) - (ob < 0 ? 99 : ob);
     const na = parseInt(a.code, 10), nb = parseInt(b.code, 10);
     return (!isNaN(na) && !isNaN(nb)) ? na - nb : a.code.localeCompare(b.code);
