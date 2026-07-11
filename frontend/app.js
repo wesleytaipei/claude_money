@@ -639,6 +639,13 @@ function renderDashboard() {
   const debtRatio = t.totalAssets > 0 ? (t.totalDebts / t.totalAssets * 100) : 0;
   document.getElementById('kpi-debt-ratio').textContent = '負債率 ' + debtRatio.toFixed(1) + '%';
 
+  const levEl = document.getElementById('kpi-leverage');
+  levEl.textContent = t.leverage.toFixed(2) + 'x';
+  levEl.style.color = t.leverage > 2 ? 'var(--red-2)' : '';
+
+  const expEl = document.getElementById('kpi-exposure');
+  expEl.textContent = t.exposure.toFixed(1) + '%';
+  expEl.style.color = t.exposure > 100 ? 'var(--amber)' : '';
 
   // Allocation
   const entries = Object.entries(t.groupTotals)

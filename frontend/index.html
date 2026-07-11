@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=61" />
+  <link rel="stylesheet" href="/static/style.css?v=62" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
@@ -124,6 +124,16 @@
             <div class="kpi-label">總負債</div>
             <div class="kpi-value" id="kpi-total-debts">—</div>
             <div class="kpi-sub" id="kpi-debt-ratio">—</div>
+          </div>
+          <div class="kpi-card kpi-leverage">
+            <div class="kpi-label">資產槓桿</div>
+            <div class="kpi-value" id="kpi-leverage">—</div>
+            <div class="kpi-sub">總資產 / 淨資產</div>
+          </div>
+          <div class="kpi-card kpi-exposure">
+            <div class="kpi-label">投資曝險</div>
+            <div class="kpi-value" id="kpi-exposure">—</div>
+            <div class="kpi-sub">投資 / 淨資產</div>
           </div>
         </div>
 
@@ -531,6 +541,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=64"></script>
+  <script src="/static/app.js?v=65"></script>
 </body>
 </html>
