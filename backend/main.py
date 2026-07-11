@@ -3612,23 +3612,74 @@ _MARKET_META: dict = {
 
 def _ind_fetch_one(s: dict) -> dict:
     market = (s.get("market") or "US").upper()
-    suffixes = [".TW", ".TWO"] if market == "TW_AUTO" else [_MARKET_META.get(market, _MARKET_META["US"])["suffix"]]
     meta = _MARKET_META.get(market, _MARKET_META["US"])
     base = {**s, "flag": meta["flag"], "currency": meta["currency"],
             "price": None, "change": None, "change_pct": None, "ok": False}
-    for suffix in suffixes:
-        ticker = f"{s['code']}{suffix}"
-        try:
-            fi    = yf.Ticker(ticker).fast_info
-            price = float(fi.last_price or 0)
-            prev  = float(fi.previous_close or 0)
-            if price > 0:
-                ch  = round(price - prev, 4)
-                pct = round(ch / prev * 100, 2) if prev else 0.0
-                return {**base, "yf_ticker": ticker, "price": price, "change": ch, "change_pct": pct, "ok": True}
-        except Exception as e:
-            logger.warning(f"[industry-map] {ticker}: {e}")
-    return {**base, "yf_ticker": f"{s['code']}{suffixes[-1]}"}
+
+    if market == "TW_AUTO":
+        code = s["code"]
+        # Use same method as investment portfolio: Yahoo TW scrape → yfinance fallback
+        by_sym = _tw_table.get("by_symbol", {})
+        known_market = by_sym.get(code, {}).get("market", "tse")
+        # Try known market first, then the other one
+        markets_to_try = [known_market] if known_market in ("tse", "otc") else ["tse", "otc"]
+        if len(markets_to_try) == 1 and markets_to_try[0] == "tse":
+            markets_to_try = ["tse", "otc"]
+        else:
+            markets_to_try = ["otc", "tse"] if known_market == "otc" else ["tse", "otc"]
+
+        for mkt in markets_to_try:
+            result = _fetch_yahoo_tw_scrape(code, mkt)
+            if result.get("price"):
+                price = result["price"]
+                pct   = result.get("change_pct") or 0.0
+                suffix = ".TWO" if mkt == "otc" else ".TW"
+                return {**base, "yf_ticker": f"{code}{suffix}",
+                        "price": price, "change": None, "change_pct": pct, "ok": True}
+
+        # yfinance fallback
+        for suffix in (".TW", ".TWO"):
+            try:
+                fi    = yf.Ticker(f"{code}{suffix}").fast_info
+                price = float(fi.last_price or 0)
+                prev  = float(fi.previous_close or 0)
+                if price > 0:
+                    ch  = round(price - prev, 4)
+                    pct = round(ch / prev * 100, 2) if prev else 0.0
+                    return {**base, "yf_ticker": f"{code}{suffix}",
+                            "price": price, "change": ch, "change_pct": pct, "ok": True}
+            except Exception:
+                pass
+        return {**base, "yf_ticker": f"{code}.TW"}
+
+    # Non-TW markets: use Yahoo Finance chart API → yfinance fallback
+    suffix = meta["suffix"]
+    ticker = f"{s['code']}{suffix}"
+    try:
+        r = http_requests.get(
+            f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
+        m = r.json()["chart"]["result"][0]["meta"]
+        price = m.get("regularMarketPrice")
+        prev  = m.get("previousClose") or m.get("chartPreviousClose")
+        if price is not None:
+            price = float(price)
+            pct   = round((price - float(prev)) / float(prev) * 100, 2) if prev and float(prev) > 0 else 0.0
+            ch    = round(price - float(prev), 4) if prev else None
+            return {**base, "yf_ticker": ticker, "price": price, "change": ch, "change_pct": pct, "ok": True}
+    except Exception as e:
+        logger.warning(f"[industry-map] chart API {ticker}: {e}")
+    try:
+        fi    = yf.Ticker(ticker).fast_info
+        price = float(fi.last_price or 0)
+        prev  = float(fi.previous_close or 0)
+        if price > 0:
+            ch  = round(price - prev, 4)
+            pct = round(ch / prev * 100, 2) if prev else 0.0
+            return {**base, "yf_ticker": ticker, "price": price, "change": ch, "change_pct": pct, "ok": True}
+    except Exception as e:
+        logger.warning(f"[industry-map] {ticker}: {e}")
+    return {**base, "yf_ticker": ticker}
 
 
 @app.get("/api/industry-map")
