@@ -4562,16 +4562,15 @@ function _cbBeRedrawConv() {
 let _indData = null;   // last fetched API response
 
 const _IND_MARKETS = [
-  {value:'TW',    label:'🇹🇼 台灣上市 (TWSE)'},
-  {value:'TWO',   label:'🇹🇼 台灣上櫃 (TPEX)'},
-  {value:'JP',    label:'🇯🇵 日本 (TSE)'},
-  {value:'KR',    label:'🇰🇷 韓國 (KRX)'},
-  {value:'US',    label:'🇺🇸 美國 (NYSE/NASDAQ)'},
-  {value:'CN_SZ', label:'🇨🇳 中國深圳 (SZ)'},
-  {value:'CN_SS', label:'🇨🇳 中國上海 (SS)'},
-  {value:'HK',    label:'🇭🇰 香港 (HKEX)'},
+  {value:'TW_AUTO', label:'🇹🇼 台灣（自動判斷上市/上櫃）'},
+  {value:'JP',      label:'🇯🇵 日本 (TSE)'},
+  {value:'KR',      label:'🇰🇷 韓國 (KRX)'},
+  {value:'US',      label:'🇺🇸 美國 (NYSE/NASDAQ)'},
+  {value:'CN_SZ',   label:'🇨🇳 中國深圳 (SZ)'},
+  {value:'CN_SS',   label:'🇨🇳 中國上海 (SS)'},
+  {value:'HK',      label:'🇭🇰 香港 (HKEX)'},
 ];
-const _IND_MARKET_ORDER = ['TW','TWO','JP','KR','US','HK','CN_SZ','CN_SS'];
+const _IND_MARKET_ORDER = ['TW_AUTO','TW','TWO','JP','KR','US','HK','CN_SZ','CN_SS'];
 function _sortIndStocks(stocks) {
   return [...stocks].sort((a, b) => {
     const oa = _IND_MARKET_ORDER.indexOf(a.market), ob = _IND_MARKET_ORDER.indexOf(b.market);

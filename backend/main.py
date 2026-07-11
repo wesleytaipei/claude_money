@@ -3598,9 +3598,10 @@ INDUSTRY_MAP_CONFIG_FILE = DATA_DIR / "industry_map_config.json"
 _industry_map_cache: dict = {"ts": 0.0, "data": None}
 
 _MARKET_META: dict = {
-    "TW":    {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TW"},
-    "TWO":   {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TWO"},
-    "JP":    {"flag": "🇯🇵", "currency": "JPY", "suffix": ".T"},
+    "TW_AUTO": {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TW"},   # auto-try .TW then .TWO
+    "TW":      {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TW"},
+    "TWO":     {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TWO"},
+    "JP":      {"flag": "🇯🇵", "currency": "JPY", "suffix": ".T"},
     "KR":    {"flag": "🇰🇷", "currency": "KRW", "suffix": ".KS"},
     "CN_SZ": {"flag": "🇨🇳", "currency": "CNY", "suffix": ".SZ"},
     "CN_SS": {"flag": "🇨🇳", "currency": "CNY", "suffix": ".SS"},
@@ -3610,22 +3611,24 @@ _MARKET_META: dict = {
 
 
 def _ind_fetch_one(s: dict) -> dict:
-    meta   = _MARKET_META.get((s.get("market") or "US").upper(), _MARKET_META["US"])
-    ticker = f"{s['code']}{meta['suffix']}"
-    base   = {**s, "yf_ticker": ticker, "flag": meta["flag"],
-              "currency": meta["currency"], "price": None,
-              "change": None, "change_pct": None, "ok": False}
-    try:
-        fi    = yf.Ticker(ticker).fast_info
-        price = float(fi.last_price or 0)
-        prev  = float(fi.previous_close or 0)
-        if price > 0:
-            ch  = round(price - prev, 4)
-            pct = round(ch / prev * 100, 2) if prev else 0.0
-            return {**base, "price": price, "change": ch, "change_pct": pct, "ok": True}
-    except Exception as e:
-        logger.warning(f"[industry-map] {ticker}: {e}")
-    return base
+    market = (s.get("market") or "US").upper()
+    suffixes = [".TW", ".TWO"] if market == "TW_AUTO" else [_MARKET_META.get(market, _MARKET_META["US"])["suffix"]]
+    meta = _MARKET_META.get(market, _MARKET_META["US"])
+    base = {**s, "flag": meta["flag"], "currency": meta["currency"],
+            "price": None, "change": None, "change_pct": None, "ok": False}
+    for suffix in suffixes:
+        ticker = f"{s['code']}{suffix}"
+        try:
+            fi    = yf.Ticker(ticker).fast_info
+            price = float(fi.last_price or 0)
+            prev  = float(fi.previous_close or 0)
+            if price > 0:
+                ch  = round(price - prev, 4)
+                pct = round(ch / prev * 100, 2) if prev else 0.0
+                return {**base, "yf_ticker": ticker, "price": price, "change": ch, "change_pct": pct, "ok": True}
+        except Exception as e:
+            logger.warning(f"[industry-map] {ticker}: {e}")
+    return {**base, "yf_ticker": f"{s['code']}{suffixes[-1]}"}
 
 
 @app.get("/api/industry-map")
