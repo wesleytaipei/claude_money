@@ -923,8 +923,9 @@ async function renderPnLGrid(year) {
       return;
     }
     const hasGroups = !!(startSnap?.asset_groups && endSnap?.asset_groups);
-    const startMV = _invMVFromSnap(startSnap);
-    const endMV   = _invMVFromSnap(endSnap);
+    const _nw = s => s.net_worth ?? s.total_assets ?? 0;
+    const startMV = hasGroups ? _invMVFromSnap(startSnap) : _nw(startSnap);
+    const endMV   = hasGroups ? _invMVFromSnap(endSnap)   : _nw(endSnap);
     const yearPnL = endMV - startMV;
     const yearPct = startMV > 0 ? yearPnL / startMV * 100 : 0;
     const cls     = yearPnL >= 0 ? 'profit' : 'loss';
