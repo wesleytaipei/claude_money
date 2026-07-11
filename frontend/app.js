@@ -873,7 +873,8 @@ async function renderDashboardTrendChart() {
 const _INV_HIST_GROUPS = ['股票', '可轉債', '美國股市'];
 
 function _invMVFromSnap(snap) {
-  if (!snap?.asset_groups) return 0;
+  if (!snap) return 0;
+  if (!snap.asset_groups) return snap.net_worth ?? snap.total_assets ?? 0;
   const exNames = getExcludedGroupNames();
   return _INV_HIST_GROUPS.reduce((s, g) => exNames.has(g) ? s : s + (snap.asset_groups[g] || 0), 0);
 }
@@ -983,12 +984,17 @@ async function renderPnLGrid(year) {
         <div class="empty-state" style="padding:20px">無 ${year} 年度快照資料</div>`;
       return;
     }
-    const startMV = _invMVFromSnap(state.history[snaps[0]]);
-    const endMV   = _invMVFromSnap(state.history[snaps.at(-1)]);
+    const startSnap = state.history[snaps[0]];
+    const endSnap   = state.history[snaps.at(-1)];
+    const hasGroups = !!(endSnap?.asset_groups);
+    const startMV = _invMVFromSnap(startSnap);
+    const endMV   = _invMVFromSnap(endSnap);
     const yearPnL = endMV - startMV;
     const yearPct = startMV > 0 ? yearPnL / startMV * 100 : 0;
     const cls     = yearPnL >= 0 ? 'profit' : 'loss';
     const s       = yearPnL >= 0 ? '+' : '';
+    const mvLabel = hasGroups ? '年度結算投資市值' : '年度結算淨資產';
+    const note    = hasGroups ? `期初 ${fmtFull(startMV)}` : `期初 ${fmtFull(startMV)}（以淨資產估算）`;
 
     container.innerHTML = `
       <div class="pnl-year-switcher">${switcher}</div>
@@ -1004,9 +1010,9 @@ async function renderPnLGrid(year) {
           <div class="pnl-card-sub">${snaps[0]} → ${snaps.at(-1)}</div>
         </div>
         <div class="pnl-card">
-          <div class="pnl-card-label">年度結算投資市值</div>
+          <div class="pnl-card-label">${mvLabel}</div>
           <div class="pnl-card-value">${fmtFull(endMV)}</div>
-          <div class="pnl-card-sub">期初 ${fmtFull(startMV)}</div>
+          <div class="pnl-card-sub">${note}</div>
         </div>
       </div>`;
   }
