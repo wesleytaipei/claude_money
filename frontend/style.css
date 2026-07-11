@@ -1388,8 +1388,8 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   align-items: start;
 }
 .ind-group .panel-head { padding: 8px 12px; }
-.ind-group-stocks table { width: 100%; border-collapse: collapse; }
-.ind-group-stocks td { padding: 3px 6px; font-size: 12px; vertical-align: middle; }
+.ind-group-stocks table { width: auto; border-collapse: collapse; }
+.ind-group-stocks td { padding: 2px 4px; font-size: 12px; vertical-align: middle; white-space: nowrap; }
 .ind-group-stocks tr:hover td { background: var(--hover); }
 .ind-flag-code { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 13px; }
 .ind-name  { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
