@@ -4641,6 +4641,15 @@ const _IND_MARKETS = [
   {value:'CN_SS', label:'🇨🇳 中國上海 (SS)'},
   {value:'HK',    label:'🇭🇰 香港 (HKEX)'},
 ];
+const _IND_MARKET_ORDER = ['TW','TWO','JP','KR','US','HK','CN_SZ','CN_SS'];
+function _sortIndStocks(stocks) {
+  return [...stocks].sort((a, b) => {
+    const oa = _IND_MARKET_ORDER.indexOf(a.market), ob = _IND_MARKET_ORDER.indexOf(b.market);
+    if (oa !== ob) return (oa < 0 ? 99 : oa) - (ob < 0 ? 99 : ob);
+    const na = parseInt(a.code, 10), nb = parseInt(b.code, 10);
+    return (!isNaN(na) && !isNaN(nb)) ? na - nb : a.code.localeCompare(b.code);
+  });
+}
 
 const _IND_CURRENCY_FMT = {
   JPY: p => Math.round(p).toLocaleString(),
@@ -4684,6 +4693,7 @@ function _renderIndGroups() {
     body.innerHTML = '<div class="empty-state">尚無族群，點擊「＋ 新增族群」開始</div>';
     return;
   }
+  groups.forEach(g => { if (g.stocks) g.stocks = _sortIndStocks(g.stocks); });
   body.innerHTML = groups.map((g, gi) => _renderIndGroupCard(g, gi)).join('');
 }
 
