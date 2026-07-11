@@ -1,7 +1,7 @@
 {
   "2020-01-01": {
-    "net_worth": 1500000,
-    "total_assets": 2000000,
+    "net_worth": 2000000,
+    "total_assets": 2500000,
     "total_liabilities": 500000,
     "taiex": 11997.14,
     "otc": 149.36,
@@ -351,8 +351,8 @@
   },
   "2022-12-01": {
     "net_worth": 14033780,
-    "total_assets": 16373780,
-    "total_liabilities": 2340000,
+    "total_assets": 31873780,
+    "total_liabilities": 17840000,
     "taiex": 15012.8,
     "otc": 190.33,
     "dji": 34395.01,
@@ -361,8 +361,8 @@
   },
   "2023-01-01": {
     "net_worth": 14954031,
-    "total_assets": 17274031,
-    "total_liabilities": 2320000,
+    "total_assets": 32774031,
+    "total_liabilities": 17820000,
     "taiex": 14137.69,
     "otc": 180.34,
     "dji": 33147.25,
@@ -371,8 +371,8 @@
   },
   "2023-02-01": {
     "net_worth": 15194128,
-    "total_assets": 17494128,
-    "total_liabilities": 2300000,
+    "total_assets": 32994128,
+    "total_liabilities": 17800000,
     "taiex": 15420.13,
     "otc": 196.54,
     "dji": 34092.96,
@@ -381,8 +381,8 @@
   },
   "2023-03-01": {
     "net_worth": 17496295,
-    "total_assets": 19776295,
-    "total_liabilities": 2280000,
+    "total_assets": 35276295,
+    "total_liabilities": 17780000,
     "taiex": 15598.49,
     "otc": 206.99,
     "dji": 32661.84,
@@ -391,8 +391,8 @@
   },
   "2023-04-01": {
     "net_worth": 19381447,
-    "total_assets": 21641447,
-    "total_liabilities": 2260000,
+    "total_assets": 37141447,
+    "total_liabilities": 17760000,
     "taiex": 15868.06,
     "otc": 212.65,
     "dji": 33274.15,
@@ -401,8 +401,8 @@
   },
   "2023-05-01": {
     "net_worth": 18616129,
-    "total_assets": 20856129,
-    "total_liabilities": 2240000,
+    "total_assets": 36356129,
+    "total_liabilities": 17740000,
     "taiex": 15579.18,
     "otc": 209.33,
     "dji": 34051.7,
@@ -411,8 +411,8 @@
   },
   "2023-06-01": {
     "net_worth": 17449484,
-    "total_assets": 19669484,
-    "total_liabilities": 2220000,
+    "total_assets": 35169484,
+    "total_liabilities": 17720000,
     "taiex": 16512.65,
     "otc": 216.72,
     "dji": 33061.57,
