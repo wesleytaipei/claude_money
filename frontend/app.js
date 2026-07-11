@@ -939,7 +939,6 @@ async function renderPnLGrid(year) {
         <div class="pnl-card">
           <div class="pnl-card-label">${year} 年度總損益</div>
           <div class="pnl-card-value ${cls}">${s}${fmtFull(Math.abs(yearPnL))}</div>
-          <div class="pnl-card-sub ${cls}">${fmtPct(yearPct)}</div>
         </div>
         <div class="pnl-card">
           <div class="pnl-card-label">年度損益%</div>
