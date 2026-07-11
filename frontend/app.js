@@ -978,14 +978,15 @@ async function renderPnLGrid(year) {
 
   } else {
     // ── Past year: 3 simplified cards ────────────────────────────────
-    const snaps = Object.keys(state.history).filter(d => d.startsWith(year + '-')).sort();
-    if (snaps.length === 0) {
+    const startKey = `${year}-01-01`;
+    const endKey   = `${year + 1}-01-01`;
+    const startSnap = state.history[startKey];
+    const endSnap   = state.history[endKey];
+    if (!startSnap || !endSnap) {
       container.innerHTML = `<div class="pnl-year-switcher">${switcher}</div>
-        <div class="empty-state" style="padding:20px">無 ${year} 年度快照資料</div>`;
+        <div class="empty-state" style="padding:20px">缺少 ${startKey} 或 ${endKey} 快照資料</div>`;
       return;
     }
-    const startSnap = state.history[snaps[0]];
-    const endSnap   = state.history[snaps.at(-1)];
     const hasGroups = !!(endSnap?.asset_groups);
     const startMV = _invMVFromSnap(startSnap);
     const endMV   = _invMVFromSnap(endSnap);
@@ -1007,7 +1008,7 @@ async function renderPnLGrid(year) {
         <div class="pnl-card">
           <div class="pnl-card-label">年度損益%</div>
           <div class="pnl-card-value ${cls}">${s}${fmtPct(yearPct)}</div>
-          <div class="pnl-card-sub">${snaps[0]} → ${snaps.at(-1)}</div>
+          <div class="pnl-card-sub">${startKey} → ${endKey}</div>
         </div>
         <div class="pnl-card">
           <div class="pnl-card-label">${mvLabel}</div>
