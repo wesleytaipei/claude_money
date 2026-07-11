@@ -4566,17 +4566,21 @@ const _IND_MARKETS = [
   {value:'JP',      label:'🇯🇵 日本 (TSE)'},
   {value:'KR',      label:'🇰🇷 韓國 (KRX)'},
   {value:'US',      label:'🇺🇸 美國 (NYSE/NASDAQ)'},
+  {value:'DE',      label:'🇩🇪 德國 (FWB/XETRA)'},
+  {value:'UK',      label:'🇬🇧 英國 (LSE)'},
+  {value:'PA',      label:'🇫🇷 法國 (Euronext Paris)'},
   {value:'CN_SZ',   label:'🇨🇳 中國深圳 (SZ)'},
   {value:'CN_SS',   label:'🇨🇳 中國上海 (SS)'},
   {value:'HK',      label:'🇭🇰 香港 (HKEX)'},
 ];
-const _IND_MARKET_ORDER = ['TW_AUTO','TW','TWO','JP','KR','US','HK','CN_SZ','CN_SS'];
+const _IND_MARKET_ORDER = ['TW_AUTO','TW','TWO','JP','KR','US','DE','UK','PA','HK','CN_SZ','CN_SS'];
 const _IND_MARKET_META = {
   TW_AUTO:{flag:'🇹🇼',currency:'TWD'}, TW:{flag:'🇹🇼',currency:'TWD'}, TWO:{flag:'🇹🇼',currency:'TWD'},
   JP:{flag:'🇯🇵',currency:'JPY'}, KR:{flag:'🇰🇷',currency:'KRW'}, US:{flag:'🇺🇸',currency:'USD'},
+  DE:{flag:'🇩🇪',currency:'EUR'}, UK:{flag:'🇬🇧',currency:'GBP'}, PA:{flag:'🇫🇷',currency:'EUR'},
   CN_SZ:{flag:'🇨🇳',currency:'CNY'}, CN_SS:{flag:'🇨🇳',currency:'CNY'}, HK:{flag:'🇭🇰',currency:'HKD'},
 };
-const _IND_SORT_ORDER = ['TW','JP','KR','US','HK','CN_SZ','CN_SS'];
+const _IND_SORT_ORDER = ['TW','JP','KR','US','DE','UK','PA','HK','CN_SZ','CN_SS'];
 function _mktSortKey(m) {
   if (!m) return 'ZZ';
   if (m === 'TW_AUTO' || m === 'TW' || m === 'TWO') return 'TW';
@@ -4595,12 +4599,15 @@ function _sortIndStocks(stocks) {
 const _IND_CURRENCY_FMT = {
   JPY: p => Math.round(p).toLocaleString(),
   KRW: p => Math.round(p).toLocaleString(),
+  GBX: p => Math.round(p).toLocaleString(),
   USD: p => p.toFixed(2),
   CNY: p => p.toFixed(2),
   HKD: p => p.toFixed(2),
   TWD: p => p.toFixed(2),
+  EUR: p => p.toFixed(2),
+  GBP: p => p.toFixed(2),
 };
-const _IND_CURRENCY_PREFIX = {TWD:'',JPY:'¥',USD:'$',KRW:'₩',CNY:'¥',HKD:'HK$'};
+const _IND_CURRENCY_PREFIX = {TWD:'',JPY:'¥',USD:'$',KRW:'₩',CNY:'¥',HKD:'HK$',EUR:'€',GBP:'£',GBX:'p'};
 
 function _fmtIndPrice(price, currency) {
   if (price == null || !isFinite(price)) return '—';

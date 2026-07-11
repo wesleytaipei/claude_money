@@ -3608,6 +3608,9 @@ _MARKET_META: dict = {
     "CN_SS": {"flag": "🇨🇳", "currency": "CNY", "suffix": ".SS"},
     "HK":    {"flag": "🇭🇰", "currency": "HKD", "suffix": ".HK"},
     "US":    {"flag": "🇺🇸", "currency": "USD", "suffix": ""},
+    "DE":    {"flag": "🇩🇪", "currency": "EUR", "suffix": ".DE"},
+    "UK":    {"flag": "🇬🇧", "currency": "GBP", "suffix": ".L"},
+    "PA":    {"flag": "🇫🇷", "currency": "EUR", "suffix": ".PA"},
 }
 
 
