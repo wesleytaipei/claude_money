@@ -707,163 +707,90 @@ function renderDashboard() {
   // Indices
   renderIndices();
 
-  renderPnLGrid();  // async, uses history — fire and forget
-
-  renderDashboardTrendChart(); // async, uses history — fire and forget
+  renderPnLGrid();  // async; also triggers renderDashboardTrendChart internally
 
   document.getElementById('dash-time').textContent = '更新於 ' + new Date().toLocaleString('zh-TW');
 }
 
-async function renderDashboardTrendChart() {
-  if (Object.keys(state.history).length === 0) {
-    await loadHistory();
-  }
+async function renderDashboardTrendChart(year) {
+  if (Object.keys(state.history).length === 0) await loadHistory();
 
   const canvas = document.getElementById('trend-chart-new');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
 
-  // Merge live totals as the latest snapshot point
-  const t = calcTotals();
-  const historyWithToday = { ...state.history };
+  const curYear = new Date().getFullYear();
+  if (year == null) year = state.pnlYear ?? curYear;
   const todayStr = new Date().toISOString().slice(0, 10);
-  
-  const currentAssetGroups = {};
-  for (const [gName, gVal] of Object.entries(t.groupTotals)) {
-    currentAssetGroups[gName] = gVal;
-  }
-  
-  historyWithToday[todayStr] = {
-    net_worth: t.netWorth,
-    total_assets: t.totalAssets,
-    total_liabilities: t.totalDebts,
-    asset_groups: currentAssetGroups
-  };
 
-  // Filter dates >= 2026-01-01
+  const historyWithToday = { ...state.history };
+  if (year === curYear) {
+    const t = calcTotals();
+    historyWithToday[todayStr] = {
+      net_worth: t.netWorth,
+      total_assets: t.totalAssets,
+      total_liabilities: t.totalDebts,
+    };
+  }
+
+  const startDate = `${year}-01-01`;
+  const endDate   = year === curYear ? todayStr : `${year + 1}-01-01`;
+
   const dates = Object.keys(historyWithToday)
-    .filter(d => !d.startsWith('_') && d >= '2026-01-01')
+    .filter(d => !d.startsWith('_') && d >= startDate && d <= endDate)
     .sort();
   
   if (dates.length === 0) return;
 
-  // Group by YYYY-MM and pick the last date of each month
+  // For current year: group by month (many daily entries); past years: already monthly
   const monthGroups = {};
   for (const d of dates) {
     const yyyymm = d.slice(0, 7);
     if (!monthGroups[yyyymm]) monthGroups[yyyymm] = [];
     monthGroups[yyyymm].push(d);
   }
-  
-  const monthlyDates = [];
-  for (const yyyymm of Object.keys(monthGroups).sort()) {
-    const groupDates = monthGroups[yyyymm].sort();
-    monthlyDates.push(groupDates[groupDates.length - 1]);
-  }
+  const plotDates = Object.keys(monthGroups).sort()
+    .map(ym => monthGroups[ym].sort().at(-1));
 
-  if (charts.dashboardTrend) {
-    charts.dashboardTrend.destroy();
-  }
+  if (charts.dashboardTrend) { charts.dashboardTrend.destroy(); charts.dashboardTrend = null; }
 
-  const labels = monthlyDates.map(d => {
-    const parts = d.split('-');
-    return `${parts[0]}.${parseInt(parts[1], 10)}`;
+  const ctx = canvas.getContext('2d');
+  const toM = v => +(v / 1e6).toFixed(3);
+  const labels = plotDates.map(d => {
+    const [y, m] = d.split('-');
+    return year === curYear ? `${y}.${+m}` : `${+m}月`;
   });
 
-  const toMillion = v => v / 1e6;
-  const plugins = [];
-  if (typeof ChartDataLabels !== 'undefined') {
-    plugins.push(ChartDataLabels);
-  }
+  const mk = (label, color, key) => ({
+    label, borderColor: color,
+    backgroundColor: color.replace(')', ', 0.08)').replace('rgb', 'rgba'),
+    data: plotDates.map(d => toM(historyWithToday[d][key] ?? historyWithToday[d].total_debts ?? 0)),
+    borderWidth: 2, tension: 0.2, pointRadius: 3, pointHoverRadius: 5, fill: false,
+  });
 
   charts.dashboardTrend = new Chart(ctx, {
     type: 'line',
-    plugins: plugins,
     data: {
-      labels: labels,
+      labels,
       datasets: [
-        {
-          label: '總資產',
-          data: monthlyDates.map(d => toMillion(historyWithToday[d].total_assets)),
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          borderWidth: 2.5,
-          tension: 0.2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: false,
-        },
-        {
-          label: '淨資產',
-          data: monthlyDates.map(d => toMillion(historyWithToday[d].net_worth)),
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          borderWidth: 2.5,
-          tension: 0.2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: false,
-        },
-        {
-          label: '總負債',
-          data: monthlyDates.map(d => toMillion(historyWithToday[d].total_liabilities)),
-          borderColor: '#ef4444',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-          borderWidth: 2.5,
-          tension: 0.2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: false,
-        }
+        mk('總資產', '#3b82f6', 'total_assets'),
+        mk('淨資產', '#10b981', 'net_worth'),
+        mk('總負債', '#ef4444', 'total_liabilities'),
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            color: '#a7b0c8',
-            font: { size: 12, family: 'Inter, sans-serif' },
-            boxWidth: 12,
-            boxHeight: 12,
-            useBorderRadius: true,
-            borderRadius: 6
-          }
-        },
+        legend: { position: 'top', labels: { color: '#a7b0c8', font: {size:12}, boxWidth:12, boxHeight:12, useBorderRadius:true, borderRadius:6 } },
         tooltip: {
-          backgroundColor: '#1a2547',
-          borderColor: '#334b82',
-          borderWidth: 1,
-          titleColor: '#e8ecf6',
-          bodyColor: '#a7b0c8',
-          callbacks: {
-            label: (context) => {
-              return ` ${context.dataset.label}: ${context.raw.toFixed(2)} 百萬元`;
-            }
-          }
+          backgroundColor: '#1a2547', borderColor: '#334b82', borderWidth: 1,
+          titleColor: '#e8ecf6', bodyColor: '#a7b0c8',
+          callbacks: { label: c => ` ${c.dataset.label}: ${c.raw.toFixed(2)} 百萬` }
         },
-        datalabels: {
-          display: true,
-          align: 'top',
-          anchor: 'end',
-          color: (context) => context.dataset.borderColor,
-          font: { weight: 'bold', size: 10, family: 'Inter, sans-serif' },
-          formatter: (value) => value.toFixed(2),
-          offset: 4
-        }
+        datalabels: { display: false },
       },
       scales: {
-        x: {
-          grid: { color: 'rgba(255, 255, 255, 0.04)' },
-          ticks: { color: '#a7b0c8', font: { size: 11 } }
-        },
-        y: {
-          grid: { color: 'rgba(255, 255, 255, 0.04)' },
-          ticks: { color: '#a7b0c8', font: { size: 11 } },
-          min: 0
-        }
+        x: { grid: {color:'rgba(255,255,255,0.04)'}, ticks: {color:'#a7b0c8', font:{size:11}} },
+        y: { grid: {color:'rgba(255,255,255,0.04)'}, ticks: {color:'#a7b0c8', font:{size:11}}, min: 0 }
       }
     }
   });
@@ -987,7 +914,7 @@ async function renderPnLGrid(year) {
         <div class="empty-state" style="padding:20px">缺少 ${startKey} 或 ${endKey} 快照資料</div>`;
       return;
     }
-    const hasGroups = !!(endSnap?.asset_groups);
+    const hasGroups = !!(startSnap?.asset_groups && endSnap?.asset_groups);
     const startMV = _invMVFromSnap(startSnap);
     const endMV   = _invMVFromSnap(endSnap);
     const yearPnL = endMV - startMV;
@@ -1017,6 +944,7 @@ async function renderPnLGrid(year) {
         </div>
       </div>`;
   }
+  renderDashboardTrendChart(year);
 }
 
 function renderIndices() {
