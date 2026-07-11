@@ -790,7 +790,11 @@ async function renderDashboardTrendChart(year) {
       },
       scales: {
         x: { grid: {color:'rgba(255,255,255,0.04)'}, ticks: {color:'#a7b0c8', font:{size:11}} },
-        y: { grid: {color:'rgba(255,255,255,0.04)'}, ticks: {color:'#a7b0c8', font:{size:11}}, min: 0 }
+        y: {
+          grid: {color:'rgba(255,255,255,0.04)'},
+          ticks: {color:'#a7b0c8', font:{size:11}},
+          title: {display:true, text:'百萬 TWD', color:'#6b7694', font:{size:11}},
+        }
       }
     }
   });
@@ -813,7 +817,11 @@ async function renderPnLGrid(year) {
 
   if (Object.keys(state.history).length === 0) await loadHistory();
 
-  const allHistYears = [...new Set(Object.keys(state.history).map(d => +d.slice(0, 4)))].sort();
+  const allHistYears = [...new Set(
+    Object.keys(state.history)
+      .map(d => +d.slice(0, 4))
+      .filter(y => !isNaN(y) && y > 2000)
+  )].sort();
   if (!allHistYears.includes(curYear)) allHistYears.push(curYear);
 
   const switcher = allHistYears.map(y =>
@@ -930,11 +938,11 @@ async function renderPnLGrid(year) {
         <div class="pnl-card">
           <div class="pnl-card-label">${year} 年度總損益</div>
           <div class="pnl-card-value ${cls}">${s}${fmtFull(Math.abs(yearPnL))}</div>
-          <div class="pnl-card-sub ${cls}">${s}${fmtPct(yearPct)}</div>
+          <div class="pnl-card-sub ${cls}">${fmtPct(yearPct)}</div>
         </div>
         <div class="pnl-card">
           <div class="pnl-card-label">年度損益%</div>
-          <div class="pnl-card-value ${cls}">${s}${fmtPct(yearPct)}</div>
+          <div class="pnl-card-value ${cls}">${fmtPct(yearPct)}</div>
           <div class="pnl-card-sub">${startKey} → ${endKey}</div>
         </div>
         <div class="pnl-card">
