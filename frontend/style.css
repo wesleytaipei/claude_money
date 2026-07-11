@@ -1382,11 +1382,12 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 
 /* ══ 產業地圖 ════════════════════════════════════════════════════════════════ */
 .industry-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
-  align-items: start;
+  align-items: flex-start;
 }
+.ind-group { flex: 0 0 auto; width: fit-content; min-width: 180px; }
 .ind-group .panel-head { padding: 8px 12px; }
 .ind-group-stocks table { width: auto; border-collapse: collapse; }
 .ind-group-stocks td { padding: 2px 4px; font-size: 12px; vertical-align: middle; white-space: nowrap; }
@@ -1401,7 +1402,7 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
 .ind-add-btn { font-size: 11px; padding: 3px 8px; }
 
 @media (max-width: 900px) {
-  .industry-grid { grid-template-columns: 1fr; }
+  .ind-group { width: 100%; }
 }
 
 /* Narrow portrait only (≤ 430px) */
