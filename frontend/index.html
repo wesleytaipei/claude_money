@@ -53,6 +53,9 @@
         <button class="nav-item" data-page="cb-be">
           <span class="nav-ico">📉</span><span>CB餘額對照</span>
         </button>
+        <button class="nav-item" data-page="industry">
+          <span class="nav-ico">🗺️</span><span>產業地圖</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -478,6 +481,23 @@
         </div>
       </section>
 
+      <!-- ══ 產業地圖 ══ -->
+      <section class="page" id="page-industry">
+        <div class="page-header">
+          <div>
+            <h1>產業地圖</h1>
+            <p class="page-sub" id="industry-sub">族群指標股行情</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn-ghost" onclick="renderIndustryMap(true)" title="重新整理">🔄 更新</button>
+            <button class="btn-primary" onclick="openAddIndustryGroup()">＋ 新增族群</button>
+          </div>
+        </div>
+        <div class="industry-grid" id="industry-body">
+          <div class="empty-state">點擊側邊欄「產業地圖」載入資料</div>
+        </div>
+      </section>
+
       <!-- ══ CB 餘額圖 ══ -->
       <section class="page" id="page-cb-be">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
@@ -521,6 +541,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=60"></script>
+  <script src="/static/app.js?v=61"></script>
 </body>
 </html>

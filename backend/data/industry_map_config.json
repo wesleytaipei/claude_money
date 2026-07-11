@@ -1,0 +1,21 @@
+{
+  "groups": [
+    {
+      "id": "passive_components",
+      "name": "被動元件",
+      "icon": "🔌",
+      "stocks": [
+        {"code": "2327", "name": "國巨",   "market": "TW"},
+        {"code": "2492", "name": "華新科", "market": "TW"},
+        {"code": "6981", "name": "村田製造","market": "JP"},
+        {"code": "6976", "name": "太陽誘電","market": "JP"},
+        {"code": "6762", "name": "TDK",    "market": "JP"},
+        {"code": "009150","name": "三星電機","market": "KR"},
+        {"code": "VSH",  "name": "威世",   "market": "US"},
+        {"code": "300408","name": "三環集團","market": "CN_SZ"},
+        {"code": "000636","name": "風華高科","market": "CN_SZ"},
+        {"code": "002138","name": "順絡電子","market": "CN_SZ"}
+      ]
+    }
+  ]
+}

@@ -1380,6 +1380,22 @@ tr.highlighted:hover { background: rgba(234,179,8,.14); }
   #page-cb-be .panel-head > div:last-child { flex-wrap: wrap; width: 100%; gap: 6px; }
 }
 
+/* ══ 產業地圖 ════════════════════════════════════════════════════════════════ */
+.industry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.ind-group-stocks td:first-child { font-size: 16px; width: 24px; text-align: center; }
+.ind-price   { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+.ind-chg     { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.ind-code    { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--primary-2); }
+
+@media (max-width: 900px) {
+  .industry-grid { grid-template-columns: 1fr; }
+}
+
 /* Narrow portrait only (≤ 430px) */
 @media (max-width: 430px) {
   .kpi-grid { gap: 6px; }

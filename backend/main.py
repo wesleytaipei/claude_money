@@ -3593,6 +3593,85 @@ def get_cb_bookentry(code: str, force: bool = False):
         raise HTTPException(status_code=404, detail=str(e))
 
 
+# ── 產業地圖 ─────────────────────────────────────────────────────────────────
+INDUSTRY_MAP_CONFIG_FILE = DATA_DIR / "industry_map_config.json"
+_industry_map_cache: dict = {"ts": 0.0, "data": None}
+
+_MARKET_META: dict = {
+    "TW":    {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TW"},
+    "TWO":   {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TWO"},
+    "JP":    {"flag": "🇯🇵", "currency": "JPY", "suffix": ".T"},
+    "KR":    {"flag": "🇰🇷", "currency": "KRW", "suffix": ".KS"},
+    "CN_SZ": {"flag": "🇨🇳", "currency": "CNY", "suffix": ".SZ"},
+    "CN_SS": {"flag": "🇨🇳", "currency": "CNY", "suffix": ".SS"},
+    "HK":    {"flag": "🇭🇰", "currency": "HKD", "suffix": ".HK"},
+    "US":    {"flag": "🇺🇸", "currency": "USD", "suffix": ""},
+}
+
+
+def _ind_fetch_one(s: dict) -> dict:
+    meta   = _MARKET_META.get((s.get("market") or "US").upper(), _MARKET_META["US"])
+    ticker = f"{s['code']}{meta['suffix']}"
+    base   = {**s, "yf_ticker": ticker, "flag": meta["flag"],
+              "currency": meta["currency"], "price": None,
+              "change": None, "change_pct": None, "ok": False}
+    try:
+        fi    = yf.Ticker(ticker).fast_info
+        price = float(fi.last_price or 0)
+        prev  = float(fi.previous_close or 0)
+        if price > 0:
+            ch  = round(price - prev, 4)
+            pct = round(ch / prev * 100, 2) if prev else 0.0
+            return {**base, "price": price, "change": ch, "change_pct": pct, "ok": True}
+    except Exception as e:
+        logger.warning(f"[industry-map] {ticker}: {e}")
+    return base
+
+
+@app.get("/api/industry-map")
+def get_industry_map(force: bool = False):
+    """族群指標股行情，快取 15 分鐘。"""
+    global _industry_map_cache
+    now = time.time()
+    if not force and _industry_map_cache["data"] and (now - _industry_map_cache["ts"]) < 900:
+        return _industry_map_cache["data"]
+
+    # Pull latest config from Gist (Railway)
+    if IS_RAILWAY:
+        _gist_pull_one("industry_map_config.json")
+
+    cfg    = load_json(INDUSTRY_MAP_CONFIG_FILE, {"groups": []})
+    stocks = [s for g in cfg.get("groups", []) for s in g.get("stocks", [])]
+
+    with ThreadPoolExecutor(max_workers=12) as ex:
+        results = list(ex.map(_ind_fetch_one, stocks))
+
+    idx, out_groups = 0, []
+    for g in cfg.get("groups", []):
+        n = len(g.get("stocks", []))
+        out_groups.append({**g, "stocks": results[idx:idx + n]})
+        idx += n
+
+    data = {"groups": out_groups, "updated_at": datetime.now().isoformat()}
+    _industry_map_cache = {"ts": now, "data": data}
+    return data
+
+
+@app.put("/api/industry-map/config")
+async def save_industry_map_config(req: Request):
+    """儲存族群設定並推送至 Gist。"""
+    from fastapi import HTTPException
+    body = await req.json()
+    if not isinstance(body, dict) or "groups" not in body:
+        raise HTTPException(400, "Invalid config: missing 'groups'")
+    INDUSTRY_MAP_CONFIG_FILE.write_text(
+        json.dumps(body, ensure_ascii=False, indent=2), encoding="utf-8")
+    _gist_push_file(INDUSTRY_MAP_CONFIG_FILE)
+    global _industry_map_cache
+    _industry_map_cache = {"ts": 0.0, "data": None}
+    return {"ok": True}
+
+
 # ── Serve frontend ───────────────────────────────────────────────────────────
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware

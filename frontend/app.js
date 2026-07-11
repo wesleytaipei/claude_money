@@ -2087,6 +2087,7 @@ function goPage(name) {
   else if (name === 'etf') renderEtfPage(false);
   else if (name === 'ranking') renderRanking(false);
   else if (name === 'cb-be') _initCbBookentryMyCbs();
+  else if (name === 'industry') renderIndustryMap(false);
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -2098,7 +2099,8 @@ function goPage(name) {
     growth: '資產成長圖', history: '歷史紀錄', important: '重要資訊',
     etf: 'ETF追蹤',
     ranking: '成交值排行',
-    'cb-be': 'CB餘額對照'
+    'cb-be': 'CB餘額對照',
+    industry: '產業地圖'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -4618,4 +4620,191 @@ async function renderCbBookentryChart(force = false, _useCache = false) {
 // 轉換價輸入框變更時：用快取資料重繪，不重新 fetch，不覆蓋輸入框
 function _cbBeRedrawConv() {
   if (_cbBELastData) renderCbBookentryChart(false, true);
+}
+
+// ══ 產業地圖 ════════════════════════════════════════════════════════════════
+let _indData = null;   // last fetched API response
+
+const _IND_MARKETS = [
+  {value:'TW',    label:'🇹🇼 台灣上市 (TWSE)'},
+  {value:'TWO',   label:'🇹🇼 台灣上櫃 (TPEX)'},
+  {value:'JP',    label:'🇯🇵 日本 (TSE)'},
+  {value:'KR',    label:'🇰🇷 韓國 (KRX)'},
+  {value:'US',    label:'🇺🇸 美國 (NYSE/NASDAQ)'},
+  {value:'CN_SZ', label:'🇨🇳 中國深圳 (SZ)'},
+  {value:'CN_SS', label:'🇨🇳 中國上海 (SS)'},
+  {value:'HK',    label:'🇭🇰 香港 (HKEX)'},
+];
+
+const _IND_CURRENCY_FMT = {
+  JPY: p => Math.round(p).toLocaleString(),
+  KRW: p => Math.round(p).toLocaleString(),
+  USD: p => p.toFixed(2),
+  CNY: p => p.toFixed(2),
+  HKD: p => p.toFixed(2),
+  TWD: p => p.toFixed(2),
+};
+const _IND_CURRENCY_PREFIX = {TWD:'',JPY:'¥',USD:'$',KRW:'₩',CNY:'¥',HKD:'HK$'};
+
+function _fmtIndPrice(price, currency) {
+  if (price == null || !isFinite(price)) return '—';
+  const fmt = _IND_CURRENCY_FMT[currency] || (p => p.toFixed(2));
+  const pre = _IND_CURRENCY_PREFIX[currency] ?? '';
+  return pre + fmt(price);
+}
+
+async function renderIndustryMap(force = false) {
+  const body = document.getElementById('industry-body');
+  if (!body) return;
+  body.innerHTML = '<div class="empty-state">⏳ 載入中…</div>';
+  try {
+    _indData = await api(`/api/industry-map${force ? '?force=true' : ''}`);
+    _renderIndGroups();
+    const sub = document.getElementById('industry-sub');
+    if (sub && _indData.updated_at) {
+      const d = new Date(_indData.updated_at);
+      sub.textContent = `更新於 ${d.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'})}`;
+    }
+  } catch(e) {
+    body.innerHTML = `<div class="empty-state">載入失敗：${e.message}</div>`;
+  }
+}
+
+function _renderIndGroups() {
+  const body = document.getElementById('industry-body');
+  if (!body || !_indData) return;
+  const { groups } = _indData;
+  if (!groups || !groups.length) {
+    body.innerHTML = '<div class="empty-state">尚無族群，點擊「＋ 新增族群」開始</div>';
+    return;
+  }
+  body.innerHTML = groups.map((g, gi) => _renderIndGroupCard(g, gi)).join('');
+}
+
+function _renderIndGroupCard(g, gi) {
+  const rows = (g.stocks || []).map((s, si) => {
+    const up = (s.change_pct ?? 0) >= 0;
+    const clr = s.ok ? (up ? 'var(--green-2)' : 'var(--red-2)') : 'var(--muted)';
+    const pStr = s.ok ? _fmtIndPrice(s.price, s.currency) : '—';
+    const cStr = s.ok
+      ? `${up ? '+' : ''}${s.change_pct?.toFixed(2)}%`
+      : '—';
+    return `<tr>
+      <td style="font-size:15px;text-align:center;padding:6px 4px">${s.flag || ''}</td>
+      <td class="ind-code">${s.code}</td>
+      <td style="font-size:13px">${s.name}</td>
+      <td class="num ind-price">${pStr}</td>
+      <td class="num ind-chg" style="color:${clr}">${cStr}</td>
+      <td><button class="btn-icon" onclick="deleteIndStock(${gi},${si})" title="移除">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="panel ind-group">
+    <div class="panel-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px;line-height:1">${g.icon || '📊'}</span>
+        <h3>${g.name}</h3>
+        <span class="panel-sub">${(g.stocks||[]).length} 檔</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-primary" style="font-size:12px;padding:5px 10px"
+          onclick="openAddIndStock(${gi})">＋ 個股</button>
+        <button class="btn-icon" onclick="deleteIndGroup(${gi})" title="刪除族群">✕</button>
+      </div>
+    </div>
+    <div class="table-wrap ind-group-stocks">
+      <table><thead><tr>
+        <th></th><th>代號</th><th>名稱</th>
+        <th class="num">股價</th><th class="num">漲跌%</th><th></th>
+      </tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="muted" style="text-align:center;padding:14px">尚無個股</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ── CRUD helpers ─────────────────────────────────────────────────────────────
+function _indConfigFromData() {
+  return {
+    groups: (_indData?.groups || []).map(g => ({
+      id: g.id || g.name,
+      name: g.name,
+      icon: g.icon || '📊',
+      stocks: (g.stocks || []).map(s => ({code: s.code, name: s.name, market: s.market})),
+    }))
+  };
+}
+
+async function _saveIndConfig() {
+  const cfg = _indConfigFromData();
+  await fetch('/api/industry-map/config', {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(cfg),
+  });
+  // Force re-fetch prices on next render
+  await renderIndustryMap(true);
+}
+
+function openAddIndustryGroup() {
+  const mktOpts = _IND_MARKETS.map(m =>
+    `<option value="${m.value}">${m.label}</option>`).join('');
+  openModal('新增族群', `
+    <div class="form-group"><label>族群名稱</label>
+      <input id="ig-name" type="text" placeholder="如：AI 伺服器" /></div>
+    <div class="form-group"><label>圖示（emoji）</label>
+      <input id="ig-icon" type="text" placeholder="📊" maxlength="4" value="📊" /></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="_addIndGroup()">新增</button>
+    </div>`);
+}
+
+async function _addIndGroup() {
+  const name = document.getElementById('ig-name')?.value.trim();
+  const icon = document.getElementById('ig-icon')?.value.trim() || '📊';
+  if (!name) { showToast('請輸入族群名稱', 'error'); return; }
+  if (!_indData) _indData = {groups: []};
+  _indData.groups.push({id: Date.now().toString(), name, icon, stocks: []});
+  closeModal();
+  await _saveIndConfig();
+}
+
+function openAddIndStock(gi) {
+  const mktOpts = _IND_MARKETS.map(m =>
+    `<option value="${m.value}">${m.label}</option>`).join('');
+  openModal('新增個股', `
+    <div class="form-group"><label>市場</label>
+      <select id="is-market">${mktOpts}</select></div>
+    <div class="form-group"><label>代號</label>
+      <input id="is-code" type="text" placeholder="如：2327 / 6981 / VSH" /></div>
+    <div class="form-group"><label>名稱</label>
+      <input id="is-name" type="text" placeholder="如：國巨" /></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="_addIndStock(${gi})">新增</button>
+    </div>`);
+}
+
+async function _addIndStock(gi) {
+  const market = document.getElementById('is-market')?.value;
+  const code   = document.getElementById('is-code')?.value.trim().toUpperCase();
+  const name   = document.getElementById('is-name')?.value.trim();
+  if (!code || !name) { showToast('請填寫代號與名稱', 'error'); return; }
+  _indData.groups[gi].stocks.push({code, name, market});
+  closeModal();
+  await _saveIndConfig();
+}
+
+async function deleteIndStock(gi, si) {
+  if (!confirm('確定移除此個股？')) return;
+  _indData.groups[gi].stocks.splice(si, 1);
+  await _saveIndConfig();
+}
+
+async function deleteIndGroup(gi) {
+  const name = _indData?.groups[gi]?.name || '';
+  if (!confirm(`確定刪除族群「${name}」及其所有個股？`)) return;
+  _indData.groups.splice(gi, 1);
+  await _saveIndConfig();
 }
