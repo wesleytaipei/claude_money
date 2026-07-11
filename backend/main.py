@@ -3596,6 +3596,7 @@ def get_cb_bookentry(code: str, force: bool = False):
 # ── 產業地圖 ─────────────────────────────────────────────────────────────────
 INDUSTRY_MAP_CONFIG_FILE = DATA_DIR / "industry_map_config.json"
 _industry_map_cache: dict = {"ts": 0.0, "data": None}
+_industry_map_saved_at: float = 0.0  # timestamp of last local save
 
 _MARKET_META: dict = {
     "TW_AUTO": {"flag": "🇹🇼", "currency": "TWD", "suffix": ".TW"},   # auto-try .TW then .TWO
@@ -3690,8 +3691,8 @@ def get_industry_map(force: bool = False):
     if not force and _industry_map_cache["data"] and (now - _industry_map_cache["ts"]) < 900:
         return _industry_map_cache["data"]
 
-    # Pull latest config from Gist (Railway)
-    if IS_RAILWAY:
+    # Pull latest config from Gist (Railway) — skip if we just saved locally (avoid race)
+    if IS_RAILWAY and (now - _industry_map_saved_at) > 30:
         _gist_pull_one("industry_map_config.json")
 
     cfg    = load_json(INDUSTRY_MAP_CONFIG_FILE, {"groups": []})
@@ -3721,8 +3722,9 @@ async def save_industry_map_config(req: Request):
     INDUSTRY_MAP_CONFIG_FILE.write_text(
         json.dumps(body, ensure_ascii=False, indent=2), encoding="utf-8")
     _gist_push_file(INDUSTRY_MAP_CONFIG_FILE)
-    global _industry_map_cache
+    global _industry_map_cache, _industry_map_saved_at
     _industry_map_cache = {"ts": 0.0, "data": None}
+    _industry_map_saved_at = time.time()
     return {"ok": True}
 
 
