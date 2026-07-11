@@ -2054,6 +2054,14 @@ function goPage(name) {
 }
 
 // ── Date range shortcuts for Growth / Trend charts ──────────────────────────
+function _setChartYear(yr) {
+  const today = new Date().toISOString().slice(0, 10);
+  const curYear = new Date().getFullYear();
+  document.getElementById('growth-start').value = `${yr}-01-01`;
+  document.getElementById('growth-end').value = yr >= curYear ? today : `${yr}-12-31`;
+  renderGrowthChart(); renderTrendChart();
+}
+
 function _setChartRange(prefix, type) {
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
@@ -2687,6 +2695,15 @@ async function init() {
     if (currentPage() === 'dashboard') renderDashboard();
     if (currentPage() === 'investments') renderInvestmentsPage();
   });
+
+  // Inject year-filter buttons for Growth chart (2020 → current year)
+  const _yearBtnEl = document.getElementById('growth-year-btns');
+  if (_yearBtnEl) {
+    const _curYr = new Date().getFullYear();
+    _yearBtnEl.innerHTML = Array.from({length: _curYr - 2020 + 1}, (_, i) => 2020 + i)
+      .map(y => `<button class="btn-ghost" style="padding:6px 10px;font-size:12px" onclick="_setChartYear(${y})">${y}</button>`)
+      .join('');
+  }
 
   // Auto-sync from Gist on page load (silent, timestamp-based — only pulls if Gist is newer)
   _autoSyncFromGist();

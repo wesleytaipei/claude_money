@@ -38,7 +38,7 @@
         <button class="nav-item" data-page="growth">
           <span class="nav-ico">📊</span><span>資產成長圖</span>
         </button>
-        <button class="nav-item" data-page="history">
+        <button class="nav-item" data-page="history" style="display:none">
           <span class="nav-ico">📅</span><span>歷史紀錄</span>
         </button>
         <button class="nav-item" data-page="important">
@@ -373,6 +373,7 @@
             <input type="date" id="growth-end" />
             <button class="btn-primary" onclick="renderGrowthChart();renderTrendChart()">更新圖表</button>
           </div>
+          <div class="trend-controls" style="margin-top:6px" id="growth-year-btns"></div>
         </div>
 
         <div class="panel" style="margin-top:16px">
@@ -531,6 +532,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=71"></script>
+  <script src="/static/app.js?v=72"></script>
 </body>
 </html>
