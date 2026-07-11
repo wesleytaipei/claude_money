@@ -2244,15 +2244,23 @@ async function renderGrowthChart() {
     </div>
   `;
 
+  // 簡化模式：歷史月資料大多無 asset_groups，只顯示兩條折線
+  const _hasGroupCount = filtered.filter(d => state.history[d].asset_groups).length;
+  const _simplified = _hasGroupCount < filtered.length * 0.5;
+
   // Render chart
   const ctx = document.getElementById('growth-chart').getContext('2d');
   if (charts.growth) charts.growth.destroy();
 
+  const _labels = _simplified
+    ? filtered.map(d => d.slice(0, 7))   // YYYY-MM for monthly view
+    : filtered;
+
   charts.growth = new Chart(ctx, {
-    type: 'bar',
+    type: _simplified ? 'line' : 'bar',
     data: {
-      labels: filtered,
-      datasets: [netWorthLine, liabLine, ...stackedDatasets],
+      labels: _labels,
+      datasets: _simplified ? [netWorthLine, liabLine] : [netWorthLine, liabLine, ...stackedDatasets],
     },
     plugins: [minMaxPlugin],
     options: {
