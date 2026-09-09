@@ -15,7 +15,7 @@ _info_cache = {"ts": 0, "data": {}}
 
 FIRECRAWL_API_KEY = "fc-d6d780def05343a5b032c3d22e89e15d"
 _margin_ratio_cache = {"ts": 0, "data": None}       # daily data — cache 6 hours
-_tpex_margin_ratio_cache = {"ts": 0, "data": None}  # daily data — cache 6 hours
+_tpex_margin_ratio_cache = {"ts": 0, "data": None, "fail_ts": 0.0}  # daily data — cache 6 hours
 
 # ── Margin ratio history (persist prev-day values across restarts) ─────────────
 _RATIO_HIST_FILE = _Path(__file__).parent / 'data' / 'margin_ratio_history.json'
@@ -292,7 +292,9 @@ def fetch_cnyes_twncon():
                 }
     except Exception as e:
         print(f"Error fetching TWNCON: {e}")
-    return {"price": "-", "change": "-", "change_pct": "-"}
+    # Cnyes' "GF" (global futures) category has been returning 404/500 site-wide —
+    # fall back to the same underlying instrument (SGX FTSE Taiwan Index Futures).
+    return fetch_stwn_robust()
 
 def fetch_taiwan_vix():
     """Fetch 臺指選擇權波動率指數 (TAIWANVIX / 台指VIX) from TAIFEX MIS realtime quote.
@@ -320,72 +322,86 @@ def fetch_taiwan_vix():
         print(f"Error fetching TAIWANVIX: {e}")
     return {"price": "-", "change": "-", "change_pct": "-"}
 
+_FUTURES_MONTH_CODES = "FGHJKMNQUVXZ"
+
+def _futures_month_symbol(dt):
+    return f"{_FUTURES_MONTH_CODES[dt.month - 1]}{dt.year % 100:02d}"
+
 def fetch_stwn_robust():
-    """Fetch FTSE Taiwan futures (STWN) from multiple sources."""
+    """Fetch SGX FTSE Taiwan Index Futures (front month) via Yahoo Finance.
+
+    Yahoo has no continuous ticker for this contract — it's listed per
+    contract-month as TWN-<month code><yy>.SI (e.g. TWN-U26.SI = Sep 2026).
+    We probe the current + next 2 months and pick whichever has real trading
+    volume (the actively-traded front month; older/unlisted months 404 or
+    show near-zero volume).
+    """
+    from datetime import date, datetime, timezone, timedelta
+
     headers = HEADERS
+    today = date.today()
 
-    # 1. Try yfinance with SGX suffix
-    try:
-        tk = yf.Ticker("STWN.SI").fast_info
-        price = float(tk.last_price or 0)
-        prev = float(tk.previous_close or 0)
-        if price > 100:  # sanity check — STWN trades ~3000 SGD points
-            change = round(price - prev, 2)
-            pct = round((change / prev) * 100, 2) if prev else 0
-            return {
-                "price": str(round(price, 2)),
-                "change": f"+{change}" if change > 0 else str(change),
-                "change_pct": f"{pct}%"
-            }
-    except Exception as e:
-        print(f"STWN yfinance error: {e}")
+    def add_months(d, n):
+        m = d.month - 1 + n
+        y = d.year + m // 12
+        m = m % 12 + 1
+        return d.replace(year=y, month=m, day=1)
 
-    # 2. Try Yahoo Finance chart API directly (no HTML scraping)
-    try:
-        url = "https://query1.finance.yahoo.com/v8/finance/chart/STWN.SI?interval=1d&range=2d"
-        r = requests.get(url, headers=headers, timeout=10)
-        jd = r.json()
-        result = jd.get("chart", {}).get("result", [])
-        if result:
-            meta = result[0].get("meta", {})
+    best = None  # (volume, price, change, change_pct)
+    for i in range(3):
+        cand = add_months(today, i)
+        sym = f"TWN-{_futures_month_symbol(cand)}.SI"
+        try:
+            url = f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}?interval=1h&range=10d"
+            r = requests.get(url, headers=headers, timeout=10)
+            jd = r.json()
+            result = jd.get("chart", {}).get("result") or []
+            if not result:
+                continue
+            res = result[0]
+            meta = res.get("meta", {})
             price = float(meta.get("regularMarketPrice") or 0)
-            prev = float(meta.get("previousClose") or meta.get("chartPreviousClose") or 0)
-            if price > 100:
-                change = round(price - prev, 2)
-                pct = round((change / prev) * 100, 2) if prev else 0
-                return {
-                    "price": str(round(price, 2)),
-                    "change": f"+{change}" if change > 0 else str(change),
-                    "change_pct": f"{pct}%"
-                }
-    except Exception as e:
-        print(f"STWN Yahoo chart API error: {e}")
+            volume = float(meta.get("regularMarketVolume") or 0)
+            if price <= 100:  # sanity check — trades ~3000-4000 points
+                continue
 
-    # 3. Try Google Finance embedded JSON (STWN:SGX)
-    try:
-        url = "https://www.google.com/finance/quote/STWN:SGX"
-        r = requests.get(url, headers=headers, timeout=10)
-        # Google Finance embeds price in JSON-like script blocks
-        p_match = re.search(r'data-last-price="([^"]+)"', r.text)
-        prev_match = re.search(r'data-previous-close="([^"]+)"', r.text)
-        if not p_match:
-            # try alternate pattern in script data
-            p_match = re.search(r'"regularMarketPrice":\{"raw":([\d.]+)', r.text)
-            prev_match = re.search(r'"regularMarketPreviousClose":\{"raw":([\d.]+)', r.text)
-        if p_match and prev_match:
-            price_val = float(p_match.group(1).replace(",", ""))
-            prev_val = float(prev_match.group(1).replace(",", ""))
-            if price_val > 100:
-                change = round(price_val - prev_val, 2)
-                pct = round((change / prev_val) * 100, 2)
-                return {
-                    "price": str(price_val),
-                    "change": f"+{change}" if change > 0 else str(change),
-                    "change_pct": f"{pct}%"
-                }
-    except Exception as e:
-        print(f"STWN Google Finance error: {e}")
+            # Derive change vs prior trading day's last close (SGT) from hourly candles —
+            # the daily-close series for these thin contracts is often only 1 point deep.
+            prev_close = None
+            try:
+                closes = res["indicators"]["quote"][0]["close"]
+                timestamps = res["timestamp"]
+                tz = timezone(timedelta(hours=8))  # SGT
+                by_day = {}
+                for ts, c in zip(timestamps, closes):
+                    if c is None:
+                        continue
+                    d = datetime.fromtimestamp(ts, tz).date()
+                    by_day[d] = c  # keep overwriting -> last close of the day
+                days = sorted(by_day)
+                if len(days) >= 2:
+                    prev_close = by_day[days[-2]]
+                    price = by_day[days[-1]]
+            except Exception:
+                pass
+            if prev_close is None:
+                prev_close = float(meta.get("chartPreviousClose") or 0) or None
 
+            change = round(price - prev_close, 2) if prev_close else 0.0
+            pct = round(change / prev_close * 100, 2) if prev_close else 0.0
+
+            if best is None or volume > best[0]:
+                best = (volume, price, change, pct)
+        except Exception as e:
+            print(f"SGX TWN futures error ({sym}): {e}")
+
+    if best:
+        _, price, change, pct = best
+        return {
+            "price": str(round(price, 2)),
+            "change": f"+{change}" if change > 0 else str(change),
+            "change_pct": f"{pct}%"
+        }
     return {"price": "-", "change": "-", "change_pct": "-"}
 
 def fetch_tsm_adr():
@@ -557,89 +573,122 @@ def fetch_tpex_margin_ratio():
     if _tpex_margin_ratio_cache["data"] and (now - _tpex_margin_ratio_cache["ts"]) < 21600:
         return _tpex_margin_ratio_cache["data"]
 
+    def _last_good_from_history():
+        hist = _load_ratio_history()
+        for d in sorted(hist, reverse=True):
+            v = hist[d].get("tpex")
+            if v is not None:
+                return {"current": v, "prev": v}
+        return {"current": None, "prev": None}
+
+    # All attempts failed recently — skip straight to a fallback instead of
+    # hammering TPEX with 3 more retries on every request during an outage.
+    fail_ts = _tpex_margin_ratio_cache.get("fail_ts", 0.0)
+    if fail_ts and (now - fail_ts) < _MARGIN_COOLDOWN:
+        return _tpex_margin_ratio_cache["data"] or _last_good_from_history()
+
     import json as _json
     ua = HEADERS
-    try:
-        # ── 1. Per-stock margin positions + total debt ────────────────────────
-        r_margin = requests.get(
-            "https://www.tpex.org.tw/web/stock/margin_trading/margin_balance/margin_bal_result.php",
-            params={"l": "zh-tw", "o": "json", "s": "0,asc"},
-            headers=ua, timeout=20, verify=False
-        )
+    last_err = None
+    for attempt in range(_MARGIN_RETRIES):
         try:
-            raw = r_margin.content.decode("cp950", errors="replace")
-        except Exception:
-            raw = r_margin.text
-        margin_data = _json.loads(raw)
-        tables = margin_data.get("tables", [])
-        if not tables:
-            raise ValueError("TPEX margin_bal_result: empty tables")
-
-        margin_rows = tables[0].get("data", [])
-        summary = tables[0].get("summary", [])
-
-        # summary[1][6] = 融資金額 今日餘額 (仟元)
-        if len(summary) < 2 or len(summary[1]) < 7:
-            raise ValueError(f"TPEX summary format unexpected: {summary}")
-        total_debt_kt = float(str(summary[1][6]).replace(",", ""))
-        if total_debt_kt <= 0:
-            raise ValueError("TPEX total margin debt is 0 or missing")
-
-        # ── 2. TPEX closing prices ────────────────────────────────────────────
-        r_prices = requests.get(
-            "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
-            headers=ua, timeout=20, verify=False
-        )
-        price_map = {}
-        for item in r_prices.json():
-            code = str(item.get("SecuritiesCompanyCode", "")).strip()
+            # ── 1. Per-stock margin positions + total debt ────────────────────
+            r_margin = requests.get(
+                "https://www.tpex.org.tw/web/stock/margin_trading/margin_balance/margin_bal_result.php",
+                params={"l": "zh-tw", "o": "json", "s": "0,asc"},
+                headers=ua, timeout=20, verify=False
+            )
+            r_margin.raise_for_status()
+            if not r_margin.content:
+                raise ValueError("TPEX margin_bal_result: empty response body")
             try:
-                p = float(str(item.get("Close", "") or "").replace(",", ""))
-                if p > 0:
-                    price_map[code] = p
+                raw = r_margin.content.decode("cp950", errors="replace")
             except Exception:
-                pass
+                raw = r_margin.text
+            margin_data = _json.loads(raw)
+            tables = margin_data.get("tables", [])
+            if not tables:
+                raise ValueError("TPEX margin_bal_result: empty tables")
 
-        # ── 3. Collateral value (仟元) ────────────────────────────────────────
-        # row[0]=代號, row[6]=資餘額(張); collateral_仟元 = Σ(lots_張 × price)
-        collateral_kt = 0.0
-        for row in margin_rows:
-            if len(row) < 7:
-                continue
-            code = str(row[0]).strip()
-            try:
-                lots = float(str(row[6]).replace(",", ""))
-            except Exception:
-                lots = 0.0
-            if lots <= 0:
-                continue
-            price = price_map.get(code)
-            if price:
-                collateral_kt += lots * price
+            margin_rows = tables[0].get("data", [])
+            summary = tables[0].get("summary", [])
 
-        # ── 4. Ratio ──────────────────────────────────────────────────────────
-        ratio = collateral_kt / total_debt_kt * 100.0
-        from datetime import datetime, timezone, timedelta as _td
-        tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
-        tw_yesterday = (tw_today - _td(days=1)).isoformat()
-        hist = _load_ratio_history()
-        prev_val = hist.get(tw_yesterday, {}).get("tpex")
-        result = {"current": round(ratio, 2), "prev": prev_val}
-        # Persist today's value
-        today_key = tw_today.isoformat()
-        entry = hist.get(today_key, {})
-        entry["tpex"] = result["current"]
-        hist[today_key] = entry
-        _save_ratio_history(hist)
-        _tpex_margin_ratio_cache = {"ts": now, "data": result}
-        return result
+            # summary[1][6] = 融資金額 今日餘額 (仟元)
+            if len(summary) < 2 or len(summary[1]) < 7:
+                raise ValueError(f"TPEX summary format unexpected: {summary}")
+            total_debt_kt = float(str(summary[1][6]).replace(",", ""))
+            if total_debt_kt <= 0:
+                raise ValueError("TPEX total margin debt is 0 or missing")
 
-    except Exception as e:
-        print(f"Error computing TPEX margin ratio: {e}")
+            # ── 2. TPEX closing prices ─────────────────────────────────────────
+            r_prices = requests.get(
+                "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
+                headers=ua, timeout=20, verify=False
+            )
+            r_prices.raise_for_status()
+            if not r_prices.content:
+                raise ValueError("TPEX daily_close_quotes: empty response body")
+            price_map = {}
+            for item in r_prices.json():
+                code = str(item.get("SecuritiesCompanyCode", "")).strip()
+                try:
+                    p = float(str(item.get("Close", "") or "").replace(",", ""))
+                    if p > 0:
+                        price_map[code] = p
+                except Exception:
+                    pass
 
-    if _tpex_margin_ratio_cache["data"]:
-        return _tpex_margin_ratio_cache["data"]
-    return {"current": None, "prev": None}
+            # ── 3. Collateral value (仟元) ───────────────────────────────────────
+            # row[0]=代號, row[6]=資餘額(張); collateral_仟元 = Σ(lots_張 × price)
+            collateral_kt = 0.0
+            for row in margin_rows:
+                if len(row) < 7:
+                    continue
+                code = str(row[0]).strip()
+                try:
+                    lots = float(str(row[6]).replace(",", ""))
+                except Exception:
+                    lots = 0.0
+                if lots <= 0:
+                    continue
+                price = price_map.get(code)
+                if price:
+                    collateral_kt += lots * price
+
+            # ── 4. Ratio ─────────────────────────────────────────────────────────
+            ratio = collateral_kt / total_debt_kt * 100.0
+            from datetime import datetime, timezone, timedelta as _td
+            tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
+            hist = _load_ratio_history()
+            # Most recent prior day that actually has a value (skips weekends/holidays
+            # where nothing was fetched, instead of hard-coding "yesterday").
+            prev_val = None
+            for d in sorted((k for k in hist if k < tw_today.isoformat()), reverse=True):
+                v = hist[d].get("tpex")
+                if v is not None:
+                    prev_val = v
+                    break
+            result = {"current": round(ratio, 2), "prev": prev_val}
+            # Persist today's value
+            today_key = tw_today.isoformat()
+            entry = hist.get(today_key, {})
+            entry["tpex"] = result["current"]
+            hist[today_key] = entry
+            _save_ratio_history(hist)
+            _tpex_margin_ratio_cache = {"ts": now, "data": result, "fail_ts": 0.0}
+            return result
+
+        except Exception as e:
+            last_err = e
+            if attempt < _MARGIN_RETRIES - 1:
+                time.sleep(1)
+
+    print(f"Error computing TPEX margin ratio (all {_MARGIN_RETRIES} attempts failed): {last_err}")
+    _tpex_margin_ratio_cache["fail_ts"] = now
+
+    # Fall back to the last persisted value (in-memory, then on disk) so a
+    # restart during a TPEX outage doesn't blank the card out entirely.
+    return _tpex_margin_ratio_cache["data"] or _last_good_from_history()
 
 
 def _fetch_wtx():
@@ -681,9 +730,24 @@ def _last_saturday() -> "_date":
     return today - _timedelta(days=days_since_sat)
 
 def _chip_valid(entry: dict) -> bool:
-    """Cache is valid when fetched on or after the most recent Saturday."""
+    """Cache is valid when fetched on or after the most recent Saturday AND
+    the cached week's data isn't stale.
+
+    norway.twsthr.info doesn't always have the new week's numbers up by
+    Saturday — sometimes it lands Sunday/Monday. If we happen to fetch right
+    before it updates, `fetch_date` alone would lock in last week's data for
+    a full week. So also require the cached `current_date` to be recent
+    (<=8 days old); otherwise treat as stale and retry.
+    """
     try:
-        return _date.fromisoformat(entry["fetch_date"]) >= _last_saturday()
+        if _date.fromisoformat(entry["fetch_date"]) < _last_saturday():
+            return False
+        cur = entry.get("data", {}).get("current_date")
+        if cur:
+            cur_d = _date(int(cur[:4]), int(cur[4:6]), int(cur[6:8]))
+            if (_date.today() - cur_d).days > 8:
+                return False
+        return True
     except Exception:
         return False
 

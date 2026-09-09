@@ -64,67 +64,67 @@
     }
   },
   "2327": {
-    "fetch_date": "2026-07-11",
+    "fetch_date": "2026-07-22",
     "data": {
       "total": 2071465,
-      "current": 1531263,
-      "prev": 1540338,
-      "change": -9075,
-      "change_pct": -0.44,
-      "run_change": -9075,
-      "run_change_pct": -0.44,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current": 1510023,
+      "prev": 1520355,
+      "change": -10332,
+      "change_pct": -0.5,
+      "run_change": -21240,
+      "run_change_pct": -1.03,
+      "run_weeks": 3,
+      "current_date": "20260717",
+      "prev_date": "20260709",
+      "run_start_date": "20260703"
     }
   },
   "3715": {
-    "fetch_date": "2026-05-22",
+    "fetch_date": "2026-08-30",
     "data": {
       "total": 283575,
-      "current": 100572,
-      "prev": 106004,
-      "change": -5432,
-      "change_pct": -1.92,
-      "run_change": -5432,
-      "run_change_pct": -1.92,
+      "current": 83972,
+      "prev": 82861,
+      "change": 1111,
+      "change_pct": 0.39,
+      "run_change": 1111,
+      "run_change_pct": 0.39,
       "run_weeks": 2,
-      "current_date": "20260515",
-      "prev_date": "20260508",
-      "run_start_date": "20260508"
+      "current_date": "20260828",
+      "prev_date": "20260821",
+      "run_start_date": "20260821"
     }
   },
   "3717": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 210948,
-      "current": 91089,
-      "prev": 95731,
-      "change": -4642,
-      "change_pct": -2.2,
-      "run_change": -5373,
-      "run_change_pct": -2.55,
-      "run_weeks": 3,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260618"
+      "total": 211642,
+      "current": 77730,
+      "prev": 79223,
+      "change": -1493,
+      "change_pct": -0.71,
+      "run_change": -1493,
+      "run_change_pct": -0.71,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   },
   "3587": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
       "total": 71685,
-      "current": 24096,
-      "prev": 23953,
-      "change": 143,
-      "change_pct": 0.2,
-      "run_change": 143,
-      "run_change_pct": 0.2,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current": 22494,
+      "prev": 22680,
+      "change": -186,
+      "change_pct": -0.26,
+      "run_change": -1051,
+      "run_change_pct": -1.47,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "6806": {
@@ -192,35 +192,35 @@
     }
   },
   "1560": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-08-10",
     "data": {
-      "total": 150289,
-      "current": 99933,
-      "prev": 99301,
-      "change": 632,
-      "change_pct": 0.42,
-      "run_change": 2558,
-      "run_change_pct": 1.7,
+      "total": 150962,
+      "current": 97682,
+      "prev": 98355,
+      "change": -673,
+      "change_pct": -0.45,
+      "run_change": -1163,
+      "run_change_pct": -0.77,
       "run_weeks": 3,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260618"
+      "current_date": "20260807",
+      "prev_date": "20260731",
+      "run_start_date": "20260724"
     }
   },
   "2464": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-08-06",
     "data": {
-      "total": 217040,
-      "current": 99832,
-      "prev": 86624,
-      "change": 13208,
-      "change_pct": 6.09,
-      "run_change": 13208,
-      "run_change_pct": 6.09,
+      "total": 218499,
+      "current": 85762,
+      "prev": 85564,
+      "change": 198,
+      "change_pct": 0.09,
+      "run_change": 198,
+      "run_change_pct": 0.09,
       "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current_date": "20260731",
+      "prev_date": "20260724",
+      "run_start_date": "20260724"
     }
   },
   "3583": {
@@ -256,35 +256,35 @@
     }
   },
   "3526": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 66871,
-      "current": 32302,
-      "prev": 32759,
-      "change": -457,
-      "change_pct": -0.68,
-      "run_change": -659,
-      "run_change_pct": -0.99,
-      "run_weeks": 3,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260618"
+      "total": 67466,
+      "current": 29974,
+      "prev": 29563,
+      "change": 411,
+      "change_pct": 0.61,
+      "run_change": 411,
+      "run_change_pct": 0.61,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   },
   "2436": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-08-10",
     "data": {
-      "total": 204178,
-      "current": 59232,
-      "prev": 57620,
-      "change": 1612,
-      "change_pct": 0.79,
-      "run_change": 7580,
-      "run_change_pct": 3.71,
+      "total": 209524,
+      "current": 50969,
+      "prev": 52272,
+      "change": -1303,
+      "change_pct": -0.62,
+      "run_change": -2741,
+      "run_change_pct": -1.31,
       "run_weeks": 3,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260618"
+      "current_date": "20260807",
+      "prev_date": "20260731",
+      "run_start_date": "20260724"
     }
   },
   "8091": {
@@ -320,35 +320,35 @@
     }
   },
   "3680": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 96205,
-      "current": 55646,
-      "prev": 54158,
-      "change": 1488,
-      "change_pct": 1.55,
-      "run_change": 1488,
-      "run_change_pct": 1.55,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "total": 96384,
+      "current": 54563,
+      "prev": 52447,
+      "change": 2116,
+      "change_pct": 2.2,
+      "run_change": 2518,
+      "run_change_pct": 2.61,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "8467": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
       "total": 48374,
-      "current": 39679,
-      "prev": 39679,
+      "current": 39675,
+      "prev": 39675,
       "change": 0,
       "change_pct": 0.0,
       "run_change": 0,
       "run_change_pct": 0.0,
       "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   },
   "3141": {
@@ -400,19 +400,19 @@
     }
   },
   "4722": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 103765,
-      "current": 64426,
-      "prev": 64200,
-      "change": 226,
-      "change_pct": 0.22,
-      "run_change": 2117,
-      "run_change_pct": 2.04,
-      "run_weeks": 3,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260618"
+      "total": 104223,
+      "current": 61136,
+      "prev": 61495,
+      "change": -359,
+      "change_pct": -0.34,
+      "run_change": -359,
+      "run_change_pct": -0.34,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   },
   "2467": {
@@ -432,83 +432,83 @@
     }
   },
   "6274": {
-    "fetch_date": "2026-05-22",
+    "fetch_date": "2026-08-25",
     "data": {
-      "total": 295181,
-      "current": 202915,
-      "prev": 201414,
-      "change": 1501,
-      "change_pct": 0.51,
-      "run_change": 4423,
-      "run_change_pct": 1.5,
-      "run_weeks": 3,
-      "current_date": "20260515",
-      "prev_date": "20260508",
-      "run_start_date": "20260430"
+      "total": 299460,
+      "current": 198696,
+      "prev": 200418,
+      "change": -1722,
+      "change_pct": -0.58,
+      "run_change": -1722,
+      "run_change_pct": -0.58,
+      "run_weeks": 2,
+      "current_date": "20260821",
+      "prev_date": "20260814",
+      "run_start_date": "20260814"
     }
   },
   "8255": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-07-25",
     "data": {
-      "total": 101939,
-      "current": 54107,
-      "prev": 54587,
-      "change": -480,
-      "change_pct": -0.47,
-      "run_change": -480,
-      "run_change_pct": -0.47,
+      "total": 101961,
+      "current": 52972,
+      "prev": 52940,
+      "change": 32,
+      "change_pct": 0.03,
+      "run_change": 32,
+      "run_change_pct": 0.03,
       "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current_date": "20260724",
+      "prev_date": "20260717",
+      "run_start_date": "20260717"
     }
   },
   "6197": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-08-01",
     "data": {
-      "total": 123439,
-      "current": 58228,
-      "prev": 59432,
-      "change": -1204,
-      "change_pct": -0.98,
-      "run_change": -1204,
-      "run_change_pct": -0.98,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "total": 125758,
+      "current": 58077,
+      "prev": 57556,
+      "change": 521,
+      "change_pct": 0.41,
+      "run_change": 1516,
+      "run_change_pct": 1.21,
+      "run_weeks": 3,
+      "current_date": "20260731",
+      "prev_date": "20260724",
+      "run_start_date": "20260717"
     }
   },
   "8155": {
-    "fetch_date": "2026-05-22",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 61730,
-      "current": 32232,
-      "prev": 34192,
-      "change": -1960,
-      "change_pct": -3.18,
-      "run_change": -4044,
-      "run_change_pct": -6.55,
+      "total": 62854,
+      "current": 30073,
+      "prev": 30194,
+      "change": -121,
+      "change_pct": -0.19,
+      "run_change": -461,
+      "run_change_pct": -0.73,
       "run_weeks": 3,
-      "current_date": "20260515",
-      "prev_date": "20260508",
-      "run_start_date": "20260430"
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "3131": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-05",
     "data": {
-      "total": 29868,
-      "current": 14171,
-      "prev": 13806,
-      "change": 365,
-      "change_pct": 1.22,
-      "run_change": 365,
-      "run_change_pct": 1.22,
+      "total": 30121,
+      "current": 14819,
+      "prev": 14563,
+      "change": 256,
+      "change_pct": 0.85,
+      "run_change": 256,
+      "run_change_pct": 0.85,
       "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current_date": "20260828",
+      "prev_date": "20260821",
+      "run_start_date": "20260821"
     }
   },
   "2368": {
@@ -528,19 +528,19 @@
     }
   },
   "2316": {
-    "fetch_date": "2026-05-09",
+    "fetch_date": "2026-08-01",
     "data": {
       "total": 182741,
-      "current": 117506,
-      "prev": 115194,
-      "change": 2312,
-      "change_pct": 1.27,
-      "run_change": 2312,
-      "run_change_pct": 1.27,
-      "run_weeks": 2,
-      "current_date": "20260508",
-      "prev_date": "20260430",
-      "run_start_date": "20260430"
+      "current": 118685,
+      "prev": 118982,
+      "change": -297,
+      "change_pct": -0.16,
+      "run_change": -1611,
+      "run_change_pct": -0.88,
+      "run_weeks": 3,
+      "current_date": "20260731",
+      "prev_date": "20260724",
+      "run_start_date": "20260717"
     }
   },
   "3661": {
@@ -576,19 +576,19 @@
     }
   },
   "8996": {
-    "fetch_date": "2026-04-29",
+    "fetch_date": "2026-09-06",
     "data": {
-      "total": 93493,
-      "current": 50820,
-      "prev": 50548,
-      "change": 272,
-      "change_pct": 0.29,
-      "run_change": 272,
-      "run_change_pct": 0.29,
-      "run_weeks": 2,
-      "current_date": "20260424",
-      "prev_date": "20260417",
-      "run_start_date": "20260417"
+      "total": 93627,
+      "current": 44997,
+      "prev": 45220,
+      "change": -223,
+      "change_pct": -0.24,
+      "run_change": -2318,
+      "run_change_pct": -2.48,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "5483": {
@@ -624,35 +624,35 @@
     }
   },
   "2337": {
-    "fetch_date": "2026-05-06",
+    "fetch_date": "2026-07-15",
     "data": {
-      "total": 1981309,
-      "current": 1113178,
-      "prev": 999544,
-      "change": 113634,
-      "change_pct": 5.74,
-      "run_change": 113634,
-      "run_change_pct": 5.74,
-      "run_weeks": 2,
-      "current_date": "20260430",
-      "prev_date": "20260424",
-      "run_start_date": "20260424"
+      "total": 1981861,
+      "current": 904744,
+      "prev": 950154,
+      "change": -45410,
+      "change_pct": -2.29,
+      "run_change": -100876,
+      "run_change_pct": -5.09,
+      "run_weeks": 3,
+      "current_date": "20260709",
+      "prev_date": "20260703",
+      "run_start_date": "20260626"
     }
   },
   "4931": {
-    "fetch_date": "2026-07-11",
+    "fetch_date": "2026-09-09",
     "data": {
       "total": 65566,
-      "current": 19841,
-      "prev": 19497,
-      "change": 344,
-      "change_pct": 0.52,
-      "run_change": 344,
-      "run_change_pct": 0.52,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current": 21057,
+      "prev": 22788,
+      "change": -1731,
+      "change_pct": -2.64,
+      "run_change": -5339,
+      "run_change_pct": -8.14,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "5269": {
@@ -784,19 +784,19 @@
     }
   },
   "6223": {
-    "fetch_date": "2026-05-30",
+    "fetch_date": "2026-09-09",
     "data": {
       "total": 97981,
-      "current": 53621,
-      "prev": 52130,
-      "change": 1491,
-      "change_pct": 1.52,
-      "run_change": 1491,
-      "run_change_pct": 1.52,
+      "current": 48924,
+      "prev": 48898,
+      "change": 26,
+      "change_pct": 0.03,
+      "run_change": 26,
+      "run_change_pct": 0.03,
       "run_weeks": 2,
-      "current_date": "20260522",
-      "prev_date": "20260515",
-      "run_start_date": "20260515"
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   },
   "8299": {
@@ -848,19 +848,19 @@
     }
   },
   "4760": {
-    "fetch_date": "2026-07-12",
+    "fetch_date": "2026-09-09",
     "data": {
-      "total": 32218,
-      "current": 13757,
-      "prev": 13687,
-      "change": 70,
-      "change_pct": 0.22,
-      "run_change": 70,
-      "run_change_pct": 0.22,
-      "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "total": 32146,
+      "current": 11800,
+      "prev": 11801,
+      "change": -1,
+      "change_pct": -0.0,
+      "run_change": -422,
+      "run_change_pct": -1.31,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
     }
   },
   "3037": {
@@ -928,19 +928,291 @@
     }
   },
   "1303": {
-    "fetch_date": "2026-07-11",
+    "fetch_date": "2026-09-09",
     "data": {
       "total": 7930822,
-      "current": 6894409,
-      "prev": 6869203,
-      "change": 25206,
-      "change_pct": 0.32,
-      "run_change": 25206,
-      "run_change_pct": 0.32,
+      "current": 6858030,
+      "prev": 6876244,
+      "change": -18214,
+      "change_pct": -0.23,
+      "run_change": -18214,
+      "run_change_pct": -0.23,
       "run_weeks": 2,
-      "current_date": "20260703",
-      "prev_date": "20260626",
-      "run_start_date": "20260626"
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
+    }
+  },
+  "4958": {
+    "fetch_date": "2026-07-25",
+    "data": {
+      "total": 1114869,
+      "current": 811448,
+      "prev": 826780,
+      "change": -15332,
+      "change_pct": -1.38,
+      "run_change": -15332,
+      "run_change_pct": -1.38,
+      "run_weeks": 2,
+      "current_date": "20260724",
+      "prev_date": "20260717",
+      "run_start_date": "20260717"
+    }
+  },
+  "3711": {
+    "fetch_date": "2026-07-25",
+    "data": {
+      "total": 4479574,
+      "current": 3894374,
+      "prev": 3899239,
+      "change": -4865,
+      "change_pct": -0.11,
+      "run_change": -4865,
+      "run_change_pct": -0.11,
+      "run_weeks": 2,
+      "current_date": "20260724",
+      "prev_date": "20260717",
+      "run_start_date": "20260717"
+    }
+  },
+  "3577": {
+    "fetch_date": "2026-07-25",
+    "data": {
+      "total": 63966,
+      "current": 43007,
+      "prev": 43953,
+      "change": -946,
+      "change_pct": -1.48,
+      "run_change": -946,
+      "run_change_pct": -1.48,
+      "run_weeks": 2,
+      "current_date": "20260724",
+      "prev_date": "20260717",
+      "run_start_date": "20260717"
+    }
+  },
+  "2484": {
+    "fetch_date": "2026-07-25",
+    "data": {
+      "total": 159421,
+      "current": 38864,
+      "prev": 50386,
+      "change": -11522,
+      "change_pct": -7.23,
+      "run_change": -11522,
+      "run_change_pct": -7.23,
+      "run_weeks": 2,
+      "current_date": "20260724",
+      "prev_date": "20260717",
+      "run_start_date": "20260717"
+    }
+  },
+  "2383": {
+    "fetch_date": "2026-08-23",
+    "data": {
+      "total": 358321,
+      "current": 247261,
+      "prev": 248691,
+      "change": -1430,
+      "change_pct": -0.4,
+      "run_change": -1430,
+      "run_change_pct": -0.4,
+      "run_weeks": 2,
+      "current_date": "20260821",
+      "prev_date": "20260814",
+      "run_start_date": "20260814"
+    }
+  },
+  "2324": {
+    "fetch_date": "2026-08-15",
+    "data": {
+      "total": 4407147,
+      "current": 2836893,
+      "prev": 2795606,
+      "change": 41287,
+      "change_pct": 0.94,
+      "run_change": 41287,
+      "run_change_pct": 0.94,
+      "run_weeks": 2,
+      "current_date": "20260807",
+      "prev_date": "20260731",
+      "run_start_date": "20260731"
+    }
+  },
+  "6239": {
+    "fetch_date": "2026-08-15",
+    "data": {
+      "total": 759147,
+      "current": 485224,
+      "prev": 493608,
+      "change": -8384,
+      "change_pct": -1.1,
+      "run_change": -16610,
+      "run_change_pct": -2.19,
+      "run_weeks": 3,
+      "current_date": "20260807",
+      "prev_date": "20260731",
+      "run_start_date": "20260724"
+    }
+  },
+  "2313": {
+    "fetch_date": "2026-08-15",
+    "data": {
+      "total": 1233821,
+      "current": 726205,
+      "prev": 700541,
+      "change": 25664,
+      "change_pct": 2.08,
+      "run_change": 25664,
+      "run_change_pct": 2.08,
+      "run_weeks": 2,
+      "current_date": "20260807",
+      "prev_date": "20260731",
+      "run_start_date": "20260731"
+    }
+  },
+  "3189": {
+    "fetch_date": "2026-08-23",
+    "data": {
+      "total": 526916,
+      "current": 387087,
+      "prev": 391359,
+      "change": -4272,
+      "change_pct": -0.81,
+      "run_change": -4272,
+      "run_change_pct": -0.81,
+      "run_weeks": 2,
+      "current_date": "20260821",
+      "prev_date": "20260814",
+      "run_start_date": "20260814"
+    }
+  },
+  "6683": {
+    "fetch_date": "2026-09-09",
+    "data": {
+      "total": 27557,
+      "current": 6025,
+      "prev": 6049,
+      "change": -24,
+      "change_pct": -0.09,
+      "run_change": -24,
+      "run_change_pct": -0.09,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
+    }
+  },
+  "2301": {
+    "fetch_date": "2026-09-09",
+    "data": {
+      "total": 2316108,
+      "current": 1892673,
+      "prev": 1902317,
+      "change": -9644,
+      "change_pct": -0.42,
+      "run_change": -9644,
+      "run_change_pct": -0.42,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
+    }
+  },
+  "6147": {
+    "fetch_date": "2026-08-27",
+    "data": {
+      "total": 744578,
+      "current": 475400,
+      "prev": 473959,
+      "change": 1441,
+      "change_pct": 0.19,
+      "run_change": 1441,
+      "run_change_pct": 0.19,
+      "run_weeks": 2,
+      "current_date": "20260821",
+      "prev_date": "20260814",
+      "run_start_date": "20260814"
+    }
+  },
+  "4991": {
+    "fetch_date": "2026-08-30",
+    "data": {
+      "total": 121355,
+      "current": 62938,
+      "prev": 61771,
+      "change": 1167,
+      "change_pct": 0.96,
+      "run_change": 1167,
+      "run_change_pct": 0.96,
+      "run_weeks": 2,
+      "current_date": "20260828",
+      "prev_date": "20260821",
+      "run_start_date": "20260821"
+    }
+  },
+  "3324": {
+    "fetch_date": "2026-09-09",
+    "data": {
+      "total": 93236,
+      "current": 54966,
+      "prev": 46204,
+      "change": 8762,
+      "change_pct": 9.4,
+      "run_change": 11467,
+      "run_change_pct": 12.3,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
+    }
+  },
+  "6510": {
+    "fetch_date": "2026-09-09",
+    "data": {
+      "total": 32929,
+      "current": 17972,
+      "prev": 17878,
+      "change": 94,
+      "change_pct": 0.29,
+      "run_change": 117,
+      "run_change_pct": 0.36,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
+    }
+  },
+  "3090": {
+    "fetch_date": "2026-09-08",
+    "data": {
+      "total": 287567,
+      "current": 175531,
+      "prev": 176969,
+      "change": -1438,
+      "change_pct": -0.5,
+      "run_change": -4447,
+      "run_change_pct": -1.55,
+      "run_weeks": 3,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260821"
+    }
+  },
+  "6173": {
+    "fetch_date": "2026-09-08",
+    "data": {
+      "total": 171200,
+      "current": 109620,
+      "prev": 108041,
+      "change": 1579,
+      "change_pct": 0.92,
+      "run_change": 1579,
+      "run_change_pct": 0.92,
+      "run_weeks": 2,
+      "current_date": "20260904",
+      "prev_date": "20260828",
+      "run_start_date": "20260828"
     }
   }
 }

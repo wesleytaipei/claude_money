@@ -241,10 +241,21 @@ def sync_from_gist(force: bool = False) -> list[dict]:
 
             if force or gist_ts > local_ts:
                 path.parent.mkdir(parents=True, exist_ok=True)
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(content)
-                action = "pulled"
-                logger.info(f"[Gist] pulled {name} (gist {gist_ts:.0f} > local {local_ts:.0f})")
+                # history.json: merge (local wins on same-key conflict) so manual
+                # edits survive Gist pulls.  force=True still fully overwrites.
+                if name == "history.json" and not force and isinstance(local_data, dict) and local_data:
+                    merged = {**gist_data, **local_data}
+                    merged[_TS_KEY] = gist_data.get(_TS_KEY)   # adopt Gist ts for future comparisons
+                    merged_content = json.dumps(merged, ensure_ascii=False, indent=2)
+                    with open(path, "w", encoding="utf-8") as f:
+                        f.write(merged_content)
+                    action = "merged"
+                    logger.info(f"[Gist] merged {name} (gist {gist_ts:.0f} > local {local_ts:.0f}), local entries kept")
+                else:
+                    with open(path, "w", encoding="utf-8") as f:
+                        f.write(content)
+                    action = "pulled"
+                    logger.info(f"[Gist] pulled {name} (gist {gist_ts:.0f} > local {local_ts:.0f})")
             elif local_ts > gist_ts:
                 action = "local_newer"
             else:
@@ -1738,6 +1749,31 @@ def get_history():
     return load_json(HISTORY_FILE, {})
 
 
+@app.delete("/api/history/{date}")
+def delete_history_entry(date: str):
+    """Delete a single date's snapshot from history.json (manual data-editor)."""
+    from fastapi import HTTPException
+    history = load_json(HISTORY_FILE, {})
+    if date not in history:
+        raise HTTPException(status_code=404, detail=f"No snapshot for {date}")
+    del history[date]
+    save_json(HISTORY_FILE, history)
+    _backup_local()
+    _gist_push_confirmed()
+    return {"ok": True, "date": date}
+
+
+@app.post("/api/history/push-gist")
+def push_history_to_gist():
+    """Push current history.json to Gist as-is with a confirmed timestamp.
+    Use this after manually editing history.json so Railway picks it up."""
+    if not GIST_ENABLED:
+        return {"ok": False, "msg": "Gist not configured"}
+    _backup_local()
+    _gist_push_confirmed()
+    return {"ok": True}
+
+
 @app.get("/api/backups")
 def list_backups():
     """Return available local backup dates (newest first), each with file list and sizes."""
@@ -1946,8 +1982,18 @@ def compute_and_save_snapshot() -> dict:
 
     date_key = datetime.now().strftime("%Y-%m-%d")
     history = load_json(HISTORY_FILE, {})
+    existing_ts = history.get(_TS_KEY)   # preserve so Gist comparison stays valid
     history[date_key] = snapshot
-    save_json(HISTORY_FILE, history)
+    # Write directly (not save_json) to keep _last_modified intact.
+    # save_json always strips it, which would make local_ts=0 and cause
+    # Gist to win on next startup, overwriting any manually-edited entries.
+    if existing_ts:
+        history[_TS_KEY] = existing_ts
+    else:
+        history.pop(_TS_KEY, None)
+    HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, ensure_ascii=False, indent=2)
     logger.info(f"[auto-snapshot] {date_key} saved — net_worth={net_worth:,.0f}")
     return {"date": date_key, **snapshot}
 
@@ -2027,6 +2073,8 @@ def _startup():
         logger.info("[startup] warmup done")
     except Exception as e:
         logger.warning(f"[startup] warmup error: {e}")
+    # Pre-warm industry map in background so first page visit hits cache
+    _threading.Thread(target=_ind_do_refresh, daemon=True).start()
 
 _threading.Thread(target=_startup, daemon=True).start()
 
@@ -3119,6 +3167,348 @@ def get_advance_decline():
     return {"data": history[-120:]}
 
 
+# ── 季線選股 (全市場個股 vs 60日均線分區) ──────────────────────────────────────
+STOCK_MA_FILE = DATA_DIR / "stock_ma_history.json"
+_STOCK_MA_LOOKBACK_DAYS = 70       # trading days of history to keep (buffer above the 60-day window)
+_STOCK_MA_WINDOW = 60              # 季線 = 60 trading days
+_STOCK_MA_MIN_POINTS = 40          # need at least this many closes to trust the average
+_STOCK_CODE_RE = re.compile(r'^[1-9]\d{3}$')   # 4-digit, excludes ETF/warrant codes (00xxxx)
+
+
+def _fetch_twse_all_day(date_str: str, retries: int = 3) -> dict[str, dict]:
+    """All TWSE (上市) stock closes for one historical date (YYYYMMDD). Excludes ETFs/warrants.
+    TWSE throttles bursts of concurrent requests and returns an empty body when it does —
+    retry with backoff instead of silently treating the whole day as missing."""
+    out: dict[str, dict] = {}
+    for attempt in range(retries):
+        try:
+            r = http_requests.get(
+                f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date_str}&type=ALLBUT0999&response=json",
+                headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY,
+            )
+            d = json.loads(r.content.decode("utf-8"))
+            if d.get("stat") != "OK":
+                return out
+            for t in d.get("tables") or []:
+                fields = t.get("fields") or []
+                if "證券代號" not in fields or "收盤價" not in fields:
+                    continue
+                ci, ni, pi = fields.index("證券代號"), fields.index("證券名稱"), fields.index("收盤價")
+                for row in t.get("data") or []:
+                    code = str(row[ci]).strip()
+                    if not _STOCK_CODE_RE.match(code):
+                        continue
+                    try:
+                        close = float(str(row[pi]).replace(",", ""))
+                    except Exception:
+                        continue
+                    if close > 0:
+                        out[code] = {"name": str(row[ni]).strip(), "close": close}
+                break
+            return out
+        except Exception as e:
+            if attempt == retries - 1:
+                logger.warning(f"[stock-ma] TWSE {date_str}: {e} (gave up after {retries} tries)")
+            else:
+                time.sleep(1.5 * (attempt + 1))
+    return out
+
+
+def _fetch_tpex_all_day(date_str: str) -> dict[str, dict]:
+    """All TPEX (上櫃) stock closes for one historical date (YYYYMMDD). Excludes ETFs/warrants."""
+    out: dict[str, dict] = {}
+    try:
+        roc_date = f"{int(date_str[:4]) - 1911}/{date_str[4:6]}/{date_str[6:8]}"
+        r = http_requests.get(
+            f"https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes?date={roc_date}&response=json",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY,
+        )
+        d = r.json()
+        if d.get("stat") != "ok":
+            return out
+        for t in d.get("tables") or []:
+            for row in t.get("data") or []:
+                if len(row) < 3:
+                    continue
+                code = str(row[0]).strip()
+                if not _STOCK_CODE_RE.match(code):
+                    continue
+                try:
+                    close = float(str(row[2]).replace(",", ""))
+                except Exception:
+                    continue
+                if close > 0:
+                    out[code] = {"name": str(row[1]).strip(), "close": close}
+    except Exception as e:
+        logger.warning(f"[stock-ma] TPEX {date_str}: {e}")
+    return out
+
+
+def _fetch_tw_all_day(date_str: str) -> dict[str, dict]:
+    """Merge TWSE+TPEX for one date → {code: {name, close, market}}."""
+    merged: dict[str, dict] = {}
+    for code, v in _fetch_twse_all_day(date_str).items():
+        merged[code] = {**v, "market": "tse"}
+    for code, v in _fetch_tpex_all_day(date_str).items():
+        merged.setdefault(code, {**v, "market": "otc"})
+    return merged
+
+
+def _load_stock_ma_history() -> dict:
+    return load_json(STOCK_MA_FILE, {})
+
+
+def _save_stock_ma_history(data: dict):
+    STOCK_MA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(STOCK_MA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
+
+
+def _trading_day_candidates(n_trading_days: int) -> list[str]:
+    """Most recent N weekdays (YYYYMMDD), oldest first. Some may turn out to be
+    market holidays with no data — the caller just drops those."""
+    from datetime import date as _date, timedelta as _td
+    today = _date.today()
+    out, d = [], today
+    while len(out) < n_trading_days:
+        d -= _td(days=1)
+        if d.weekday() < 5:
+            out.append(d.strftime("%Y%m%d"))
+    out.reverse()
+    return out
+
+
+def _build_stock_ma_history() -> dict:
+    """Backfill closing prices for all TW stocks over the last ~70 trading days.
+    TWSE throttles even light concurrency (3 workers still triggered empty-body
+    responses for a chunk of dates) but is fine with fully sequential requests —
+    so this fetches one date at a time with a short pause between calls."""
+    candidates = _trading_day_candidates(_STOCK_MA_LOOKBACK_DAYS)
+    day_data: dict[str, dict] = {}
+    for dt in candidates:
+        merged = _fetch_tw_all_day(dt)
+        if merged:
+            day_data[dt] = merged
+        time.sleep(0.4)
+
+    dates = sorted(day_data.keys())
+    stocks: dict[str, dict] = {}
+    for dt_i, dt in enumerate(dates):
+        for code, v in day_data[dt].items():
+            if code not in stocks:
+                stocks[code] = {"name": v["name"], "market": v["market"], "closes": [None] * len(dates)}
+            stocks[code]["closes"][dt_i] = v["close"]
+
+    result = {"dates": dates, "stocks": stocks, "updated": _now_iso()}
+    _save_stock_ma_history(result)
+    logger.info(f"[stock-ma] backfill done — {len(dates)} days x {len(stocks)} stocks")
+    return result
+
+
+def _stock_ma_fill_gaps(data: dict, sample_size: int = 150, max_dates: int = 25) -> dict:
+    """Detect dates where most TSE or OTC rows are missing (a throttled fetch, not a real
+    holiday) and re-fetch just those dates sequentially, patching them in place. Much
+    cheaper than a full re-backfill since normally only a handful of dates need this."""
+    dates: list[str] = data.get("dates", [])
+    stocks: dict[str, dict] = data.get("stocks", {})
+    if not dates:
+        return data
+
+    tse_sample = [c for c, v in stocks.items() if v["market"] == "tse"][:sample_size]
+    otc_sample = [c for c, v in stocks.items() if v["market"] == "otc"][:sample_size]
+
+    gaps: list[tuple[int, str]] = []
+    for i in range(len(dates)):
+        if tse_sample and sum(1 for c in tse_sample if stocks[c]["closes"][i] is None) / len(tse_sample) > 0.5:
+            gaps.append((i, "tse"))
+        if otc_sample and sum(1 for c in otc_sample if stocks[c]["closes"][i] is None) / len(otc_sample) > 0.5:
+            gaps.append((i, "otc"))
+
+    if not gaps:
+        return data
+
+    patched = False
+    for i, market in gaps[:max_dates]:
+        dt = dates[i]
+        fetch_fn = _fetch_twse_all_day if market == "tse" else _fetch_tpex_all_day
+        rows = fetch_fn(dt)
+        if not rows:
+            continue
+        for code, v in rows.items():
+            if code not in stocks:
+                stocks[code] = {"name": v["name"], "market": market, "closes": [None] * len(dates)}
+            stocks[code]["closes"][i] = v["close"]
+        patched = True
+        logger.info(f"[stock-ma] gap-fill {dt} ({market}): {len(rows)} rows")
+        time.sleep(0.4)
+
+    if patched:
+        data["stocks"] = stocks
+        data["updated"] = _now_iso()
+        _save_stock_ma_history(data)
+    return data
+
+
+def _stock_ma_try_append_today(data: dict) -> dict:
+    """Append any missing weekday(s) since the last stored date, post-market only."""
+    from datetime import date as _date, timedelta as _td
+    dates: list[str] = data.get("dates", [])
+    stocks: dict[str, dict] = data.get("stocks", {})
+    today_str = _date.today().strftime("%Y%m%d")
+    last_str = dates[-1] if dates else ""
+    if last_str >= today_str or _is_tw_market_open():
+        return data
+
+    start = (_date.fromisoformat(f"{last_str[:4]}-{last_str[4:6]}-{last_str[6:]}") + _td(days=1)) if last_str else _date.today()
+    missing = [
+        (start + _td(days=i)).strftime("%Y%m%d")
+        for i in range((_date.today() - start).days + 1)
+        if (start + _td(days=i)).weekday() < 5
+    ]
+    fetched = False
+    for dt in missing:
+        merged = _fetch_tw_all_day(dt)
+        if not merged:
+            continue
+        fetched = True
+        dates.append(dt)
+        for code in stocks:
+            stocks[code]["closes"].append(None)
+        for code, v in merged.items():
+            if code not in stocks:
+                stocks[code] = {"name": v["name"], "market": v["market"], "closes": [None] * len(dates)}
+                stocks[code]["closes"][-1] = v["close"]
+            else:
+                stocks[code]["closes"][-1] = v["close"]
+
+    if fetched:
+        # Keep a rolling window so the file doesn't grow forever
+        keep = _STOCK_MA_LOOKBACK_DAYS
+        if len(dates) > keep:
+            trim = len(dates) - keep
+            dates[:] = dates[trim:]
+            for code in stocks:
+                stocks[code]["closes"] = stocks[code]["closes"][trim:]
+        data["dates"], data["stocks"], data["updated"] = dates, stocks, _now_iso()
+        _save_stock_ma_history(data)
+    return data
+
+
+def _classify_stock_zones() -> dict:
+    data = _load_stock_ma_history()
+    if not data.get("dates"):
+        data = _build_stock_ma_history()
+    else:
+        data = _stock_ma_try_append_today(data)
+
+    zones = {"strong": [], "season": [], "repair": []}
+    for code, info in data.get("stocks", {}).items():
+        closes = info["closes"][-_STOCK_MA_WINDOW:]
+        valid = [c for c in closes if c is not None]
+        if len(valid) < _STOCK_MA_MIN_POINTS:
+            continue
+        price = closes[-1]
+        if price is None:
+            continue
+        ma = sum(valid) / len(valid)
+        if ma <= 0:
+            continue
+        pct = (price - ma) / ma * 100
+
+        # 今日漲幅% — vs the previous available close (not necessarily closes[-2] if a gap exists)
+        valid_all = [c for c in info["closes"] if c is not None]
+        chg_pct = None
+        if len(valid_all) >= 2 and valid_all[-2]:
+            chg_pct = round((valid_all[-1] - valid_all[-2]) / valid_all[-2] * 100, 2)
+
+        # 是否 > 5日均價
+        last5 = valid_all[-5:]
+        ma5 = sum(last5) / len(last5) if len(last5) >= 5 else None
+        above_ma5 = (price > ma5) if ma5 is not None else None
+
+        entry = {"code": code, "name": info["name"], "market": info["market"],
+                  "price": price, "ma": round(ma, 2), "pct": round(pct, 2),
+                  "chg_pct": chg_pct,
+                  "ma5": round(ma5, 2) if ma5 is not None else None,
+                  "above_ma5": above_ma5}
+        if pct > 5:
+            zones["strong"].append(entry)
+        elif pct >= -5:
+            zones["season"].append(entry)
+        elif pct >= -10:
+            zones["repair"].append(entry)
+        # below -10% is intentionally left out (not classified into any of the 3 zones)
+
+    for k in zones:
+        zones[k].sort(key=lambda x: -x["pct"])
+
+    return {
+        "zones": zones,
+        "as_of": data["dates"][-1] if data.get("dates") else None,
+        "updated_at": data.get("updated"),
+    }
+
+
+_stock_zones_cache: dict = {"ts": 0.0, "data": None}
+_stock_zones_refreshing = False
+
+
+def _stock_zones_do_refresh():
+    global _stock_zones_cache, _stock_zones_refreshing
+    _stock_zones_refreshing = True
+    try:
+        result = _classify_stock_zones()
+        _stock_zones_cache = {"ts": time.time(), "data": result}
+    except Exception as e:
+        logger.error(f"[stock-ma] refresh error: {e}")
+    finally:
+        _stock_zones_refreshing = False
+
+
+@app.get("/api/stock-zones")
+def get_stock_zones(force: bool = False):
+    """全市場個股 vs 季線(60日均線)分區：強勢區(>+5%) / 季線區(±5%) / 修復區(-5%~-10%)。
+    首次建立需回補 ~65 個交易日的全市場收盤價，可能需要 1-2 分鐘；之後每日增量更新並快取。"""
+    global _stock_zones_cache
+    now = time.time()
+    cache_age = now - _stock_zones_cache["ts"]
+    has_cache = _stock_zones_cache["data"] is not None
+
+    if not force and has_cache and cache_age < 1800:
+        return _stock_zones_cache["data"]
+
+    if not force and has_cache:
+        if not _stock_zones_refreshing:
+            _threading.Thread(target=_stock_zones_do_refresh, daemon=True).start()
+        return {**_stock_zones_cache["data"], "stale": True}
+
+    # No cache yet, or force=true: must block (first call may take a while to backfill)
+    _stock_zones_do_refresh()
+    return _stock_zones_cache["data"] or {"zones": {"strong": [], "season": [], "repair": []}, "as_of": None, "updated_at": None}
+
+
+def _run_daily_stock_ma_update():
+    try:
+        data = _load_stock_ma_history()
+        if data.get("dates"):
+            data = _stock_ma_try_append_today(data)
+            _stock_ma_fill_gaps(data)   # self-heal any dates a previous run failed to fetch
+        global _stock_zones_cache
+        _stock_zones_cache = {"ts": 0.0, "data": None}   # force next request to recompute
+    except Exception as e:
+        logger.error(f"[stock-ma] daily update failed: {e}")
+
+
+# 季線選股資料每日收盤後更新 (15:10，在 daily_snapshot 之後留緩衝)
+_scheduler.add_job(
+    _run_daily_stock_ma_update,
+    CronTrigger(day_of_week="mon-fri", hour=15, minute=10, timezone="Asia/Taipei"),
+    id="stock_ma_daily_update",
+    replace_existing=True,
+)
+logger.info("[scheduler] stock-ma zone update @ 15:10")
+
+
 # ── 成交值排行 ────────────────────────────────────────────────────────────────
 _turnover_cache: dict = {}
 _turnover_cache_ts: float = 0.0
@@ -3686,33 +4076,63 @@ def _ind_fetch_one(s: dict) -> dict:
     return {**base, "yf_ticker": ticker}
 
 
+_ind_refreshing: bool = False  # guard: only one background refresh at a time
+
+
+def _ind_do_refresh():
+    """Fetch all industry-map prices and update the cache. Thread-safe via _ind_refreshing guard."""
+    global _industry_map_cache, _ind_refreshing
+    _ind_refreshing = True
+    try:
+        now = time.time()
+        if IS_RAILWAY and (now - _industry_map_saved_at) > 30:
+            _gist_pull_one("industry_map_config.json")
+
+        cfg    = load_json(INDUSTRY_MAP_CONFIG_FILE, {"groups": []})
+        stocks = [s for g in cfg.get("groups", []) for s in g.get("stocks", [])]
+
+        with ThreadPoolExecutor(max_workers=12) as ex:
+            results = list(ex.map(_ind_fetch_one, stocks))
+
+        idx, out_groups = 0, []
+        for g in cfg.get("groups", []):
+            n = len(g.get("stocks", []))
+            out_groups.append({**g, "stocks": results[idx:idx + n]})
+            idx += n
+
+        data = {"groups": out_groups, "updated_at": datetime.now().isoformat()}
+        _industry_map_cache = {"ts": time.time(), "data": data}
+        logger.info(f"[industry-map] cache refreshed ({len(stocks)} stocks)")
+    except Exception as e:
+        logger.error(f"[industry-map] refresh error: {e}")
+    finally:
+        _ind_refreshing = False
+
+
 @app.get("/api/industry-map")
 def get_industry_map(force: bool = False):
-    """族群指標股行情，快取 15 分鐘。"""
+    """族群指標股行情，快取 15 分鐘。
+    Stale-while-revalidate: if stale cache exists, return it immediately and
+    kick off a background refresh so the next request (or frontend silent poll)
+    gets fresh data without blocking the user."""
     global _industry_map_cache
     now = time.time()
-    if not force and _industry_map_cache["data"] and (now - _industry_map_cache["ts"]) < 900:
+    cache_age = now - _industry_map_cache["ts"]
+    has_cache = _industry_map_cache["data"] is not None
+
+    # Fresh cache hit — return immediately
+    if not force and has_cache and cache_age < 900:
         return _industry_map_cache["data"]
 
-    # Pull latest config from Gist (Railway) — skip if we just saved locally (avoid race)
-    if IS_RAILWAY and (now - _industry_map_saved_at) > 30:
-        _gist_pull_one("industry_map_config.json")
+    # Stale cache: return old data instantly, refresh in background
+    if not force and has_cache:
+        if not _ind_refreshing:
+            _threading.Thread(target=_ind_do_refresh, daemon=True).start()
+        return {**_industry_map_cache["data"], "stale": True}
 
-    cfg    = load_json(INDUSTRY_MAP_CONFIG_FILE, {"groups": []})
-    stocks = [s for g in cfg.get("groups", []) for s in g.get("stocks", [])]
-
-    with ThreadPoolExecutor(max_workers=12) as ex:
-        results = list(ex.map(_ind_fetch_one, stocks))
-
-    idx, out_groups = 0, []
-    for g in cfg.get("groups", []):
-        n = len(g.get("stocks", []))
-        out_groups.append({**g, "stocks": results[idx:idx + n]})
-        idx += n
-
-    data = {"groups": out_groups, "updated_at": datetime.now().isoformat()}
-    _industry_map_cache = {"ts": now, "data": data}
-    return data
+    # No cache at all (first load / force): must block
+    _ind_do_refresh()
+    return _industry_map_cache["data"] or {"groups": [], "updated_at": datetime.now().isoformat()}
 
 
 @app.put("/api/industry-map/config")

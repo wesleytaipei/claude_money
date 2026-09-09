@@ -713,6 +713,9 @@ tbody tr:hover { background: rgba(99,102,241,.05); }
 tbody tr:last-child td { border-bottom: none; }
 tr.highlighted { background: rgba(234,179,8,.08); }
 tr.highlighted:hover { background: rgba(234,179,8,.14); }
+tr.inv-group-summary { background: rgba(99,102,241,.06); }
+tr.inv-group-summary:hover { background: rgba(99,102,241,.12); }
+tr.inv-subrow td { opacity: .72; }
 .symbol-badge {
   font-family: var(--mono);
   font-weight: 700;

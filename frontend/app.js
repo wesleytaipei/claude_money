@@ -27,7 +27,10 @@ const state = {
   usdTwd: 31.77,
   jpyTwd: 0.2,
   excluded: new Set(),  // keys like "assets.0.1" or "assets.0.*"
+  mergeSameSymbol: localStorage.getItem('hc_merge_same_symbol') !== '0',  // default on
 };
+
+const _invExpandedGroups = new Set();  // manually-expanded group symbols, per session (default: collapsed)
 
 // Load excluded from localStorage
 try {
@@ -1241,6 +1244,8 @@ function renderInvestmentsPage() {
   }
 
   document.getElementById('inv-title').textContent = groupName;
+  const mergeToggle = document.getElementById('inv-merge-toggle');
+  if (mergeToggle) mergeToggle.checked = state.mergeSameSymbol;
 
   // Summary — use Σ _pnl_twd so margin doesn't inflate the figure
   let totalMV = 0, totalCost = 0, totalPnL = 0;
@@ -1421,12 +1426,14 @@ function renderInvestmentsPage() {
       });
   }
 
-  tbody.innerHTML = sortedItems.map((item, si) => {
-    const idx = origIdx[si];
+  // Build one <tr>. `idx` is the item's index in the unsorted group.items array
+  // (undefined for a synthetic group-summary row, which uses `memberIdxs` instead).
+  function _invRowHtml(item, idx, opts = {}) {
+    const { isSub = false, isSummary = false, groupKey = '', memberIdxs = [], memberCount = 0 } = opts;
     const mv = item._mv || 0;
     const pnl = item._pnl || 0;
     const pnlPct = item._pnl_pct || 0;
-    const rowCls = item.highlighted ? 'highlighted' : '';
+    const rowCls = [item.highlighted ? 'highlighted' : '', isSub ? 'inv-subrow' : '', isSummary ? 'inv-group-summary' : ''].filter(Boolean).join(' ');
 
     const priceCell = (v) => fmtPrice(v);
 
@@ -1448,8 +1455,16 @@ function renderInvestmentsPage() {
     // Stock: chip goes at end of baseCells; CB: chip goes into cbCells after 現股價格
     const chipTd = (chipSym && !isCB) ? chipTdEl : '';
 
+    const collapsed = isSummary && !_invExpandedGroups.has(groupKey);
+    const leadPrefix = isSub
+      ? '<span class="muted" style="margin-right:2px">└</span>'
+      : isSummary
+        ? `<span class="muted" style="margin-right:4px">${collapsed ? '▸' : '▾'}</span>`
+        : '';
     const baseCells = `
-      <td><span class="symbol-badge">${item.symbol || '—'}</span></td>
+      <td>${leadPrefix}<span class="symbol-badge">${item.symbol || '—'}</span>${
+        isSummary ? `<span class="small muted" style="margin-left:4px">×${memberCount}</span>` : ''
+      }</td>
       <td>${item.note
         ? `<span title="${escapeAttr(item.note)}" style="cursor:help;border-bottom:1px dotted var(--muted)">${item.name || '—'}</span>`
         : (item.name || '—')}</td>
@@ -1511,17 +1526,82 @@ function renderInvestmentsPage() {
     const showFilled = item.highlighted || isAutoHit;
     const starCls = item.highlighted ? 'on' : (isAutoHit ? 'on auto' : '');
     const starTitle = isAutoHit ? ` title="${autoReasons.join('&#10;')}"` : '';
+    const starOnclick = isSummary
+      ? `toggleHighlightGroup([${memberIdxs.join(',')}])`
+      : `toggleHighlight(${idx})`;
     const starCell = showStar
-      ? `<td><span class="star-btn ${starCls}"${starTitle} onclick="event.stopPropagation(); toggleHighlight(${idx})">${showFilled ? '★' : '☆'}</span></td>`
+      ? `<td><span class="star-btn ${starCls}"${starTitle} onclick="event.stopPropagation(); ${starOnclick}">${showFilled ? '★' : '☆'}</span></td>`
       : '';
 
     const brokerTd = `<td class="small muted">${item.broker || '—'}</td>`;
+
+    if (isSummary) {
+      return `<tr class="${rowCls}" onclick="toggleInvGroupCollapse('${escapeAttr(groupKey)}')" style="cursor:pointer;font-weight:600">
+        ${starCell}${baseCells}${cbCells}${brokerTd}
+        <td></td>
+      </tr>`;
+    }
 
     return `<tr class="${rowCls}" onclick="openEditPosition(${idx})" style="cursor:pointer">
       ${starCell}${baseCells}${cbCells}${brokerTd}
       <td><button class="btn-icon" onclick="event.stopPropagation(); deletePosition(${idx})">✕</button></td>
     </tr>`;
-  }).join('');
+  }
+
+  // Group consecutive rows that share the same symbol (sortedItems is already
+  // sorted by symbol, so same-symbol items are adjacent) into a summary + sub-rows.
+  function _buildGroupSummary(members) {
+    const first = members[0];
+    const sum = f => members.reduce((s, it) => s + (Number(it[f]) || 0), 0);
+    const shares = sum('shares');
+    const cost = sum('cost');
+    const margin = sum('_margin');   // 融資借款 (0 for CB/US) — 股票均價 = (自備款+融資) / 股數
+    // CB 均價 = Σ(買入均價 × 股數) / Σ股數（cost 不一定等於 entry_price×shares，故不能用 cost 反推）
+    const weightedEntry = members.reduce((s, it) => s + (Number(it.entry_price) || 0) * (Number(it.shares) || 0), 0);
+    const brokers = [...new Set(members.map(it => (it.broker || '').trim()).filter(Boolean))];
+    return {
+      symbol: first.symbol, name: first.name, note: '',
+      shares, cost,
+      entry_price: shares ? (isCB ? weightedEntry / shares : (cost + margin) / shares) : 0,
+      current_price: first.current_price,
+      _mv: sum('_mv'), _pnl: sum('_pnl'),
+      _pnl_pct: cost ? sum('_pnl') / cost * 100 : 0,
+      _margin: margin,
+      _change_pct: first._change_pct, _stock_change_pct: first._stock_change_pct,
+      broker: brokers.join(' / '),
+      highlighted: members.every(it => it.highlighted),
+      cb_due_date: first.cb_due_date, cbas_due_date: first.cbas_due_date,
+      remain_shares: first.remain_shares, issued_shares: first.issued_shares,
+      conversion_price: first.conversion_price, premium_rate: first.premium_rate,
+      stock_price: first.stock_price,
+      _suspended: first._suspended, _suspension_dates: first._suspension_dates,
+    };
+  }
+
+  const rowsHtml = [];
+  if (state.mergeSameSymbol) {
+    let i = 0;
+    while (i < sortedItems.length) {
+      const sym = (sortedItems[i].symbol || '').trim();
+      let j = i + 1;
+      while (sym && j < sortedItems.length && (sortedItems[j].symbol || '').trim() === sym) j++;
+      if (sym && j - i > 1) {
+        const members = sortedItems.slice(i, j);
+        const memberIdxs = origIdx.slice(i, j);
+        const groupKey = `${state.currentInv}:${sym}`;
+        rowsHtml.push(_invRowHtml(_buildGroupSummary(members), null, { isSummary: true, groupKey, memberIdxs, memberCount: members.length }));
+        if (_invExpandedGroups.has(groupKey)) {
+          members.forEach((item, k) => rowsHtml.push(_invRowHtml(item, memberIdxs[k], { isSub: true })));
+        }
+      } else {
+        rowsHtml.push(_invRowHtml(sortedItems[i], origIdx[i], {}));
+      }
+      i = j;
+    }
+  } else {
+    sortedItems.forEach((item, si) => rowsHtml.push(_invRowHtml(item, origIdx[si], {})));
+  }
+  tbody.innerHTML = rowsHtml.join('');
 
   // Fire async chip data fetches for all visible TW/CB symbols
   if (showStar) {
@@ -1557,6 +1637,28 @@ async function toggleHighlight(idx) {
   if (!group) return;
   group.items[idx].highlighted = !group.items[idx].highlighted;
   await savePortfolio();
+  renderInvestmentsPage();
+}
+
+async function toggleHighlightGroup(idxs) {
+  const groupName = INV_GROUP_MAP[state.currentInv];
+  const group = state.portfolio.investments.find(g => g.group === groupName);
+  if (!group) return;
+  const allOn = idxs.every(i => group.items[i].highlighted);
+  idxs.forEach(i => { group.items[i].highlighted = !allOn; });
+  await savePortfolio();
+  renderInvestmentsPage();
+}
+
+function toggleMergeSameSymbol(checked) {
+  state.mergeSameSymbol = checked;
+  localStorage.setItem('hc_merge_same_symbol', checked ? '1' : '0');
+  renderInvestmentsPage();
+}
+
+function toggleInvGroupCollapse(groupKey) {
+  if (_invExpandedGroups.has(groupKey)) _invExpandedGroups.delete(groupKey);
+  else _invExpandedGroups.add(groupKey);
   renderInvestmentsPage();
 }
 
@@ -1908,6 +2010,23 @@ async function saveSnapshot() {
   } catch (e) { toast('資料儲存失敗', 'error'); }
 }
 
+async function pushHistoryToGist() {
+  const btn = document.getElementById('btn-push-history');
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> 推送中...';
+  btn.disabled = true;
+  try {
+    const res = await api('/api/history/push-gist', { method: 'POST' });
+    if (!res.ok) throw new Error(res.msg || 'failed');
+    toast('✅ history.json 已推到雲端');
+  } catch (e) {
+    toast('❌ 推送失敗: ' + (e?.message || e), 'error');
+  } finally {
+    btn.innerHTML = orig;
+    btn.disabled = false;
+  }
+}
+
 // ══ Refresh all ═════════════════════════════════════════════════════════
 async function syncFromGist(force = false) {
   const btn = document.getElementById('btn-sync-gist');
@@ -2031,6 +2150,11 @@ function goPage(name) {
   else if (name === 'ranking') renderRanking(false);
   else if (name === 'cb-be') _initCbBookentryMyCbs();
   else if (name === 'industry') renderIndustryMap(false);
+  else if (name === 'data-editor') renderDataEditorPage();
+  else if (name === 'stock-zones') renderStockZonesPage(false);
+
+  _stopIndustryAutoRefresh();
+  if (name === 'industry') _startIndustryAutoRefresh();
 
   // Switch active classes after content is ready
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === name));
@@ -2043,7 +2167,9 @@ function goPage(name) {
     etf: 'ETF追蹤',
     ranking: '成交值排行',
     'cb-be': 'CB餘額對照',
-    industry: '產業地圖'
+    industry: '產業地圖',
+    'data-editor': '資料管理',
+    'stock-zones': '季線選股'
   };
   const titleEl = document.getElementById('mobile-page-title');
   if (titleEl) titleEl.textContent = titles[name] || name;
@@ -2064,7 +2190,7 @@ function _setChartYear(yr) {
   const today = new Date().toISOString().slice(0, 10);
   const curYear = new Date().getFullYear();
   document.getElementById('growth-start').value = `${yr}-01-01`;
-  document.getElementById('growth-end').value = yr >= curYear ? today : `${yr}-12-31`;
+  document.getElementById('growth-end').value = yr >= curYear ? today : `${yr + 1}-01-01`;
   renderGrowthChart(); renderTrendChart();
 }
 
@@ -2525,6 +2651,168 @@ async function deleteManualHistory(date) {
   await api('/api/manual-history/' + date, { method: 'DELETE' });
   await loadManualHistory();
   renderHistoryPage();
+}
+
+// ══ 資料管理 (history.json CRUD) ══════════════════════════════════════════
+function renderDataEditorPage() {
+  const dates = Object.keys(state.history || {})
+    .filter(d => d !== '_last_modified')
+    .sort().reverse();
+
+  document.getElementById('data-editor-count').textContent = `${dates.length} 筆紀錄`;
+
+  document.getElementById('data-editor-tbody').innerHTML = dates.length === 0
+    ? '<tr><td colspan="10" style="text-align:center; padding:20px;">尚無資料</td></tr>'
+    : dates.map(d => {
+        const h = state.history[d];
+        return `
+          <tr>
+            <td>${d}</td>
+            <td>${fmtFull(h.net_worth)}</td>
+            <td>${fmtFull(h.total_assets)}</td>
+            <td>${fmtFull(h.total_liabilities)}</td>
+            <td>${h.taiex ?? '—'}</td>
+            <td>${h.otc ?? '—'}</td>
+            <td>${h.dji ?? '—'}</td>
+            <td>${h.nasdaq ?? '—'}</td>
+            <td>${h.sox ?? '—'}</td>
+            <td style="white-space:nowrap">
+              <button class="btn-ghost" style="padding:3px 8px;font-size:11px" onclick="openHistoryEntryModal('${d}')">✏️</button>
+              <button class="btn-icon" onclick="deleteHistoryEntry('${d}')">✕</button>
+            </td>
+          </tr>`;
+      }).join('');
+}
+
+let _histEditGroups = [];   // [{name, value}] rows while the modal is open
+let _histEditIsNew = true;
+
+function openHistoryEntryModal(date) {
+  const h = date ? (state.history[date] || {}) : {};
+  _histEditIsNew = !date;
+  _histEditGroups = Object.entries(h.asset_groups || {}).map(([name, value]) => ({ name, value }));
+
+  openModal(date ? `✏️ 編輯 ${date}` : '➕ 新增紀錄', `
+    <div class="form-group">
+      <label>日期</label>
+      <input type="date" id="he-date" value="${date || ''}" ${date ? 'disabled' : ''} />
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>淨資產</label>
+        <input type="text" inputmode="decimal" id="he-nw" value="${h.net_worth ?? ''}" /></div>
+      <div class="form-group"><label>總資產</label>
+        <input type="text" inputmode="decimal" id="he-ta" value="${h.total_assets ?? ''}" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>總負債</label>
+        <input type="text" inputmode="decimal" id="he-tl" value="${h.total_liabilities ?? ''}" /></div>
+      <div></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>加權指數</label>
+        <input type="text" inputmode="decimal" id="he-taiex" value="${h.taiex ?? ''}" /></div>
+      <div class="form-group"><label>櫃買指數</label>
+        <input type="text" inputmode="decimal" id="he-otc" value="${h.otc ?? ''}" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>道瓊</label>
+        <input type="text" inputmode="decimal" id="he-dji" value="${h.dji ?? ''}" /></div>
+      <div class="form-group"><label>那斯達克</label>
+        <input type="text" inputmode="decimal" id="he-nasdaq" value="${h.nasdaq ?? ''}" /></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>費城半導體</label>
+        <input type="text" inputmode="decimal" id="he-sox" value="${h.sox ?? ''}" /></div>
+      <div></div>
+    </div>
+
+    <div class="form-group">
+      <label>資產分類明細 (asset_groups)</label>
+      <div id="he-groups-rows"></div>
+      <button class="btn-ghost" style="margin-top:6px;font-size:12px" onclick="_histAddGroupRow()">＋ 新增分類</button>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="saveHistoryEntry('${date || ''}')">儲存</button>
+    </div>`);
+
+  _histRenderGroupRows();
+}
+
+function _histRenderGroupRows() {
+  const el = document.getElementById('he-groups-rows');
+  if (!el) return;
+  el.innerHTML = _histEditGroups.map((g, i) => `
+    <div class="form-row" style="grid-template-columns:1fr 1fr auto;align-items:center;gap:8px">
+      <input type="text" placeholder="分類名稱" value="${g.name}" oninput="_histEditGroups[${i}].name=this.value" />
+      <input type="text" inputmode="decimal" placeholder="金額" value="${g.value}" oninput="_histEditGroups[${i}].value=this.value" />
+      <button class="btn-icon" onclick="_histRemoveGroupRow(${i})">✕</button>
+    </div>`).join('');
+}
+
+function _histAddGroupRow() {
+  _histEditGroups.push({ name: '', value: 0 });
+  _histRenderGroupRows();
+}
+
+function _histRemoveGroupRow(i) {
+  _histEditGroups.splice(i, 1);
+  _histRenderGroupRows();
+}
+
+async function saveHistoryEntry(origDate) {
+  const date = _histEditIsNew ? document.getElementById('he-date').value : origDate;
+  if (!date) { toast('請選擇日期', 'error'); return; }
+
+  const num = id => {
+    const v = document.getElementById(id).value;
+    return v === '' ? undefined : parseFloat(v);
+  };
+
+  const asset_groups = {};
+  for (const g of _histEditGroups) {
+    const name = (g.name || '').trim();
+    if (!name) continue;
+    asset_groups[name] = parseFloat(g.value) || 0;
+  }
+
+  const body = {
+    date,
+    net_worth: num('he-nw') ?? 0,
+    total_assets: num('he-ta') ?? 0,
+    total_liabilities: num('he-tl') ?? 0,
+    asset_groups,
+    taiex: num('he-taiex'),
+    otc: num('he-otc'),
+    dji: num('he-dji'),
+    nasdaq: num('he-nasdaq'),
+    sox: num('he-sox'),
+  };
+  // Drop undefined index fields instead of writing them as null
+  Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+  try {
+    await api('/api/snapshot', { method: 'POST', body: JSON.stringify(body) });
+    await loadHistory();
+    closeModal();
+    renderDataEditorPage();
+    toast('✅ 已儲存');
+  } catch (e) {
+    toast('儲存失敗：' + e.message, 'error');
+  }
+}
+
+async function deleteHistoryEntry(date) {
+  if (!confirm(`刪除 ${date} 的快照紀錄？此操作無法復原（可用「回溯」還原）。`)) return;
+  try {
+    await api('/api/history/' + date, { method: 'DELETE' });
+    await loadHistory();
+    renderDataEditorPage();
+    toast('✅ 已刪除');
+  } catch (e) {
+    toast('刪除失敗：' + e.message, 'error');
+  }
 }
 
 // ══ Settings Modal ═════════════════════════════════════════════════════
@@ -4619,19 +4907,40 @@ function _fmtIndPrice(price, currency) {
 async function renderIndustryMap(force = false) {
   const body = document.getElementById('industry-body');
   if (!body) return;
-  body.innerHTML = '<div class="empty-state">⏳ 載入中…</div>';
+  if (!_indData) body.innerHTML = '<div class="empty-state">⏳ 載入中…</div>';
   try {
     _indData = await api(`/api/industry-map${force ? '?force=true' : ''}`);
     _renderIndGroups();
     const sub = document.getElementById('industry-sub');
     if (sub && _indData.updated_at) {
       const d = new Date(_indData.updated_at);
-      sub.textContent = `更新於 ${d.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'})}`;
+      const staleTag = _indData.stale ? ' ⟳' : '';
+      sub.textContent = `更新於 ${d.toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'})}${staleTag}`;
     }
+    // Stale-while-revalidate: backend is refreshing in background; re-fetch after 5s
+    if (_indData.stale) setTimeout(_bgRefreshIndPrices, 5000);
   } catch(e) {
     body.innerHTML = `<div class="empty-state">載入失敗：${e.message}</div>`;
   }
 }
+
+// ── Auto-refresh while the page stays open (server-side cache makes this cheap) ──
+let _indAutoRefreshTimer = null;
+
+function _startIndustryAutoRefresh() {
+  if (_indAutoRefreshTimer) return;
+  _indAutoRefreshTimer = setInterval(() => {
+    if (!document.hidden) renderIndustryMap(false);
+  }, 60000);
+}
+
+function _stopIndustryAutoRefresh() {
+  if (_indAutoRefreshTimer) { clearInterval(_indAutoRefreshTimer); _indAutoRefreshTimer = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentPage() === 'industry') renderIndustryMap(false);
+});
 
 function _renderIndGroups() {
   const body = document.getElementById('industry-body');
@@ -4714,6 +5023,217 @@ function _bgRefreshIndPrices() {
     .then(r => r.json())
     .then(data => { _indData = data; _renderIndGroups(); })
     .catch(() => {});
+}
+
+// ══ 季線選股 ═══════════════════════════════════════════════════════════
+const _STOCK_ZONE_META = {
+  strong: { label: '強勢區', hint: '現價 > 季線 +5%',    color: '#f87171' },
+  season: { label: '季線區', hint: '季線 ±5% 內',        color: '#a7b0c8' },
+  repair: { label: '修復區', hint: '季線 -5% ~ -10%',    color: '#34d399' },
+};
+
+let _stockZonesData = null;
+const _szFilter = { q: '', market: 'all', sortKey: 'pct', sortDir: 'desc', maxAbsPct: '', ma5: 'all', chg: 'all' };
+const _SZ_SORT_COLS = [
+  { key: 'code',    label: '代號' },
+  { key: 'name',    label: '名稱' },
+  { key: 'market',  label: '市場' },
+  { key: 'price',   label: '現價' },
+  { key: 'chg_pct', label: '今日漲幅%' },
+  { key: 'ma',      label: '季線' },
+  { key: 'pct',     label: '季線乖離%' },
+  { key: 'above_ma5', label: '>5日均' },
+];
+
+async function renderStockZonesPage(force = false) {
+  const body = document.getElementById('stock-zones-body');
+  if (!body) return;
+  if (!_stockZonesData) {
+    body.innerHTML = '<div class="empty-state">⏳ 載入中…首次建立需回補約 65 個交易日的全市場收盤價，可能需要 1-2 分鐘</div>';
+  }
+  try {
+    _stockZonesData = await api(`/api/stock-zones${force ? '?force=true' : ''}`);
+    _renderStockZonesSummary();
+    _renderStockZonesFilterBar();
+    _renderStockZones();
+    const sub = document.getElementById('stock-zones-sub');
+    if (sub) {
+      const asOf = _stockZonesData.as_of;
+      const dateStr = asOf ? `${asOf.slice(0, 4)}/${asOf.slice(4, 6)}/${asOf.slice(6, 8)}` : '—';
+      const staleTag = _stockZonesData.stale ? ' ⟳ 更新中…' : '';
+      sub.textContent = `全市場個股（不含ETF）現價 vs 60日均線（季線）分區 · 資料日期 ${dateStr}${staleTag}`;
+    }
+    if (_stockZonesData.stale) setTimeout(() => renderStockZonesPage(false), 8000);
+  } catch (e) {
+    body.innerHTML = `<div class="empty-state">載入失敗：${e.message}</div>`;
+  }
+}
+
+function _renderStockZonesSummary() {
+  const el = document.getElementById('stock-zones-summary');
+  if (!el || !_stockZonesData) return;
+  const zones = _stockZonesData.zones || {};
+  const all = [...(zones.strong || []), ...(zones.season || []), ...(zones.repair || [])];
+  const total = all.length;
+  const up = all.filter(s => s.chg_pct > 0).length;
+  const down = all.filter(s => s.chg_pct < 0).length;
+  const aboveMa5 = all.filter(s => s.above_ma5 === true).length;
+  const pct = n => total ? (n / total * 100).toFixed(0) + '%' : '—';
+
+  el.innerHTML = `
+    <div class="inv-stat">
+      <div class="inv-stat-label">分類總檔數</div>
+      <div class="inv-stat-value">${total}</div>
+    </div>
+    <div class="inv-stat">
+      <div class="inv-stat-label">${_STOCK_ZONE_META.strong.label}</div>
+      <div class="inv-stat-value" style="color:${_STOCK_ZONE_META.strong.color}">${zones.strong?.length || 0} <span class="small muted">(${pct(zones.strong?.length || 0)})</span></div>
+    </div>
+    <div class="inv-stat">
+      <div class="inv-stat-label">${_STOCK_ZONE_META.season.label}</div>
+      <div class="inv-stat-value">${zones.season?.length || 0} <span class="small muted">(${pct(zones.season?.length || 0)})</span></div>
+    </div>
+    <div class="inv-stat">
+      <div class="inv-stat-label">${_STOCK_ZONE_META.repair.label}</div>
+      <div class="inv-stat-value" style="color:${_STOCK_ZONE_META.repair.color}">${zones.repair?.length || 0} <span class="small muted">(${pct(zones.repair?.length || 0)})</span></div>
+    </div>
+    <div class="inv-stat">
+      <div class="inv-stat-label">今日漲/跌家數</div>
+      <div class="inv-stat-value"><span style="color:var(--green)">${up}</span> / <span style="color:var(--red-2)">${down}</span></div>
+    </div>
+    <div class="inv-stat">
+      <div class="inv-stat-label">站上5日均</div>
+      <div class="inv-stat-value">${aboveMa5} <span class="small muted">(${pct(aboveMa5)})</span></div>
+    </div>
+  `;
+}
+
+function _szHasActiveFilter() {
+  return !!_szFilter.q || _szFilter.market !== 'all' || !!_szFilter.maxAbsPct
+    || _szFilter.ma5 !== 'all' || _szFilter.chg !== 'all';
+}
+
+function _szClearFilters() {
+  Object.assign(_szFilter, { q: '', market: 'all', maxAbsPct: '', ma5: 'all', chg: 'all' });
+  _renderStockZonesFilterBar();
+  _renderStockZones();
+}
+
+function _renderStockZonesFilterBar() {
+  const el = document.getElementById('stock-zones-filter');
+  if (!el || !_stockZonesData) return;
+  el.style.display = 'flex';
+  const focusedId = document.activeElement?.id?.startsWith('sz-') ? document.activeElement.id : null;
+  const selStart = document.activeElement?.selectionStart;
+
+  const toggleGroup = (field, opts) => opts.map(([val, label]) => {
+    const on = _szFilter[field] === val;
+    return `<button class="btn-ghost" style="padding:4px 10px;font-size:11px${on ? ';background:rgba(99,102,241,.2);color:var(--primary-2);border-color:var(--primary)' : ''}"
+      onclick="_szFilter.${field}='${val}'; _renderStockZonesFilterBar(); _renderStockZones();">${label}</button>`;
+  }).join('');
+
+  el.innerHTML = `
+    <input id="sz-search" type="text" placeholder="搜尋代號或名稱" value="${escapeAttr(_szFilter.q)}"
+      oninput="_szFilter.q = this.value; _renderStockZonesFilterBar(); _renderStockZones();"
+      style="flex:1;min-width:120px;padding:6px 10px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none" />
+    <div style="display:flex;gap:5px">${toggleGroup('market', [['all','全部'],['tse','上市'],['otc','上櫃']])}</div>
+    <div style="width:1px;height:18px;background:var(--border)"></div>
+    <span style="font-size:11px;color:var(--muted)">季線乖離率≤</span>
+    <input id="sz-max-pct" type="number" min="0" step="0.5" placeholder="不限" value="${escapeAttr(_szFilter.maxAbsPct)}"
+      oninput="_szFilter.maxAbsPct = this.value; _renderStockZonesFilterBar(); _renderStockZones();"
+      style="width:64px;padding:6px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none" />
+    <span style="font-size:11px;color:var(--muted)">%</span>
+    <div style="width:1px;height:18px;background:var(--border)"></div>
+    <span style="font-size:11px;color:var(--muted)">5日均</span>
+    <div style="display:flex;gap:5px">${toggleGroup('ma5', [['all','全部'],['above','站上'],['below','未站上']])}</div>
+    <div style="width:1px;height:18px;background:var(--border)"></div>
+    <span style="font-size:11px;color:var(--muted)">今日</span>
+    <div style="display:flex;gap:5px">${toggleGroup('chg', [['all','全部'],['up','上漲'],['down','下跌']])}</div>
+    ${_szHasActiveFilter() ? `<button class="btn-ghost" style="padding:4px 10px;font-size:11px" onclick="_szClearFilters()">✕ 清除篩選</button>` : ''}
+  `;
+  // Re-focus whichever input the user was mid-typing in
+  if (focusedId) {
+    const input = document.getElementById(focusedId);
+    if (input) {
+      input.focus();
+      if (selStart != null && input.setSelectionRange) input.setSelectionRange(selStart, selStart);
+    }
+  }
+}
+
+function _szSetSort(key) {
+  if (_szFilter.sortKey === key) {
+    _szFilter.sortDir = _szFilter.sortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    _szFilter.sortKey = key;
+    _szFilter.sortDir = (key === 'code' || key === 'name' || key === 'market') ? 'asc' : 'desc';
+  }
+  _renderStockZones();
+}
+
+function _szFilterSort(list) {
+  let out = list;
+  if (_szFilter.market !== 'all') out = out.filter(s => s.market === _szFilter.market);
+  const q = _szFilter.q.trim().toUpperCase();
+  if (q) out = out.filter(s => s.code.toUpperCase().includes(q) || (s.name || '').toUpperCase().includes(q));
+  const maxAbs = parseFloat(_szFilter.maxAbsPct);
+  if (!isNaN(maxAbs) && maxAbs >= 0) out = out.filter(s => Math.abs(s.pct) <= maxAbs);
+  if (_szFilter.ma5 === 'above') out = out.filter(s => s.above_ma5 === true);
+  else if (_szFilter.ma5 === 'below') out = out.filter(s => s.above_ma5 === false);
+  if (_szFilter.chg === 'up') out = out.filter(s => s.chg_pct > 0);
+  else if (_szFilter.chg === 'down') out = out.filter(s => s.chg_pct < 0);
+  const { sortKey, sortDir } = _szFilter;
+  const dir = sortDir === 'asc' ? 1 : -1;
+  return [...out].sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'string') { av = av.toUpperCase(); bv = (bv || '').toUpperCase(); }
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
+}
+
+function _renderStockZones() {
+  const body = document.getElementById('stock-zones-body');
+  if (!body || !_stockZonesData) return;
+  const zones = _stockZonesData.zones || {};
+  const headHtml = '<tr>' + _SZ_SORT_COLS.map(c => {
+    const active = _szFilter.sortKey === c.key;
+    const arrow = active ? (_szFilter.sortDir === 'desc' ? ' ▼' : ' ▲') : '';
+    const cls = c.key === 'code' || c.key === 'name' ? '' : 'num';
+    return `<th class="${cls}" style="cursor:pointer${active ? ';color:var(--primary-2)' : ''}" onclick="_szSetSort('${c.key}')">${c.label}${arrow}</th>`;
+  }).join('') + '</tr>';
+
+  body.innerHTML = ['strong', 'season', 'repair'].map(key => {
+    const meta = _STOCK_ZONE_META[key];
+    const full = zones[key] || [];
+    const list = _szFilterSort(full);
+    const rows = list.map(s => `
+      <tr>
+        <td><span class="symbol-badge">${s.code}</span></td>
+        <td>${s.name}</td>
+        <td class="num">${s.market === 'otc' ? '櫃' : '市'}</td>
+        <td class="num">${fmtPrice(s.price)}</td>
+        <td class="num" style="color:${s.chg_pct == null ? 'var(--muted)' : s.chg_pct >= 0 ? 'var(--green)' : 'var(--red-2)'}">${s.chg_pct == null ? '—' : fmtPct(s.chg_pct)}</td>
+        <td class="num">${fmtPrice(s.ma)}</td>
+        <td class="num" style="color:${s.pct >= 0 ? 'var(--green)' : 'var(--red-2)'}">${fmtPct(s.pct)}</td>
+        <td class="num" title="5日均價 ${s.ma5 == null ? '—' : fmtPrice(s.ma5)}">${s.above_ma5 == null ? '—' : s.above_ma5 ? '✅' : '❌'}</td>
+      </tr>`).join('');
+    const countLabel = list.length === full.length ? `${full.length} 檔` : `${list.length} / ${full.length} 檔`;
+    return `
+      <div class="panel" style="margin-bottom:16px">
+        <div class="panel-head">
+          <h3 style="color:${meta.color}">${meta.label}</h3>
+          <span class="panel-sub">${meta.hint} · ${countLabel}</span>
+        </div>
+        <div class="table-wrap" style="max-height:420px;overflow-y:auto">
+          <table class="important-table">
+            <thead>${headHtml}</thead>
+            <tbody>${rows || `<tr><td colspan="${_SZ_SORT_COLS.length}" style="text-align:center;padding:16px">尚無符合條件的個股</td></tr>`}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 function openAddIndustryGroup() {

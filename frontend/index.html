@@ -56,12 +56,24 @@
         <button class="nav-item" data-page="industry">
           <span class="nav-ico">🗺️</span><span>產業地圖</span>
         </button>
+        <button class="nav-item" data-page="data-editor">
+          <span class="nav-ico">🛠️</span><span>資料管理</span>
+        </button>
+        <button class="nav-item" data-page="stock-zones">
+          <span class="nav-ico">🎯</span><span>季線選股</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
         <div class="datetime" id="datetime">—</div>
         <div class="last-save" id="last-save"></div>
         <button class="btn-action btn-save" onclick="saveSnapshot()">💾 儲存資料</button>
+        <button class="btn-action" id="btn-push-history"
+          onclick="pushHistoryToGist()"
+          title="把現在的 history.json 原封不動推到 Gist（手動改完 file 後用這個）"
+          style="display:none;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.25)">
+          ☁️ 歷史推雲端
+        </button>
         <button class="btn-action" onclick="openRestoreModal()"
           title="回復到指定日期的備份（14天內）"
           style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">
@@ -340,7 +352,13 @@
         <div class="panel">
           <div class="panel-head">
             <h3 id="inv-title">股票</h3>
-            <button class="btn-primary" onclick="openAddPosition()">＋ 新增部位</button>
+            <div style="display:flex;align-items:center;gap:14px">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none">
+                <input type="checkbox" id="inv-merge-toggle" onchange="toggleMergeSameSymbol(this.checked)" />
+                合併同標的
+              </label>
+              <button class="btn-primary" onclick="openAddPosition()">＋ 新增部位</button>
+            </div>
           </div>
           <div class="table-wrap">
             <table id="inv-table">
@@ -515,6 +533,70 @@
         </div>
       </section>
 
+      <!-- ══ 資料管理 ══ -->
+      <section class="page" id="page-data-editor">
+        <div class="page-header">
+          <div>
+            <h1>資料管理</h1>
+            <p class="page-sub">手動新增／修改／刪除 history.json 中的每日快照資料</p>
+          </div>
+          <div>
+            <button class="btn-primary" onclick="openHistoryEntryModal()">＋ 新增紀錄</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>快照清單</h3>
+            <span class="panel-sub" id="data-editor-count">—</span>
+          </div>
+          <div class="table-wrap">
+            <table class="important-table">
+              <thead>
+                <tr>
+                  <th>日期</th>
+                  <th>淨資產</th>
+                  <th>總資產</th>
+                  <th>總負債</th>
+                  <th>加權</th>
+                  <th>櫃買</th>
+                  <th>道瓊</th>
+                  <th>那斯達克</th>
+                  <th>費半</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="data-editor-tbody">
+                <tr><td colspan="10" style="text-align:center; padding:20px;">資料載入中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══ 季線選股 ══ -->
+      <section class="page" id="page-stock-zones">
+        <div class="page-header">
+          <div>
+            <h1>季線選股</h1>
+            <p class="page-sub" id="stock-zones-sub">全市場個股（不含ETF）現價 vs 60日均線（季線）分區</p>
+          </div>
+          <div>
+            <button class="btn-ghost" onclick="renderStockZonesPage(true)" title="重新整理">🔄 更新</button>
+          </div>
+        </div>
+
+        <div class="inv-summary" id="stock-zones-summary"></div>
+
+        <div id="stock-zones-filter" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;
+              margin-bottom:12px;padding:8px 14px;background:var(--panel-bg,var(--surface));
+              border:1px solid var(--border);border-radius:10px"></div>
+
+        <div id="stock-zones-body">
+          <div class="empty-state">⏳ 載入中…首次建立需回補約 65 個交易日的全市場收盤價，可能需要 1-2 分鐘</div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -532,6 +614,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=78"></script>
+  <script src="/static/app.js?v=81"></script>
 </body>
 </html>

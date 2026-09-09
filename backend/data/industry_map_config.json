@@ -16,8 +16,13 @@
           "market": "TW"
         },
         {
-          "code": "6981",
-          "name": "村田製造",
+          "code": "3026",
+          "name": "禾伸堂",
+          "market": "TW"
+        },
+        {
+          "code": "6762",
+          "name": "TDK",
           "market": "JP"
         },
         {
@@ -26,8 +31,8 @@
           "market": "JP"
         },
         {
-          "code": "6762",
-          "name": "TDK",
+          "code": "6981",
+          "name": "村田製造",
           "market": "JP"
         },
         {
@@ -41,11 +46,6 @@
           "market": "US"
         },
         {
-          "code": "300408",
-          "name": "三環集團",
-          "market": "CN_SZ"
-        },
-        {
           "code": "000636",
           "name": "風華高科",
           "market": "CN_SZ"
@@ -56,9 +56,462 @@
           "market": "CN_SZ"
         },
         {
-          "code": "3026",
-          "name": "禾伸堂",
+          "code": "300408",
+          "name": "三環集團",
+          "market": "CN_SZ"
+        }
+      ]
+    },
+    {
+      "id": "1783791804883",
+      "name": "記憶體",
+      "icon": "💾",
+      "stocks": [
+        {
+          "code": "2337",
+          "name": "旺宏",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "2344",
+          "name": "華邦電",
           "market": "TW"
+        },
+        {
+          "code": "2408",
+          "name": "南亞科",
+          "market": "TW"
+        },
+        {
+          "code": "6770",
+          "name": "力積電",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "8299",
+          "name": "群聯",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "285A",
+          "name": "鎧俠",
+          "market": "JP"
+        },
+        {
+          "code": "000660",
+          "name": "SK海力士",
+          "market": "KR"
+        },
+        {
+          "code": "005930",
+          "name": "三星電子",
+          "market": "KR"
+        },
+        {
+          "code": "MU",
+          "name": "美光",
+          "market": "US"
+        },
+        {
+          "code": "SNDK",
+          "name": "SanDisk",
+          "market": "US"
+        },
+        {
+          "code": "STX",
+          "name": "希捷科技",
+          "market": "US"
+        },
+        {
+          "code": "WDC",
+          "name": "威騰電子",
+          "market": "US"
+        }
+      ]
+    },
+    {
+      "id": "1783794971417",
+      "name": "矽晶圓",
+      "icon": "⚪",
+      "stocks": [
+        {
+          "code": "3532",
+          "name": "台勝科",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "5483",
+          "name": "中美晶",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6182",
+          "name": "合晶",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6488",
+          "name": "環球晶",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3436",
+          "name": "勝高",
+          "market": "JP"
+        },
+        {
+          "code": "3445",
+          "name": "RS",
+          "market": "JP"
+        },
+        {
+          "code": "4063",
+          "name": "信越化學",
+          "market": "JP"
+        },
+        {
+          "code": "6890",
+          "name": "菲洛泰克",
+          "market": "JP"
+        },
+        {
+          "code": "WAF",
+          "name": "世創電子",
+          "market": "DE"
+        },
+        {
+          "code": "SOI",
+          "name": "蘇伊泰克",
+          "market": "PA"
+        }
+      ]
+    },
+    {
+      "id": "1783795683639",
+      "name": "銅箔基板",
+      "icon": "🏻",
+      "stocks": [
+        {
+          "code": "1303",
+          "name": "南亞",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "2383",
+          "name": "台光電",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6213",
+          "name": "聯茂",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6274",
+          "name": "台燿",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6752",
+          "name": "國際松下",
+          "market": "JP"
+        },
+        {
+          "code": "1888",
+          "name": "建滔積層板",
+          "market": "HK"
+        },
+        {
+          "code": "600183",
+          "name": "生益科技",
+          "market": "CN_SS"
+        }
+      ]
+    },
+    {
+      "id": "1783796017493",
+      "name": "玻纖布",
+      "icon": "🧵",
+      "stocks": [
+        {
+          "code": "1802",
+          "name": "台玻",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "1815",
+          "name": "富喬",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "5340",
+          "name": "建榮",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "5475",
+          "name": "德宏",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3110",
+          "name": "日東紡",
+          "market": "JP"
+        },
+        {
+          "code": "3407",
+          "name": "旭化成",
+          "market": "JP"
+        },
+        {
+          "code": "OC",
+          "name": "歐文斯科寧",
+          "market": "US"
+        },
+        {
+          "code": "600176",
+          "name": "中國巨石",
+          "market": "CN_SS"
+        }
+      ]
+    },
+    {
+      "id": "1783796705059",
+      "name": "光通訊",
+      "icon": "✨",
+      "stocks": [
+        {
+          "code": "3081",
+          "name": "聯亞",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3163",
+          "name": "波若威",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3363",
+          "name": "上詮",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "4979",
+          "name": "華星光",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6442",
+          "name": "光聖",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "AAOI",
+          "name": "Applied Optoelectronics",
+          "market": "US"
+        },
+        {
+          "code": "COHR",
+          "name": "Coherent",
+          "market": "US"
+        },
+        {
+          "code": "FN",
+          "name": "Fabrinet",
+          "market": "US"
+        },
+        {
+          "code": "LITE",
+          "name": "Lumentum",
+          "market": "US"
+        },
+        {
+          "code": "300308",
+          "name": "中際旭創",
+          "market": "CN_SZ"
+        }
+      ]
+    },
+    {
+      "id": "1783797045334",
+      "name": "半導體設備",
+      "icon": "🧑‍",
+      "stocks": [
+        {
+          "code": "3583",
+          "name": "辛耘",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3680",
+          "name": "家登",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "5443",
+          "name": "均豪",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6196",
+          "name": "帆宣",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "8035",
+          "name": "東京威力",
+          "market": "JP"
+        },
+        {
+          "code": "AMAT",
+          "name": "應用材料",
+          "market": "US"
+        },
+        {
+          "code": "ASML",
+          "name": "艾司摩爾",
+          "market": "US"
+        },
+        {
+          "code": "KLAC",
+          "name": "科磊",
+          "market": "US"
+        },
+        {
+          "code": "LRCX",
+          "name": "科林研發",
+          "market": "US"
+        }
+      ]
+    },
+    {
+      "id": "1783797283096",
+      "name": "人工智慧",
+      "icon": "🧠",
+      "stocks": [
+        {
+          "code": "AMD",
+          "name": "超微半導體",
+          "market": "US"
+        },
+        {
+          "code": "AMZN",
+          "name": "亞馬遜",
+          "market": "US"
+        },
+        {
+          "code": "AVGO",
+          "name": "博通",
+          "market": "US"
+        },
+        {
+          "code": "GOOGL",
+          "name": "GOOGLE",
+          "market": "US"
+        },
+        {
+          "code": "META",
+          "name": "META",
+          "market": "US"
+        },
+        {
+          "code": "MSFT",
+          "name": "微軟",
+          "market": "US"
+        },
+        {
+          "code": "NVDA",
+          "name": "輝達",
+          "market": "US"
+        },
+        {
+          "code": "TSM",
+          "name": "台積電",
+          "market": "US"
+        }
+      ]
+    },
+    {
+      "id": "1783855759217",
+      "name": "PCB載板",
+      "icon": "🇴",
+      "stocks": [
+        {
+          "code": "3037",
+          "name": "欣興",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3189",
+          "name": "景碩",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3715",
+          "name": "定穎投控",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "4958",
+          "name": "臻鼎KY",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "8046",
+          "name": "南電",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "2802",
+          "name": "味之素",
+          "market": "JP"
+        },
+        {
+          "code": "353200",
+          "name": "大德電子",
+          "market": "KR"
+        },
+        {
+          "code": "300476",
+          "name": "勝宏",
+          "market": "CN_SZ"
+        }
+      ]
+    },
+    {
+      "id": "1783859462281",
+      "name": "石英元件",
+      "icon": "🛡️",
+      "stocks": [
+        {
+          "code": "2484",
+          "name": "希華",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "3042",
+          "name": "晶技",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "8182",
+          "name": "加高",
+          "market": "TW_AUTO"
+        },
+        {
+          "code": "6724",
+          "name": "愛普生",
+          "market": "JP"
+        },
+        {
+          "code": "6779",
+          "name": "電波工業",
+          "market": "JP"
+        },
+        {
+          "code": "6962",
+          "name": "大真空",
+          "market": "JP"
         }
       ]
     }
