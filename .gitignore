@@ -19,3 +19,5 @@ backend/data/test_sync.json
 backend/debug_out.txt
 backend/fsc_tmp.xlsx
 backend/*.py.bak
+backend/uvicorn.log
+*portfolio_data.txt
