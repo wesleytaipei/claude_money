@@ -950,3 +950,52 @@ def scrape_important_info(force=False):
     _info_cache["ts"] = now
     _info_cache["data"] = data
     return data
+
+
+_ISIN_CODE_RE = re.compile(r'^[1-9]\d{3}$')
+
+
+def fetch_industry_classification() -> dict:
+    """全市場(上市+上櫃)個股產業分類，來源 TWSE ISIN 一覽表
+    (strMode=2 上市 / strMode=4 上櫃) — 官方公告的「產業別」文字，非自建對照表。
+    Returns {code: {"name": str, "industry": str, "market": "tse"|"otc"}}."""
+    out: dict = {}
+    for mode, market in ((2, "tse"), (4, "otc")):
+        try:
+            r = requests.get(
+                f"https://isin.twse.com.tw/isin/C_public.jsp?strMode={mode}",
+                headers=HEADERS, timeout=20, verify=False)
+            text = None
+            for enc in ("big5", "cp950", "utf-8-sig", "utf-8"):
+                try:
+                    text = r.content.decode(enc)
+                    break
+                except (UnicodeDecodeError, LookupError):
+                    continue
+            if not text:
+                continue
+            soup = BeautifulSoup(text, "html.parser")
+            table = soup.find("table", attrs={"class": "h4"})
+            if not table:
+                continue
+            section = ""
+            for tr in table.find_all("tr"):
+                tds = tr.find_all("td")
+                if len(tds) == 1 and tds[0].get("colspan"):
+                    section = tds[0].get_text(strip=True)
+                    continue
+                if len(tds) != 7 or section != "股票":
+                    continue
+                m = re.match(r'^(\d{4,6})\s*(.+)$', tds[0].get_text(strip=True))
+                if not m:
+                    continue
+                code, name = m.group(1), m.group(2).strip()
+                if not _ISIN_CODE_RE.match(code):
+                    continue
+                industry = tds[4].get_text(strip=True)
+                if not industry:
+                    continue
+                out[code] = {"name": name, "industry": industry, "market": market}
+        except Exception as e:
+            print(f"[industry-class] {market} error: {e}")
+    return out

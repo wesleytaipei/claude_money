@@ -6,8 +6,8 @@
   <title>HC 財務管理</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=63" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=67" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
@@ -15,17 +15,93 @@
   <div id="app">
     <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
-    <!-- ── SIDEBAR ──────────────────────────────────────────── -->
-    <aside class="sidebar">
-      <div class="sidebar-brand">
-        <div class="brand-icon">💎</div>
-        <div>
+    <!-- ── TOP NAVBAR ────────────────────────────────────────── -->
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <div class="top-brand">
           <div class="brand-title">HC Finance</div>
-          <div class="brand-sub">Wesley Chen</div>
+        </div>
+
+        <div class="nav-scroll-wrap">
+          <button class="nav-arrow nav-arrow-left" id="nav-arrow-left" onclick="scrollTopNav(-200)" aria-label="向左滾動">‹</button>
+          <nav class="nav-menu" id="top-nav-menu">
+            <button class="nav-item active" data-page="dashboard">
+              <span class="nav-ico">📊</span><span>資產總覽</span>
+            </button>
+            <button class="nav-item" data-page="assets">
+              <span class="nav-ico">💼</span><span>資產與負債</span>
+            </button>
+            <button class="nav-item" data-page="investments">
+              <span class="nav-ico">📈</span><span>投資部位</span>
+            </button>
+            <button class="nav-item" data-page="growth">
+              <span class="nav-ico">📊</span><span>資產成長圖</span>
+            </button>
+            <button class="nav-item" data-page="history" style="display:none">
+              <span class="nav-ico">📅</span><span>歷史紀錄</span>
+            </button>
+            <button class="nav-item" data-page="important">
+              <span class="nav-ico">📣</span><span>重要資訊</span>
+            </button>
+            <button class="nav-item" data-page="etf">
+              <span class="nav-ico">🔍</span><span>ETF追蹤</span>
+            </button>
+            <button class="nav-item" data-page="ranking">
+              <span class="nav-ico">🏆</span><span>成交值排行</span>
+            </button>
+            <button class="nav-item" data-page="cb-be">
+              <span class="nav-ico">📉</span><span>CB餘額對照</span>
+            </button>
+            <button class="nav-item" data-page="industry">
+              <span class="nav-ico">🗺️</span><span>產業地圖</span>
+            </button>
+            <button class="nav-item" data-page="data-editor">
+              <span class="nav-ico">🛠️</span><span>資料管理</span>
+            </button>
+            <button class="nav-item" data-page="stock-zones">
+              <span class="nav-ico">🎯</span><span>季線選股</span>
+            </button>
+            <button class="nav-item" data-page="market-heatmap">
+              <span class="nav-ico">🔥</span><span>全市場熱力</span>
+            </button>
+            <button class="nav-item" data-page="global-heatmap">
+              <span class="nav-ico">🌍</span><span>全球熱力</span>
+            </button>
+          </nav>
+          <button class="nav-arrow nav-arrow-right" id="nav-arrow-right" onclick="scrollTopNav(200)" aria-label="向右滾動">›</button>
+        </div>
+
+        <div class="top-nav-actions">
+          <div class="datetime" id="datetime">—</div>
+          <div class="last-save" id="last-save"></div>
+          <button class="btn-action btn-save" onclick="saveSnapshot()" title="儲存資料">💾 儲存</button>
+          <button class="btn-action btn-refresh" onclick="refreshAll()" title="更新數據">
+            <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新</span>
+          </button>
+          <button class="btn-action" id="btn-sync-gist"
+            onclick="syncFromGist(false)"
+            oncontextmenu="event.preventDefault(); if(confirm('強制用雲端資料覆蓋本地？')) syncFromGist(true)"
+            title="點擊：智慧同步&#10;右鍵：強制覆蓋"
+            style="background:rgba(214,177,94,.12);color:var(--primary-2);border:1px solid rgba(214,177,94,.25)">
+            ☁️ 同步
+          </button>
+          <button class="btn-action" onclick="openRestoreModal()"
+            title="回復到指定日期的備份（14天內）"
+            style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">
+            ⏪ 回溯
+          </button>
+          <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="選單">☰</button>
         </div>
       </div>
+    </header>
 
-      <nav class="nav-menu">
+    <!-- ── MOBILE SLIDE-OUT DRAWER ───────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-title">HC Finance</div>
+      </div>
+
+      <nav class="nav-menu mobile-nav-menu">
         <button class="nav-item active" data-page="dashboard">
           <span class="nav-ico">📊</span><span>資產總覽</span>
         </button>
@@ -62,32 +138,26 @@
         <button class="nav-item" data-page="stock-zones">
           <span class="nav-ico">🎯</span><span>季線選股</span>
         </button>
+        <button class="nav-item" data-page="market-heatmap">
+          <span class="nav-ico">🔥</span><span>全市場熱力</span>
+        </button>
+        <button class="nav-item" data-page="global-heatmap">
+          <span class="nav-ico">🌍</span><span>全球熱力</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
-        <div class="datetime" id="datetime">—</div>
-        <div class="last-save" id="last-save"></div>
         <button class="btn-action btn-save" onclick="saveSnapshot()">💾 儲存資料</button>
-        <button class="btn-action" id="btn-push-history"
-          onclick="pushHistoryToGist()"
-          title="把現在的 history.json 原封不動推到 Gist（手動改完 file 後用這個）"
-          style="display:none;background:rgba(99,102,241,.12);color:#818cf8;border:1px solid rgba(99,102,241,.25)">
-          ☁️ 歷史推雲端
+        <button class="btn-action btn-refresh" onclick="refreshAll()">
+          <span id="refresh-ico-mobile">🔄</span> <span>更新數據</span>
+        </button>
+        <button class="btn-action" onclick="syncFromGist(false)"
+          style="background:rgba(214,177,94,.12);color:var(--primary-2);border:1px solid rgba(214,177,94,.25)">
+          ☁️ 從雲端同步
         </button>
         <button class="btn-action" onclick="openRestoreModal()"
-          title="回復到指定日期的備份（14天內）"
           style="background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)">
           ⏪ 回溯
-        </button>
-        <button class="btn-action btn-refresh" onclick="refreshAll()">
-          <span id="refresh-ico">🔄</span> <span id="refresh-txt">更新數據</span>
-        </button>
-        <button class="btn-action" id="btn-sync-gist"
-          onclick="syncFromGist(false)"
-          oncontextmenu="event.preventDefault(); if(confirm('強制用雲端資料覆蓋本地？')) syncFromGist(true)"
-          title="點擊：智慧同步（較新的版本優先）&#10;右鍵：強制用雲端覆蓋本地"
-          style="background:rgba(99,102,241,.15);color:var(--primary-2);border:1px solid rgba(99,102,241,.3)">
-          ☁️ 從雲端同步
         </button>
       </div>
     </aside>
@@ -95,7 +165,7 @@
     <!-- ── MAIN CONTENT ─────────────────────────────────────── -->
     <main class="main-content">
 
-      <!-- ── MOBILE HEADER ─────────────────────────────────── -->
+      <!-- ── MOBILE HEADER (Simplified on small screens) ──────── -->
       <div class="mobile-header" id="mobile-header">
         <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="選單">☰</button>
         <span class="mobile-title" id="mobile-page-title">資產總覽</span>
@@ -345,11 +415,12 @@
           <button class="inv-tab active" data-inv="stock">🇹🇼 股票</button>
           <button class="inv-tab" data-inv="cb">💠 可轉債</button>
           <button class="inv-tab" data-inv="us">🇺🇸 美股</button>
+          <button class="inv-tab" data-inv="health">🩺 持股健檢</button>
         </div>
 
         <div class="inv-summary" id="inv-summary"></div>
 
-        <div class="panel">
+        <div class="panel" id="inv-table-panel">
           <div class="panel-head">
             <h3 id="inv-title">股票</h3>
             <div style="display:flex;align-items:center;gap:14px">
@@ -366,6 +437,17 @@
               <tbody id="inv-tbody"></tbody>
             </table>
           </div>
+        </div>
+
+        <div class="panel" id="inv-health-panel" style="display:none">
+          <div class="panel-head">
+            <h3>持股健檢</h3>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="panel-sub" id="inv-health-sub"></span>
+              <button class="btn-ghost" onclick="renderHoldingsHealth(true)" title="強制重新整理">🔄</button>
+            </div>
+          </div>
+          <div id="inv-health-body"></div>
         </div>
       </section>
 
@@ -597,6 +679,38 @@
         </div>
       </section>
 
+      <!-- ══ 全市場熱力 ══ -->
+      <section class="page" id="page-market-heatmap">
+        <div class="page-header">
+          <div>
+            <h1>全市場熱力</h1>
+            <p class="page-sub" id="market-heatmap-sub">全台股個股熱力圖，依產業分類，色塊大小依成交值</p>
+          </div>
+          <div>
+            <button class="btn-ghost" onclick="renderMarketHeatmap(true)" title="重新整理">🔄 更新</button>
+          </div>
+        </div>
+        <div id="market-heatmap-body" class="heat-canvas">
+          <div class="empty-state">⏳ 載入中…</div>
+        </div>
+      </section>
+
+      <!-- ══ 全球熱力 ══ -->
+      <section class="page" id="page-global-heatmap">
+        <div class="page-header">
+          <div>
+            <h1>全球熱力</h1>
+            <p class="page-sub" id="global-heatmap-sub">全球指數期貨 · 能源 · 金屬 · 農產品 · 外匯 · 債券熱力圖</p>
+          </div>
+          <div>
+            <button class="btn-ghost" onclick="renderGlobalHeatmap(true)" title="重新整理">🔄 更新</button>
+          </div>
+        </div>
+        <div id="global-heatmap-body" class="heat-canvas">
+          <div class="empty-state">⏳ 載入中…</div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -614,6 +728,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=81"></script>
+  <script type="module" src="/static/js/main.js?v=1"></script>
 </body>
 </html>

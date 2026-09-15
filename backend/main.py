@@ -31,6 +31,7 @@ _TW_VERIFY = os.getenv("TW_VERIFY", "false").lower() == "true"
 if not _TW_VERIFY:
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -38,7 +39,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty, ratio_history_pop_dirty
+from info_scraper import scrape_important_info, fetch_chip_data, chip_cache_pop_dirty, ratio_history_pop_dirty, fetch_industry_classification
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("hc_finance")
@@ -50,6 +51,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
@@ -3509,6 +3511,290 @@ _scheduler.add_job(
 logger.info("[scheduler] stock-ma zone update @ 15:10")
 
 
+# ── 持股健檢：MA5/10/20/60、大戶籌碼、外資/投信買賣超 ─────────────────────────
+_MA_WINDOWS = (5, 10, 20, 60)
+INSTI_FLOW_LASTGOOD = "institutional_flow_lastgood.json"
+_INSTI_FLOW_KEEP_DAYS = 10
+_insti_flow_cache: dict[str, dict] = {}   # date(YYYYMMDD) -> {"tse":{code:{...}}, "tpex":{code:{...}}}
+
+
+def _get_ma_status(codes: list[str]) -> dict[str, dict | None]:
+    """5/10/20/60日均線 站上/站下 + 現價 + 今日漲跌%，取自 stock_ma_history（全市場每日收盤快取）。"""
+    data = _load_stock_ma_history()
+    if not data.get("dates"):
+        data = _build_stock_ma_history()
+    else:
+        data = _stock_ma_try_append_today(data)
+    stocks = data.get("stocks", {})
+
+    out: dict[str, dict | None] = {}
+    for code in codes:
+        info = stocks.get(code)
+        closes_all = [c for c in (info["closes"] if info else []) if c is not None]
+        if not closes_all:
+            out[code] = None
+            continue
+        price = closes_all[-1]
+        entry: dict = {"name": info["name"], "market": info["market"], "price": price}
+        for w in _MA_WINDOWS:
+            window = closes_all[-w:]
+            if len(window) < w:
+                entry[f"ma{w}"] = None
+                entry[f"above_ma{w}"] = None
+            else:
+                ma = round(sum(window) / w, 2)
+                entry[f"ma{w}"] = ma
+                entry[f"above_ma{w}"] = price > ma
+        entry["chg_pct"] = (
+            round((closes_all[-1] - closes_all[-2]) / closes_all[-2] * 100, 2)
+            if len(closes_all) >= 2 and closes_all[-2] else None
+        )
+        out[code] = entry
+    return out
+
+
+def _fetch_twse_t86(date_str: str) -> dict[str, dict]:
+    """單一上市交易日 三大法人買賣超（股數）。{code: {foreign, trust, total}}"""
+    out: dict[str, dict] = {}
+    try:
+        r = http_requests.get(
+            f"https://www.twse.com.tw/rwd/zh/fund/T86?date={date_str}&selectType=ALL&response=json",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY)
+        d = json.loads(r.content.decode("utf-8"))
+        if d.get("stat") != "OK":
+            return out
+
+        def _i(s):
+            try:
+                return int(str(s).replace(",", ""))
+            except Exception:
+                return 0
+
+        for row in d.get("data") or []:
+            code = str(row[0]).strip()
+            if not _STOCK_CODE_RE.match(code) or len(row) < 19:
+                continue
+            out[code] = {"foreign": _i(row[4]) + _i(row[7]), "trust": _i(row[10]), "total": _i(row[18])}
+    except Exception as e:
+        logger.warning(f"[insti-flow] TWSE {date_str}: {e}")
+    return out
+
+
+def _fetch_tpex_insti_day(date_str: str) -> dict[str, dict]:
+    """單一上櫃交易日 三大法人買賣超（股數）。{code: {foreign, trust, total}}"""
+    out: dict[str, dict] = {}
+    try:
+        greg = f"{date_str[:4]}/{date_str[4:6]}/{date_str[6:8]}"
+        r = http_requests.get(
+            f"https://www.tpex.org.tw/www/zh-tw/insti/dailyTrade?type=Daily&sect=EW&date={greg}&id=&response=json",
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=20, verify=_TW_VERIFY)
+        d = r.json()
+
+        def _i(s):
+            try:
+                return int(str(s).replace(",", ""))
+            except Exception:
+                return 0
+
+        for t in d.get("tables") or []:
+            for row in t.get("data") or []:
+                if len(row) < 24:
+                    continue
+                code = str(row[0]).strip()
+                if not _STOCK_CODE_RE.match(code):
+                    continue
+                out[code] = {"foreign": _i(row[10]), "trust": _i(row[13]), "total": _i(row[23])}
+    except Exception as e:
+        logger.warning(f"[insti-flow] TPEX {date_str}: {e}")
+    return out
+
+
+def _get_insti_flow_day(date_str: str, lg_days: dict) -> tuple[dict, str | None]:
+    """一個交易日的三大法人資料。TWSE 部分在 Railway 被擋，沒抓到就查 last-good relay
+    (lg_days，呼叫端傳入、批次持久化，避免每個日期各自寫一次 Gist)。
+    Returns (day_data, freshly_fetched_tse_or_None)."""
+    tse = _fetch_twse_t86(date_str)
+    fresh = tse or None
+    if not tse:
+        tse = lg_days.get(date_str, {})
+    tpex = _fetch_tpex_insti_day(date_str)
+    return {"tse": tse, "tpex": tpex}, fresh
+
+
+@app.get("/api/institutional-flow")
+def get_institutional_flow(symbols: str = "", days: int = 5):
+    """指定個股 近N個交易日 外資/投信 買賣超（張）。"""
+    codes = sorted({s.strip() for s in symbols.split(",") if s.strip()})
+    if not codes:
+        return {"dates": [], "stocks": {}}
+    days = max(1, min(days, 10))
+    today_str = datetime.now().strftime("%Y%m%d")
+    candidates = [today_str] + _trading_day_candidates(days + 4)
+    seen: set[str] = set()
+    ordered = []
+    for d in reversed(candidates):  # newest first, de-duped
+        if d not in seen:
+            seen.add(d)
+            ordered.append(d)
+
+    lg_days = (_load_lastgood(INSTI_FLOW_LASTGOOD) or {}).get("days", {})
+    newly_fetched: dict[str, dict] = {}
+    fetched_dates = []
+    for d in ordered:
+        if len(fetched_dates) >= days:
+            break
+        if d not in _insti_flow_cache:
+            day_data, fresh_tse = _get_insti_flow_day(d, lg_days)
+            if not day_data["tse"] and not day_data["tpex"]:
+                continue  # holiday, or today not published yet — skip, don't cache
+            if fresh_tse:
+                newly_fetched[d] = fresh_tse
+            _insti_flow_cache[d] = day_data
+        fetched_dates.append(d)
+    fetched_dates.sort()
+
+    if newly_fetched:
+        lg_days = {**lg_days, **newly_fetched}
+        keep = sorted(lg_days.keys())[-_INSTI_FLOW_KEEP_DAYS:]
+        _save_lastgood(INSTI_FLOW_LASTGOOD, {"days": {k: lg_days[k] for k in keep}})
+
+    stocks = {}
+    for code in codes:
+        series = []
+        for d in fetched_dates:
+            day = _insti_flow_cache.get(d, {})
+            row = (day.get("tse") or {}).get(code) or (day.get("tpex") or {}).get(code)
+            series.append({
+                "date": d,
+                "foreign_lots": round(row["foreign"] / 1000, 1) if row else None,
+                "trust_lots": round(row["trust"] / 1000, 1) if row else None,
+            })
+        stocks[code] = {
+            "days": series,
+            "foreign_sum_lots": round(sum(s["foreign_lots"] for s in series if s["foreign_lots"] is not None), 1),
+            "trust_sum_lots": round(sum(s["trust_lots"] for s in series if s["trust_lots"] is not None), 1),
+        }
+    return {"dates": fetched_dates, "stocks": stocks}
+
+
+@app.get("/api/holdings-health")
+def get_holdings_health(symbols: str = ""):
+    """持股健檢：MA5/10/20/60 站上/站下、今日漲跌%、大戶籌碼、外資/投信買賣超(近5日)。"""
+    codes = sorted({s.strip() for s in symbols.split(",") if s.strip() and _STOCK_CODE_RE.match(s.strip())})
+    if not codes:
+        return {"stocks": {}, "flow_dates": []}
+
+    ma_map = _get_ma_status(codes)
+
+    # 現價/今日漲跌% 改用即時 MIS 報價覆蓋 (跟「TW股票」同一支 fetch_tw_prices_mis)，
+    # stock_ma_history 是每日收盤快取、盤中不更新，只拿來算均線本身，不能拿來當現價。
+    live_prices = fetch_tw_prices_mis(codes)
+    for c, entry in ma_map.items():
+        if not entry:
+            continue
+        live = live_prices.get(c) or {}
+        if live.get("price") is not None:
+            entry["price"] = live["price"]
+            for w in _MA_WINDOWS:
+                if entry.get(f"ma{w}") is not None:
+                    entry[f"above_ma{w}"] = live["price"] > entry[f"ma{w}"]
+        if live.get("change_pct") is not None:
+            entry["chg_pct"] = live["change_pct"]
+
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=min(len(codes), 8)) as ex:
+        chip_futs = {c: ex.submit(fetch_chip_data, c) for c in codes}
+    chip_map = {c: fut.result() for c, fut in chip_futs.items()}
+    if chip_cache_pop_dirty():
+        _gist_push_chip_cache()
+
+    flow = get_institutional_flow(symbols=",".join(codes), days=5)
+    flow_map = flow.get("stocks", {})
+
+    stocks = {c: {"ma": ma_map.get(c), "chip": chip_map.get(c), "flow": flow_map.get(c)} for c in codes}
+    return {"stocks": stocks, "flow_dates": flow.get("dates", [])}
+
+
+# ── 全球熱力圖：指數/期貨/外匯/債券 ─────────────────────────────────────────────
+GLOBAL_HEATMAP_GROUPS = [
+    {"key": "asia_idx", "label": "指數期貨(亞洲)", "items": [
+        ("台指期", "^TWII"), ("恆生", "^HSI"), ("日經", "^N225"), ("KOSPI", "^KS11"),
+        ("新加坡指數", "^STI"), ("中國H股", "^HSCE"), ("印尼指數", "^JKSE"),
+    ]},
+    {"key": "us_eu_idx", "label": "指數期貨(歐美)", "items": [
+        ("小道瓊", "YM=F"), ("小S&P500", "ES=F"), ("小那斯達克", "NQ=F"), ("小羅素", "RTY=F"),
+        ("德國DAX", "^GDAXI"), ("法國CAC40", "^FCHI"), ("英國FTSE100", "^FTSE"), ("瑞士SMI", "^SSMI"),
+        ("VIX", "^VIX"),
+    ]},
+    {"key": "energy", "label": "能源期貨", "items": [
+        ("輕原油", "CL=F"), ("布蘭特油", "BZ=F"), ("天然氣", "NG=F"),
+    ]},
+    {"key": "metal", "label": "金屬期貨", "items": [
+        ("黃金", "GC=F"), ("白銀", "SI=F"), ("白金", "PL=F"), ("高級銅", "HG=F"),
+    ]},
+    {"key": "agri", "label": "農產品期貨", "items": [
+        ("黃豆", "ZS=F"), ("小麥", "ZW=F"), ("玉米", "ZC=F"), ("黃豆油", "ZL=F"),
+    ]},
+    {"key": "fx", "label": "外匯期貨", "items": [
+        ("美元/台幣", "TWD=X"), ("日圓", "JPY=X"), ("歐元", "EURUSD=X"), ("英鎊", "GBPUSD=X"),
+        ("瑞郎", "CHF=X"), ("澳幣", "AUDUSD=X"), ("加幣", "CAD=X"), ("紐幣", "NZDUSD=X"), ("人民幣", "CNY=X"),
+    ]},
+    {"key": "bond", "label": "債券期貨", "items": [
+        ("2年美債", "ZT=F"), ("5年美債", "ZF=F"), ("10年美債", "ZN=F"), ("30年美債", "ZB=F"),
+    ]},
+]
+
+_global_heatmap_cache: dict = {"ts": 0.0, "data": None}
+_GLOBAL_HEATMAP_TTL = 180  # 3 min
+
+
+def _fetch_global_heatmap() -> dict:
+    all_syms = [sym for g in GLOBAL_HEATMAP_GROUPS for _, sym in g["items"]]
+    try:
+        tkrs = yf.Tickers(" ".join(all_syms))
+    except Exception as e:
+        logger.warning(f"[global-heatmap] Tickers() failed: {e}")
+        tkrs = None
+
+    def _quote(sym: str) -> dict | None:
+        if tkrs is None:
+            return None
+        try:
+            fi = tkrs.tickers[sym].fast_info
+            price = float(fi.last_price)
+            prev = float(fi.previous_close)
+            if not price or not prev:
+                return None
+            chg = price - prev
+            return {"price": price, "chg": round(chg, 4), "chg_pct": round(chg / prev * 100, 2)}
+        except Exception:
+            return None
+
+    groups = []
+    for g in GLOBAL_HEATMAP_GROUPS:
+        items = [
+            {"label": label, "symbol": sym, **(_quote(sym) or {"price": None, "chg": None, "chg_pct": None})}
+            for label, sym in g["items"]
+        ]
+        groups.append({"key": g["key"], "label": g["label"], "items": items})
+    return {"groups": groups, "updated_at": _now_iso()}
+
+
+@app.get("/api/global-heatmap")
+def get_global_heatmap(force: bool = False):
+    """全球指數期貨/能源/金屬/農產品/外匯/債券期貨熱力圖，yfinance 批次抓取，3分鐘快取。"""
+    now = time.time()
+    if not force and _global_heatmap_cache["data"] and now - _global_heatmap_cache["ts"] < _GLOBAL_HEATMAP_TTL:
+        return _global_heatmap_cache["data"]
+    data = _fetch_global_heatmap()
+    has_any = any(it.get("price") is not None for g in data["groups"] for it in g["items"])
+    if not has_any and _global_heatmap_cache["data"]:
+        return _global_heatmap_cache["data"]   # keep serving last-good instead of a blank page
+    _global_heatmap_cache["data"] = data
+    _global_heatmap_cache["ts"] = now
+    return data
+
+
 # ── 成交值排行 ────────────────────────────────────────────────────────────────
 _turnover_cache: dict = {}
 _turnover_cache_ts: float = 0.0
@@ -3818,6 +4104,119 @@ def seed_ranking_history(date: str):
     _turnover_cache = {}
     _turnover_cache_ts = 0.0
     return {"ok": True, "seeded_date": date, "twse_count": len(twse_map), "tpex_count": len(tpex_map)}
+
+
+# ── 全市場熱力圖：個股 x 官方產業分類 ────────────────────────────────────────────
+INDUSTRY_CLASS_FILE = "market_heatmap_industry.json"
+_INDUSTRY_CLASS_TTL = 86400 * 3   # 3 天 — 官方產業別分類很少變動
+_industry_class_cache: dict = {"ts": 0.0, "data": None}
+
+
+def _load_industry_classification(force: bool = False) -> dict:
+    """{code: {name, industry, market}}，來源 TWSE ISIN 一覽表，磁碟快取 + 3天過期重抓。"""
+    global _industry_class_cache
+    now = time.time()
+    if not force and _industry_class_cache["data"] and now - _industry_class_cache["ts"] < _INDUSTRY_CLASS_TTL:
+        return _industry_class_cache["data"]
+
+    path = DATA_DIR / INDUSTRY_CLASS_FILE
+    cached = load_json(path, None)
+    cache_fresh = (isinstance(cached, dict) and cached.get("stocks")
+                   and (now - _parse_ts(cached.get(_TS_KEY))) < _INDUSTRY_CLASS_TTL)
+    if not force and cache_fresh:
+        _industry_class_cache = {"ts": now, "data": cached["stocks"]}
+        return cached["stocks"]
+
+    fresh = fetch_industry_classification()
+    if fresh:
+        payload = {"stocks": fresh, _TS_KEY: _now_iso()}
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')), encoding="utf-8")
+        _industry_class_cache = {"ts": now, "data": fresh}
+        return fresh
+    # fetch failed — serve stale disk cache rather than nothing, else empty
+    if isinstance(cached, dict) and cached.get("stocks"):
+        _industry_class_cache = {"ts": now, "data": cached["stocks"]}
+        return cached["stocks"]
+    return {}
+
+
+_MARKET_HEATMAP_TTL = 1800  # 30 min, 跟成交值排行同節奏
+_market_heatmap_cache: dict = {"ts": 0.0, "data": None}
+_market_heatmap_refreshing = False
+MARKET_HEATMAP_TSE_LASTGOOD = "market_heatmap_tse_lastgood.json"
+
+
+def _fetch_market_heatmap_data() -> dict:
+    classification = _load_industry_classification()
+
+    twse, _trade_date = _fetch_twse_turnover_ranking(99999)
+    tpex = _fetch_tpex_turnover_ranking(99999)
+
+    # TWSE 全市場成交資料在 Railway 被擋 — 沿用跟成交值排行一樣的 last-good relay
+    if twse:
+        _save_lastgood(MARKET_HEATMAP_TSE_LASTGOOD, {"items": twse})
+    else:
+        lg = _load_lastgood(MARKET_HEATMAP_TSE_LASTGOOD)
+        if lg and lg.get("items"):
+            twse = lg["items"]
+
+    groups: dict[str, list[dict]] = {}
+    for item in [*twse, *tpex]:
+        code = item["code"]
+        meta = classification.get(code)
+        industry = meta["industry"] if meta else "其他"
+        name = meta["name"] if meta else item["name"]
+        groups.setdefault(industry, []).append({
+            "code": code, "name": name,
+            "price": item.get("close"), "chg_pct": item.get("chg_pct"),
+            "turnover": item.get("turnover") or 0,
+        })
+
+    group_list = []
+    for industry, stocks in groups.items():
+        stocks.sort(key=lambda s: -s["turnover"])
+        group_list.append({
+            "industry": industry,
+            "turnover": sum(s["turnover"] for s in stocks),
+            "stocks": stocks,
+        })
+    group_list.sort(key=lambda g: -g["turnover"])
+
+    return {"groups": group_list, "updated_at": _now_iso(), "stock_count": len(twse) + len(tpex)}
+
+
+def _market_heatmap_do_refresh():
+    global _market_heatmap_cache, _market_heatmap_refreshing
+    _market_heatmap_refreshing = True
+    try:
+        result = _fetch_market_heatmap_data()
+        _market_heatmap_cache = {"ts": time.time(), "data": result}
+    except Exception as e:
+        logger.error(f"[market-heatmap] refresh error: {e}")
+    finally:
+        _market_heatmap_refreshing = False
+
+
+@app.get("/api/market-heatmap")
+def get_market_heatmap(force: bool = False):
+    """全市場(上市+上櫃)個股熱力圖：依官方產業別分組，色塊大小依成交值，顏色依今日漲跌%。
+    30分鐘快取，stale-while-revalidate（跟季線選股同一套模式）。"""
+    global _market_heatmap_cache
+    now = time.time()
+    cache_age = now - _market_heatmap_cache["ts"]
+    has_cache = _market_heatmap_cache["data"] is not None
+
+    if not force and has_cache and cache_age < _MARKET_HEATMAP_TTL:
+        return _market_heatmap_cache["data"]
+
+    if not force and has_cache:
+        if not _market_heatmap_refreshing:
+            _threading.Thread(target=_market_heatmap_do_refresh, daemon=True).start()
+        return {**_market_heatmap_cache["data"], "stale": True}
+
+    _market_heatmap_do_refresh()
+    return _market_heatmap_cache["data"] or {"groups": [], "updated_at": None, "stock_count": 0}
 
 
 # ── CB 餘額 vs 股價 (TDCC 集保結算所) ─────────────────────────────────────────
@@ -4155,14 +4554,22 @@ async def save_industry_map_config(req: Request):
 from fastapi import Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
-class NoCacheMiddleware(BaseHTTPMiddleware):
+class StaticCacheMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        if request.url.path.startswith("/static/"):
-            response.headers["Cache-Control"] = "no-store"
+        path = request.url.path
+        if path.startswith("/static/"):
+            if request.url.query:
+                # Versioned/hashed assets (e.g. main.js?v=1) — safe to cache long-term
+                response.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=3600"
+            else:
+                # Most JS modules are dynamically import()-ed with no version query string
+                # (see routing.js PAGE_MODULES) — always revalidate so edits show up on
+                # the next normal refresh instead of being stuck behind a 24h cache.
+                response.headers["Cache-Control"] = "no-cache"
         return response
 
-app.add_middleware(NoCacheMiddleware)
+app.add_middleware(StaticCacheMiddleware)
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
 
@@ -4170,5 +4577,5 @@ app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 def serve_index():
     return FileResponse(
         str(FRONTEND_DIR / "index.html"),
-        headers={"Cache-Control": "no-store"},
+        headers={"Cache-Control": "no-cache, must-revalidate"},
     )
