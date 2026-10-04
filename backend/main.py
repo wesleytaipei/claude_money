@@ -3396,6 +3396,24 @@ def _stock_ma_try_append_today(data: dict) -> dict:
     return data
 
 
+def _fetch_live_prices_chunked(codes: list[str], chunk_size: int = 150) -> dict:
+    """Batch-fetch live MIS quotes for a large code list. fetch_tw_prices_mis builds
+    one HTTP request per call with all symbols joined into the ex_ch query param, so
+    for the whole market (~thousands of codes) we chunk it to stay under URL limits."""
+    if not codes:
+        return {}
+    chunks = [codes[i:i + chunk_size] for i in range(0, len(codes), chunk_size)]
+    result: dict = {}
+    with ThreadPoolExecutor(max_workers=min(8, len(chunks))) as ex:
+        futs = [ex.submit(fetch_tw_prices_mis, chunk) for chunk in chunks]
+        for fut in as_completed(futs):
+            try:
+                result.update(fut.result())
+            except Exception as e:
+                logger.warning(f"[stock-zones] live price chunk failed: {e}")
+    return result
+
+
 def _classify_stock_zones() -> dict:
     data = _load_stock_ma_history()
     if not data.get("dates"):
@@ -3403,7 +3421,7 @@ def _classify_stock_zones() -> dict:
     else:
         data = _stock_ma_try_append_today(data)
 
-    zones = {"strong": [], "season": [], "repair": []}
+    candidates: dict[str, dict] = {}
     for code, info in data.get("stocks", {}).items():
         closes = info["closes"][-_STOCK_MA_WINDOW:]
         valid = [c for c in closes if c is not None]
@@ -3415,7 +3433,6 @@ def _classify_stock_zones() -> dict:
         ma = sum(valid) / len(valid)
         if ma <= 0:
             continue
-        pct = (price - ma) / ma * 100
 
         # 今日漲幅% — vs the previous available close (not necessarily closes[-2] if a gap exists)
         valid_all = [c for c in info["closes"] if c is not None]
@@ -3426,11 +3443,30 @@ def _classify_stock_zones() -> dict:
         # 是否 > 5日均價
         last5 = valid_all[-5:]
         ma5 = sum(last5) / len(last5) if len(last5) >= 5 else None
-        above_ma5 = (price > ma5) if ma5 is not None else None
 
-        entry = {"code": code, "name": info["name"], "market": info["market"],
-                  "price": price, "ma": round(ma, 2), "pct": round(pct, 2),
-                  "chg_pct": chg_pct,
+        candidates[code] = {"code": code, "name": info["name"], "market": info["market"],
+                             "price": price, "ma": ma, "chg_pct": chg_pct, "ma5": ma5}
+
+    # 現價/今日漲跌% 盤中改用即時 MIS 報價覆蓋 (跟「持股健檢」同一支 fetch_tw_prices_mis)，
+    # stock_ma_history 是每日收盤快取、盤中不會新增資料，只拿來算季線/5日均本身，不能當現價。
+    if _is_tw_market_open():
+        live_prices = _fetch_live_prices_chunked(list(candidates.keys()))
+        for code, c in candidates.items():
+            live = live_prices.get(code) or {}
+            if live.get("price") is not None:
+                c["price"] = live["price"]
+            if live.get("change_pct") is not None:
+                c["chg_pct"] = live["change_pct"]
+
+    zones = {"strong": [], "season": [], "repair": []}
+    for c in candidates.values():
+        pct = (c["price"] - c["ma"]) / c["ma"] * 100
+        ma5 = c["ma5"]
+        above_ma5 = (c["price"] > ma5) if ma5 is not None else None
+
+        entry = {"code": c["code"], "name": c["name"], "market": c["market"],
+                  "price": c["price"], "ma": round(c["ma"], 2), "pct": round(pct, 2),
+                  "chg_pct": c["chg_pct"],
                   "ma5": round(ma5, 2) if ma5 is not None else None,
                   "above_ma5": above_ma5}
         if pct > 5:
@@ -4147,9 +4183,7 @@ _market_heatmap_refreshing = False
 MARKET_HEATMAP_TSE_LASTGOOD = "market_heatmap_tse_lastgood.json"
 
 
-def _fetch_market_heatmap_data() -> dict:
-    classification = _load_industry_classification()
-
+def _fetch_market_heatmap_data(mode: str = "themes") -> dict:
     twse, _trade_date = _fetch_twse_turnover_ranking(99999)
     tpex = _fetch_tpex_turnover_ranking(99999)
 
@@ -4161,8 +4195,57 @@ def _fetch_market_heatmap_data() -> dict:
         if lg and lg.get("items"):
             twse = lg["items"]
 
+    all_stocks = [*twse, *tpex]
+    stock_map = {item["code"]: item for item in all_stocks}
+
+    if mode == "themes":
+        # 100% 對齊 futboardkk 全市場族群分類（53 個核心概念族群與精選標的）
+        futboard_file = DATA_DIR / "market_heatmap_futboard.json"
+        cfg = load_json(futboard_file, {"theme_groups": []})
+        group_list = []
+        covered_codes = set()
+        for g in cfg.get("theme_groups", []):
+            g_name = g.get("name", "未命名")
+            stocks = []
+            for s in g.get("stocks", []):
+                code = s.get("code")
+                if not code:
+                    continue
+                covered_codes.add(code)
+                info = stock_map.get(code)
+                if info:
+                    stocks.append({
+                        "code": code,
+                        "name": s.get("name") or info.get("name", code),
+                        "price": info.get("close"),
+                        "chg_pct": info.get("chg_pct"),
+                        "turnover": info.get("turnover") or 0,
+                    })
+                else:
+                    stocks.append({
+                        "code": code,
+                        "name": s.get("name", code),
+                        "price": None,
+                        "chg_pct": None,
+                        "turnover": 0,
+                    })
+
+            # 依個股成交值降冪排序
+            stocks.sort(key=lambda x: -x["turnover"])
+            group_turnover = sum(x["turnover"] for x in stocks)
+            group_list.append({
+                "industry": g_name,
+                "turnover": group_turnover,
+                "stocks": stocks,
+            })
+        # 族群依總成交額由大到小排序
+        group_list.sort(key=lambda x: -x["turnover"])
+        return {"groups": group_list, "updated_at": _now_iso(), "stock_count": len(covered_codes), "mode": "themes"}
+
+    # mode == "official": 原官方產業分類
+    classification = _load_industry_classification()
     groups: dict[str, list[dict]] = {}
-    for item in [*twse, *tpex]:
+    for item in all_stocks:
         code = item["code"]
         meta = classification.get(code)
         industry = meta["industry"] if meta else "其他"
@@ -4183,40 +4266,46 @@ def _fetch_market_heatmap_data() -> dict:
         })
     group_list.sort(key=lambda g: -g["turnover"])
 
-    return {"groups": group_list, "updated_at": _now_iso(), "stock_count": len(twse) + len(tpex)}
+    return {"groups": group_list, "updated_at": _now_iso(), "stock_count": len(all_stocks), "mode": "official"}
 
 
-def _market_heatmap_do_refresh():
+def _market_heatmap_do_refresh(mode: str = "themes"):
     global _market_heatmap_cache, _market_heatmap_refreshing
     _market_heatmap_refreshing = True
     try:
-        result = _fetch_market_heatmap_data()
-        _market_heatmap_cache = {"ts": time.time(), "data": result}
+        result = _fetch_market_heatmap_data(mode=mode)
+        _market_heatmap_cache[mode] = {"ts": time.time(), "data": result}
     except Exception as e:
-        logger.error(f"[market-heatmap] refresh error: {e}")
+        logger.error(f"[market-heatmap] refresh error ({mode}): {e}")
     finally:
         _market_heatmap_refreshing = False
 
 
 @app.get("/api/market-heatmap")
-def get_market_heatmap(force: bool = False):
-    """全市場(上市+上櫃)個股熱力圖：依官方產業別分組，色塊大小依成交值，顏色依今日漲跌%。
-    30分鐘快取，stale-while-revalidate（跟季線選股同一套模式）。"""
+def get_market_heatmap(mode: str = "themes", force: bool = False):
+    """個股熱力圖：
+    - mode="themes": 精選核心產業概念族群（futboardkk 風格，聚焦指標股，不擁擠）
+    - mode="official": 全台股官方分類。
+    30分鐘快取，stale-while-revalidate。"""
     global _market_heatmap_cache
+    if not isinstance(_market_heatmap_cache.get(mode), dict):
+        _market_heatmap_cache[mode] = {"ts": 0.0, "data": None}
+
     now = time.time()
-    cache_age = now - _market_heatmap_cache["ts"]
-    has_cache = _market_heatmap_cache["data"] is not None
+    entry = _market_heatmap_cache[mode]
+    cache_age = now - entry["ts"]
+    has_cache = entry["data"] is not None
 
     if not force and has_cache and cache_age < _MARKET_HEATMAP_TTL:
-        return _market_heatmap_cache["data"]
+        return entry["data"]
 
     if not force and has_cache:
         if not _market_heatmap_refreshing:
-            _threading.Thread(target=_market_heatmap_do_refresh, daemon=True).start()
-        return {**_market_heatmap_cache["data"], "stale": True}
+            _threading.Thread(target=_market_heatmap_do_refresh, args=(mode,), daemon=True).start()
+        return {**entry["data"], "stale": True}
 
-    _market_heatmap_do_refresh()
-    return _market_heatmap_cache["data"] or {"groups": [], "updated_at": None, "stock_count": 0}
+    _market_heatmap_do_refresh(mode=mode)
+    return _market_heatmap_cache[mode]["data"] or {"groups": [], "updated_at": None, "stock_count": 0, "mode": mode}
 
 
 # ── CB 餘額 vs 股價 (TDCC 集保結算所) ─────────────────────────────────────────

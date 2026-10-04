@@ -145,6 +145,26 @@ export function toast(msg, type = 'success') {
   setTimeout(() => el.classList.add('hidden'), 2400);
 }
 
+// Generic "in-flight" feedback for any 更新/重新整理/🔄 button: disables the button,
+// swaps its label for a spinner while `fn` is awaited, then restores it and toasts
+// the outcome — so a click never looks like it did nothing while data is loading.
+export async function withBtnSpinner(event, fn) {
+  const btn = event?.currentTarget || event?.target?.closest?.('button');
+  if (!btn || btn.disabled) return;
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 更新中…';
+  try {
+    await fn();
+    toast('✅ 已更新');
+  } catch (e) {
+    toast('❌ 更新失敗：' + (e?.message || e), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
 
 export function escapeAttr(s) {
   return String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;');

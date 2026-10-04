@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=67" />
+  <link rel="stylesheet" href="/static/style.css?v=70" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
@@ -266,7 +266,7 @@
             <p class="page-sub">每日即時重要市場數據</p>
           </div>
           <div>
-            <button class="btn-primary" onclick="renderImportantInfo(true)">↺ 重新整理</button>
+            <button class="btn-primary" onclick="withBtnSpinner(event, () => renderImportantInfo(true))">↺ 重新整理</button>
           </div>
         </div>
 
@@ -293,7 +293,7 @@
         <div class="panel" style="margin-top:20px">
           <div class="panel-head">
             <h3>📈 上市+上櫃 騰落線</h3>
-            <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="renderAdlChart(true)">↺</button>
+            <button class="btn-ghost" style="padding:4px 10px;font-size:12px" onclick="withBtnSpinner(event, () => renderAdlChart(true))">↺</button>
           </div>
           <div id="adl-stats" style="display:flex;gap:24px;padding:12px 0 16px;flex-wrap:wrap"></div>
           <div style="position:relative;height:280px">
@@ -444,7 +444,7 @@
             <h3>持股健檢</h3>
             <div style="display:flex;align-items:center;gap:10px">
               <span class="panel-sub" id="inv-health-sub"></span>
-              <button class="btn-ghost" onclick="renderHoldingsHealth(true)" title="強制重新整理">🔄</button>
+              <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderHoldingsHealth(true))" title="強制重新整理">🔄</button>
             </div>
           </div>
           <div id="inv-health-body"></div>
@@ -471,7 +471,7 @@
             <input type="date" id="growth-start" />
             <label>結束：</label>
             <input type="date" id="growth-end" />
-            <button class="btn-primary" onclick="renderGrowthChart();renderTrendChart()">更新圖表</button>
+            <button class="btn-primary" onclick="withBtnSpinner(event, async () => { await renderGrowthChart(); await renderTrendChart(); })">更新圖表</button>
           </div>
           <div class="trend-controls" style="margin-top:6px" id="growth-year-btns"></div>
         </div>
@@ -553,7 +553,7 @@
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <div id="etf-tab-bar" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-            <button class="btn-ghost" onclick="renderEtfPage(true)" title="強制重新抓取">🔄</button>
+            <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderEtfPage(true))" title="強制重新抓取">🔄</button>
           </div>
         </div>
         <div id="etf-body">
@@ -565,7 +565,7 @@
       <section class="page" id="page-ranking">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span id="ranking-sub" style="font-size:12px;color:var(--text-muted)">—</span>
-          <button class="btn-ghost" onclick="renderRanking(true)" title="重新抓取">🔄</button>
+          <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderRanking(true))" title="重新抓取">🔄</button>
         </div>
         <div id="ranking-body">
           <div class="empty-state">點擊側邊欄「成交值排行」載入資料</div>
@@ -580,7 +580,7 @@
             <p class="page-sub" id="industry-sub">族群指標股行情</p>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <button class="btn-ghost" onclick="renderIndustryMap(true)" title="重新整理">🔄 更新</button>
+            <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderIndustryMap(true))" title="重新整理">🔄 更新</button>
             <button class="btn-primary" onclick="openAddIndustryGroup()">＋ 新增族群</button>
           </div>
         </div>
@@ -598,8 +598,8 @@
               <input id="cb-be-input" type="text" maxlength="6" placeholder="CB 代號，如 47602"
                 style="width:130px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none"
                 onkeydown="if(event.key==='Enter') renderCbBookentryChart()" />
-              <button class="btn-primary" style="padding:4px 10px;font-size:12px" onclick="renderCbBookentryChart()">查詢</button>
-              <button class="btn-ghost" style="font-size:11px" onclick="renderCbBookentryChart(true)" title="強制重新抓取">🔄</button>
+              <button class="btn-primary" style="padding:4px 10px;font-size:12px" onclick="withBtnSpinner(event, () => renderCbBookentryChart())">查詢</button>
+              <button class="btn-ghost" style="font-size:11px" onclick="withBtnSpinner(event, () => renderCbBookentryChart(true))" title="強制重新抓取">🔄</button>
               <span style="font-size:11px;color:var(--muted);white-space:nowrap">轉換價</span>
               <input id="cb-be-conv" type="number" step="0.1" min="0" placeholder="元"
                 style="width:72px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);outline:none"
@@ -664,7 +664,7 @@
             <p class="page-sub" id="stock-zones-sub">全市場個股（不含ETF）現價 vs 60日均線（季線）分區</p>
           </div>
           <div>
-            <button class="btn-ghost" onclick="renderStockZonesPage(true)" title="重新整理">🔄 更新</button>
+            <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderStockZonesPage(true))" title="重新整理">🔄 更新</button>
           </div>
         </div>
 
@@ -684,10 +684,33 @@
         <div class="page-header">
           <div>
             <h1>全市場熱力</h1>
-            <p class="page-sub" id="market-heatmap-sub">全台股個股熱力圖，依產業分類，色塊大小依成交值</p>
+            <p class="page-sub" id="market-heatmap-sub">全市場概念族群熱力圖，等比例清晰呈現各檔標的</p>
           </div>
-          <div>
-            <button class="btn-ghost" onclick="renderMarketHeatmap(true)" title="重新整理">🔄 更新</button>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div class="heatmap-controls">
+              <label for="mh-mode">分類：</label>
+              <select id="mh-mode" class="mh-select" onchange="onMarketHeatModeChange()">
+                <option value="themes" selected>精選核心族群 (Futboardkk 風格)</option>
+                <option value="official">全台股官方產業 (全市場)</option>
+              </select>
+
+              <label for="mh-filter-turnover">門檻：</label>
+              <select id="mh-filter-turnover" class="mh-select" onchange="onMarketHeatFilterChange()">
+                <option value="0" selected>全部納入族群</option>
+                <option value="20000000">成交額 ≥ 2000萬</option>
+                <option value="50000000">成交額 ≥ 5000萬</option>
+                <option value="100000000">成交額 ≥ 1億</option>
+              </select>
+
+              <label for="mh-filter-top">上限：</label>
+              <select id="mh-filter-top" class="mh-select" onchange="onMarketHeatFilterChange()">
+                <option value="15">Top 15 檔</option>
+                <option value="25" selected>Top 25 檔</option>
+                <option value="50">Top 50 檔</option>
+                <option value="9999">不限</option>
+              </select>
+            </div>
+            <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderMarketHeatmap(true))" title="重新整理">🔄 更新</button>
           </div>
         </div>
         <div id="market-heatmap-body" class="heat-canvas">
@@ -703,7 +726,7 @@
             <p class="page-sub" id="global-heatmap-sub">全球指數期貨 · 能源 · 金屬 · 農產品 · 外匯 · 債券熱力圖</p>
           </div>
           <div>
-            <button class="btn-ghost" onclick="renderGlobalHeatmap(true)" title="重新整理">🔄 更新</button>
+            <button class="btn-ghost" onclick="withBtnSpinner(event, () => renderGlobalHeatmap(true))" title="重新整理">🔄 更新</button>
           </div>
         </div>
         <div id="global-heatmap-body" class="heat-canvas">
