@@ -1,0 +1,62 @@
+Traceback (most recent call last):
+  File [35m"C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\logging\config.py"[0m, line [35m583[0m, in [35mconfigure[0m
+    formatters[name] = [31mself.configure_formatter[0m[1;31m([0m
+                       [31m~~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^[0m
+                                        [1;31mformatters[name])[0m
+                                        [1;31m^^^^^^^^^^^^^^^^^[0m
+  File [35m"C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\logging\config.py"[0m, line [35m693[0m, in [35mconfigure_formatter[0m
+    result = self.configure_custom(config)
+  File [35m"C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\logging\config.py"[0m, line [35m487[0m, in [35mconfigure_custom[0m
+    result = c(**kwargs)
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\logging.py"[0m, line [35m42[0m, in [35m__init__[0m
+    self.use_colors = [1;31msys.stdout.isatty[0m()
+                      [1;31m^^^^^^^^^^^^^^^^^[0m
+[1;35mAttributeError[0m: [35m'NoneType' object has no attribute 'isatty'[0m
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File [35m"<frozen runpy>"[0m, line [35m203[0m, in [35m_run_module_as_main[0m
+  File [35m"<frozen runpy>"[0m, line [35m88[0m, in [35m_run_code[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\__main__.py"[0m, line [35m4[0m, in [35m<module>[0m
+    [31muvicorn.main[0m[1;31m()[0m
+    [31m~~~~~~~~~~~~[0m[1;31m^^[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\click\core.py"[0m, line [35m1631[0m, in [35m__call__[0m
+    return [31mself.main[0m[1;31m(*args, **kwargs)[0m
+           [31m~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\click\core.py"[0m, line [35m1552[0m, in [35mmain[0m
+    rv = self.invoke(ctx)
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\click\core.py"[0m, line [35m1415[0m, in [35minvoke[0m
+    return [31mctx.invoke[0m[1;31m(self.callback, **ctx.params)[0m
+           [31m~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\click\core.py"[0m, line [35m910[0m, in [35minvoke[0m
+    return callback(*args, **kwargs)
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\main.py"[0m, line [35m433[0m, in [35mmain[0m
+    [31mrun[0m[1;31m([0m
+    [31m~~~[0m[1;31m^[0m
+        [1;31mapp,[0m
+        [1;31m^^^^[0m
+    ...<47 lines>...
+        [1;31mh11_max_incomplete_event_size=h11_max_incomplete_event_size,[0m
+        [1;31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+    [1;31m)[0m
+    [1;31m^[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\main.py"[0m, line [35m541[0m, in [35mrun[0m
+    config = Config(
+        app,
+    ...<46 lines>...
+        h11_max_incomplete_event_size=h11_max_incomplete_event_size,
+    )
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\config.py"[0m, line [35m280[0m, in [35m__init__[0m
+    [31mself.configure_logging[0m[1;31m()[0m
+    [31m~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^[0m
+  File [35m"C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\uvicorn\config.py"[0m, line [35m372[0m, in [35mconfigure_logging[0m
+    [31mlogging.config.dictConfig[0m[1;31m(self.log_config)[0m
+    [31m~~~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^^^^^^^^^^^^^^^^[0m
+  File [35m"C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\logging\config.py"[0m, line [35m935[0m, in [35mdictConfig[0m
+    [31mdictConfigClass(config).configure[0m[1;31m()[0m
+    [31m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m[1;31m^^[0m
+  File [35m"C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.13_3.13.3824.0_x64__qbz5n2kfra8p0\Lib\logging\config.py"[0m, line [35m586[0m, in [35mconfigure[0m
+    raise ValueError('Unable to configure '
+                     'formatter %r' % name) from e
+[1;35mValueError[0m: [35mUnable to configure formatter 'default'[0m

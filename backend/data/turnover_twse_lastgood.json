@@ -3,204 +3,204 @@
     {
       "code": "2330",
       "name": "台積電",
-      "turnover": 71769230740,
-      "close": 2470.0,
-      "chg": 10.0,
-      "chg_pct": 0.41
-    },
-    {
-      "code": "2344",
-      "name": "華邦電",
-      "turnover": 41927685454,
-      "close": 188.0,
-      "chg": 8.0,
-      "chg_pct": 4.44
+      "turnover": 101920437251,
+      "close": 2490.0,
+      "chg": -50.0,
+      "chg_pct": -1.97
     },
     {
       "code": "2408",
       "name": "南亞科",
-      "turnover": 40694980627,
-      "close": 531.0,
-      "chg": 14.0,
-      "chg_pct": 2.71
-    },
-    {
-      "code": "2454",
-      "name": "聯發科",
-      "turnover": 30947800640,
-      "close": 4710.0,
-      "chg": -50.0,
-      "chg_pct": -1.05
-    },
-    {
-      "code": "2303",
-      "name": "聯電",
-      "turnover": 30312382562,
-      "close": 137.0,
-      "chg": -6.0,
-      "chg_pct": -4.2
-    },
-    {
-      "code": "3231",
-      "name": "緯創",
-      "turnover": 22910532283,
-      "close": 186.5,
-      "chg": -10.5,
-      "chg_pct": -5.33
-    },
-    {
-      "code": "2327",
-      "name": "國巨*",
-      "turnover": 22558357199,
-      "close": 567.0,
-      "chg": -22.0,
-      "chg_pct": -3.74
-    },
-    {
-      "code": "2409",
-      "name": "友達",
-      "turnover": 18452065566,
-      "close": 29.6,
-      "chg": 0.9,
-      "chg_pct": 3.14
-    },
-    {
-      "code": "4958",
-      "name": "臻鼎-KY",
-      "turnover": 17072598189,
-      "close": 505.0,
-      "chg": 4.0,
-      "chg_pct": 0.8
-    },
-    {
-      "code": "3037",
-      "name": "欣興",
-      "turnover": 17042118575,
-      "close": 954.0,
-      "chg": 5.0,
-      "chg_pct": 0.53
-    },
-    {
-      "code": "2059",
-      "name": "川湖",
-      "turnover": 16662072085,
-      "close": 12520.0,
-      "chg": -1385.0,
-      "chg_pct": -9.96
-    },
-    {
-      "code": "1303",
-      "name": "南亞",
-      "turnover": 15306594271,
-      "close": 235.0,
-      "chg": 4.5,
-      "chg_pct": 1.95
-    },
-    {
-      "code": "3167",
-      "name": "大量",
-      "turnover": 14952181089,
-      "close": 938.0,
-      "chg": 55.0,
-      "chg_pct": 6.23
-    },
-    {
-      "code": "7769",
-      "name": "鴻勁",
-      "turnover": 13156802150,
-      "close": 6970.0,
-      "chg": 405.0,
-      "chg_pct": 6.17
-    },
-    {
-      "code": "2345",
-      "name": "智邦",
-      "turnover": 12850208590,
-      "close": 1955.0,
-      "chg": -145.0,
-      "chg_pct": -6.9
+      "turnover": 47852609625,
+      "close": 488.0,
+      "chg": -39.0,
+      "chg_pct": -7.4
     },
     {
       "code": "3008",
       "name": "大立光",
-      "turnover": 12757771195,
-      "close": 6500.0,
-      "chg": -160.0,
-      "chg_pct": -2.4
+      "turnover": 39367953090,
+      "close": 7275.0,
+      "chg": -50.0,
+      "chg_pct": -0.68
     },
     {
-      "code": "6770",
-      "name": "力積電",
-      "turnover": 12658034103,
-      "close": 72.4,
-      "chg": -0.5,
-      "chg_pct": -0.69
+      "code": "1303",
+      "name": "南亞",
+      "turnover": 37992423554,
+      "close": 319.0,
+      "chg": 16.0,
+      "chg_pct": 5.28
     },
     {
-      "code": "8039",
-      "name": "台虹",
-      "turnover": 12419425467,
-      "close": 294.5,
-      "chg": -32.5,
-      "chg_pct": -9.94
+      "code": "2454",
+      "name": "聯發科",
+      "turnover": 37162679495,
+      "close": 4525.0,
+      "chg": -100.0,
+      "chg_pct": -2.16
     },
     {
-      "code": "6669",
-      "name": "緯穎",
-      "turnover": 12065729035,
-      "close": 2340.0,
-      "chg": -150.0,
-      "chg_pct": -6.02
+      "code": "2327",
+      "name": "國巨*",
+      "turnover": 36295961253,
+      "close": 599.0,
+      "chg": -37.0,
+      "chg_pct": -5.82
     },
     {
-      "code": "2382",
-      "name": "廣達",
-      "turnover": 11741782175,
-      "close": 328.0,
-      "chg": -19.5,
-      "chg_pct": -5.61
+      "code": "2383",
+      "name": "台光電",
+      "turnover": 27618614510,
+      "close": 5545.0,
+      "chg": -605.0,
+      "chg_pct": -9.84
     },
     {
       "code": "2308",
       "name": "台達電",
-      "turnover": 11509936580,
-      "close": 1805.0,
-      "chg": -45.0,
-      "chg_pct": -2.43
+      "turnover": 27348706390,
+      "close": 1775.0,
+      "chg": -125.0,
+      "chg_pct": -6.58
     },
     {
-      "code": "2360",
-      "name": "致茂",
-      "turnover": 11251705715,
-      "close": 2265.0,
-      "chg": 35.0,
-      "chg_pct": 1.57
+      "code": "3661",
+      "name": "世芯-KY",
+      "turnover": 23146080805,
+      "close": 4055.0,
+      "chg": -340.0,
+      "chg_pct": -7.74
     },
     {
-      "code": "3017",
-      "name": "奇鋐",
-      "turnover": 11125560060,
-      "close": 3285.0,
-      "chg": -135.0,
-      "chg_pct": -3.95
+      "code": "2344",
+      "name": "華邦電",
+      "turnover": 20255270930,
+      "close": 161.5,
+      "chg": -12.5,
+      "chg_pct": -7.18
+    },
+    {
+      "code": "4958",
+      "name": "臻鼎-KY",
+      "turnover": 19980542938,
+      "close": 552.0,
+      "chg": -29.0,
+      "chg_pct": -4.99
+    },
+    {
+      "code": "2303",
+      "name": "聯電",
+      "turnover": 19173293892,
+      "close": 141.5,
+      "chg": -4.0,
+      "chg_pct": -2.75
+    },
+    {
+      "code": "3037",
+      "name": "欣興",
+      "turnover": 18820188585,
+      "close": 1180.0,
+      "chg": -75.0,
+      "chg_pct": -5.98
+    },
+    {
+      "code": "2603",
+      "name": "長榮",
+      "turnover": 15999101755,
+      "close": 264.0,
+      "chg": 8.5,
+      "chg_pct": 3.33
+    },
+    {
+      "code": "2368",
+      "name": "金像電",
+      "turnover": 15612417560,
+      "close": 1170.0,
+      "chg": -65.0,
+      "chg_pct": -5.26
+    },
+    {
+      "code": "3406",
+      "name": "玉晶光",
+      "turnover": 15529479140,
+      "close": 1175.0,
+      "chg": 105.0,
+      "chg_pct": 9.81
+    },
+    {
+      "code": "2409",
+      "name": "友達",
+      "turnover": 14056646870,
+      "close": 34.15,
+      "chg": -1.4,
+      "chg_pct": -3.94
+    },
+    {
+      "code": "2449",
+      "name": "京元電子",
+      "turnover": 12405732821,
+      "close": 305.0,
+      "chg": 5.0,
+      "chg_pct": 1.67
+    },
+    {
+      "code": "3711",
+      "name": "日月光投控",
+      "turnover": 12118985385,
+      "close": 740.0,
+      "chg": -22.0,
+      "chg_pct": -2.89
+    },
+    {
+      "code": "6770",
+      "name": "力積電",
+      "turnover": 11971667384,
+      "close": 67.5,
+      "chg": -3.9,
+      "chg_pct": -5.46
+    },
+    {
+      "code": "8996",
+      "name": "高力",
+      "turnover": 11932189215,
+      "close": 1715.0,
+      "chg": -5.0,
+      "chg_pct": -0.29
+    },
+    {
+      "code": "2345",
+      "name": "智邦",
+      "turnover": 11442768460,
+      "close": 2040.0,
+      "chg": -90.0,
+      "chg_pct": -4.23
     },
     {
       "code": "2317",
       "name": "鴻海",
-      "turnover": 10119470867,
-      "close": 251.5,
+      "turnover": 10855827349,
+      "close": 240.0,
       "chg": -4.5,
-      "chg_pct": -1.76
+      "chg_pct": -1.84
+    },
+    {
+      "code": "6278",
+      "name": "台表科",
+      "turnover": 10829434140,
+      "close": 264.0,
+      "chg": -8.5,
+      "chg_pct": -3.12
     },
     {
       "code": "3443",
       "name": "創意",
-      "turnover": 9512725720,
-      "close": 5960.0,
-      "chg": 25.0,
-      "chg_pct": 0.42
+      "turnover": 10716997670,
+      "close": 8095.0,
+      "chg": -5.0,
+      "chg_pct": -0.06
     }
   ],
-  "trade_date": "20260908",
-  "_last_modified": "2026-09-09T01:22:21Z"
+  "trade_date": "20261013",
+  "_last_modified": "2026-10-13T18:38:01Z"
 }

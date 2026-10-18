@@ -290,7 +290,8 @@ def save_json(path: Path, data):
     This ensures auto-sync always prefers the last Gist-confirmed version
     over unconfirmed local writes (price refreshes, position edits, etc.).
     _last_modified is only set by _gist_push_confirmed() (儲存資料 button)."""
-    data.pop(_TS_KEY, None)   # clear — unconfirmed save, don't block Gist pull
+    if isinstance(data, dict):
+        data.pop(_TS_KEY, None)   # clear — unconfirmed save, don't block Gist pull
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -665,9 +666,9 @@ def _fetch_tw_indices_mis() -> dict:
     return result
 
 
-def fetch_indices() -> dict:
+def fetch_indices(force: bool = False) -> dict:
     now = time.time()
-    if _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
+    if not force and _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
         return _indices_cache["data"]
 
     # US indices + FX via yfinance
@@ -945,6 +946,53 @@ def load_cb_suspensions() -> dict:
     return suspended
 
 
+def _load_cbas_data_tpex_fallback() -> dict:
+    """統一證券 CBAS API 維護/無法連線時的備援：改用櫃買中心 (TPEX) OpenAPI 取得
+    到期日/發行餘額/轉換價/名稱 (即時報價/溢價率/現股價 TPEX 沒有，留空，由
+    fetch_cb_prices() 的 MIS/Yahoo 即時報價另外補上)。"""
+    url = "https://www.tpex.org.tw/openapi/v1/bond_ISSBD5_data"
+    resp = http_requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"}, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    items = resp.json()
+    result = {}
+    FACE_VALUE = 100_000  # 可轉債面額 10 萬元 = 1 張
+    for item in items:
+        code = str(item.get("BondCode", "")).strip()
+        if not code:
+            continue
+
+        def _f(key):
+            try:
+                v = float(item.get(key))
+                return v if v else None
+            except (TypeError, ValueError):
+                return None
+
+        issue_amt = _f("IssueAmount")
+        outstanding_amt = _f("OutstandingAmount")
+        issued_shares = issue_amt / FACE_VALUE if issue_amt else None
+        remain_shares = outstanding_amt / FACE_VALUE if outstanding_amt is not None else None
+        balance_ratio = (
+            (outstanding_amt / issue_amt * 100) if issue_amt and outstanding_amt is not None else None
+        )
+
+        result[code] = {
+            "name":              str(item.get("ShortName", "")).strip(),
+            "price":             None,
+            "cb_due_date":       str(item.get("MaturityDate", "") or "").strip(),
+            "issued_shares":     issued_shares,
+            "remain_shares":     remain_shares,
+            "balance_ratio":     balance_ratio,
+            "conversion_price":  _f("Conversion/ExchangePriceAtIssuance"),
+            "premium_rate":      None,
+            "stock_price":       None,
+            "conversion_value":  None,
+            "convert_target":    "",
+            "ts": time.time(),
+        }
+    return result
+
+
 def load_cbas_data() -> dict:
     """Load all CB data from CBAS API (cached). Returns dict keyed by bond_code."""
     now = time.time()
@@ -990,6 +1038,15 @@ def load_cbas_data() -> dict:
         _cbas_cache["ts"] = now
         return result
     except Exception as e:
+        logger.warning(f"[cbas] pscnet unavailable ({e}), falling back to TPEX for conv price/name")
+        try:
+            fallback = _load_cbas_data_tpex_fallback()
+            if fallback:
+                _cbas_cache["data"] = fallback
+                _cbas_cache["ts"] = now
+                return fallback
+        except Exception as te:
+            logger.warning(f"[cbas] TPEX fallback also failed: {te}")
         return _cbas_cache.get("data", {})
 
 
@@ -1509,9 +1566,8 @@ def cb_lookup(symbol: str = "", name: str = ""):
     cbas = load_cbas_data()
 
     if symbol:
-        if symbol in cbas:
-            return _entry_to_lookup(symbol, cbas[symbol])
-        # fallback: fetch price from mis API
+        # fetch_cb_prices() merges CBAS metadata (due date/balance/conv price) with
+        # live MIS/Yahoo price regardless of which source populated the metadata.
         data = fetch_cb_prices([symbol])
         return _entry_to_lookup(symbol, data.get(symbol, {}))
 
@@ -1729,9 +1785,30 @@ def stock_lookup(symbol: str = "", name: str = "", market: str = "tw"):
     return {}
 
 
+@app.get("/api/stock-search")
+def stock_search(q: str = "", limit: int = 10):
+    """供前端自動完成用：依代號前綴或名稱部分比對，回傳候選的 {code, name} 清單
+    (純查記憶體裡的 _tw_table，不打任何外部 API，速度很快)。"""
+    q = q.strip()
+    if not q:
+        return []
+    q_upper = q.upper()
+    code_matches: list[dict] = []
+    name_matches: list[dict] = []
+    for code, entry in _tw_table.get("by_symbol", {}).items():
+        name = entry.get("name", "")
+        if code.startswith(q_upper):
+            code_matches.append({"code": code, "name": name})
+        elif q in name:
+            name_matches.append({"code": code, "name": name})
+        if len(code_matches) >= limit:
+            break
+    return (code_matches + name_matches)[:limit]
+
+
 @app.get("/api/indices")
-def get_indices():
-    return fetch_indices()
+def get_indices(force: bool = False):
+    return fetch_indices(force=force)
 
 
 @app.post("/api/snapshot")
@@ -1838,11 +1915,80 @@ async def add_manual_history(request: Request):
     return {"ok": True}
 
 
-@app.delete("/api/manual-history/{date}")
-def delete_manual_history(date: str):
-    history = load_json(MANUAL_HISTORY_FILE, [])
-    history = [h for h in history if h.get("date") != date]
-    save_json(MANUAL_HISTORY_FILE, history)
+CALENDAR_EVENTS_FILE = DATA_DIR / "calendar_events.json"
+
+@app.get("/api/calendar-events")
+def get_calendar_events():
+    """Return user manual/custom calendar events."""
+    return load_json(CALENDAR_EVENTS_FILE, [])
+
+@app.post("/api/calendar-events")
+async def save_calendar_event(request: Request):
+    """Add or update a calendar event."""
+    body = await request.json()
+    events = load_json(CALENDAR_EVENTS_FILE, [])
+    event_id = body.get("id") or f"evt_{int(time.time()*1000)}"
+    body["id"] = event_id
+    events = [e for e in events if e.get("id") != event_id]
+    events.append(body)
+    events.sort(key=lambda x: (x.get("date", ""), x.get("time", "")))
+    save_json(CALENDAR_EVENTS_FILE, events)
+    _gist_push_file(CALENDAR_EVENTS_FILE)
+    return {"ok": True, "event": body}
+
+@app.delete("/api/calendar-events/{event_id}")
+def delete_calendar_event(event_id: str):
+    """Delete a calendar event by ID."""
+    events = load_json(CALENDAR_EVENTS_FILE, [])
+    events = [e for e in events if str(e.get("id")) != str(event_id)]
+    save_json(CALENDAR_EVENTS_FILE, events)
+    _gist_push_file(CALENDAR_EVENTS_FILE)
+    return {"ok": True}
+
+
+STRATEGY_NOTES_FILE = DATA_DIR / "strategy_notes.json"
+
+@app.get("/api/strategy-notes")
+def get_strategy_notes():
+    """每日策略筆記 (交易日誌)，依日期由新到舊排序。"""
+    notes = load_json(STRATEGY_NOTES_FILE, [])
+    notes.sort(key=lambda x: x.get("date", ""), reverse=True)
+    return notes
+
+@app.post("/api/strategy-notes")
+async def save_strategy_note(request: Request):
+    """新增或更新一則策略筆記。有兩種 type：
+    - "daily" (每日交易日誌)：以 date 為唯一鍵，同一天再次儲存會覆蓋舊版。
+    - "research" (個股研究筆記)：以 id 為唯一鍵，同一檔標的可以累積多筆，不會互相覆蓋。"""
+    body = await request.json()
+    note_type = body.get("type") or "daily"
+    body["type"] = note_type
+    notes = load_json(STRATEGY_NOTES_FILE, [])
+
+    if note_type == "daily":
+        date = body.get("date")
+        if not date:
+            return {"error": "date required"}
+        note_id = body.get("id") or f"note_{date.replace('-', '')}"
+        notes = [n for n in notes if not (n.get("type", "daily") == "daily" and n.get("date") == date)]
+    else:
+        note_id = body.get("id") or f"note_{int(time.time() * 1000)}"
+        notes = [n for n in notes if n.get("id") != note_id]
+
+    body["id"] = note_id
+    notes.append(body)
+    notes.sort(key=lambda x: (x.get("date", ""), x.get("id", "")), reverse=True)
+    save_json(STRATEGY_NOTES_FILE, notes)
+    _gist_push_file(STRATEGY_NOTES_FILE)
+    return {"ok": True, "note": body}
+
+@app.delete("/api/strategy-notes/{note_id}")
+def delete_strategy_note(note_id: str):
+    """刪除指定 id 的策略筆記 (daily/research 皆適用)。"""
+    notes = load_json(STRATEGY_NOTES_FILE, [])
+    notes = [n for n in notes if str(n.get("id")) != str(note_id)]
+    save_json(STRATEGY_NOTES_FILE, notes)
+    _gist_push_file(STRATEGY_NOTES_FILE)
     return {"ok": True}
 
 
@@ -2053,8 +2199,30 @@ _scheduler.add_job(
     id="clear_tw_cache_open",
     replace_existing=True,
 )
+
+def _run_daily_esun_events_fetch():
+    """Refresh all 玉山證券台股行事曆 caches once a day (upstream's own data refreshes ~08:00)."""
+    for name, fn in (
+        ("esun-events", lambda: get_esun_events(force=True)),
+        ("esun-exdividend", lambda: get_esun_exdividend(force=True)),
+        ("esun-transfer", lambda: get_esun_transfer(force=True)),
+        ("esun-boardinfo", lambda: get_esun_boardinfo(force=True)),
+        ("esun-disposition", lambda: get_esun_disposition(force=True)),
+    ):
+        try:
+            fn()
+            logger.info(f"[scheduler] {name} fetched OK")
+        except Exception as e:
+            logger.warning(f"[scheduler] {name} fetch failed: {e}")
+
+_scheduler.add_job(
+    _run_daily_esun_events_fetch,
+    CronTrigger(hour=8, minute=15, timezone="Asia/Taipei"),
+    id="daily_esun_events_fetch",
+    replace_existing=True,
+)
 _scheduler.start()
-logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01")
+logger.info("[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01 | esun-events @ 08:15")
 
 # On startup: sync newer files from Gist (timestamp-based, both envs).
 def _startup():
@@ -2760,10 +2928,65 @@ def get_important_info(force: bool = False):
 
 _cb_listed_cache: dict = {"date": "", "data": None}
 CB_LISTED_URL = "https://cbas16889.pscnet.com.tw/api/MiDownloadExcel/GetExcel_RecentlyCB"
+CB_LISTED_CACHE_FILE = DATA_DIR / "cb_listed_cache.json"
+
+def _fetch_cb_listed_tpex():
+    """Fallback fetch for recent CB listings directly from TPEX open data API."""
+    from datetime import date
+    url = "https://www.tpex.org.tw/openapi/v1/bond_ISSBD5_data"
+    resp = http_requests.get(url, timeout=10, headers={"User-Agent": "Mozilla/5.0"}, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    items = resp.json()
+    valid = [d for d in items if d.get("ListingDate") and d.get("BondCode")]
+    valid.sort(key=lambda x: str(x.get("ListingDate", "")), reverse=True)
+
+    rows = []
+    for r in valid[:35]:
+        # 金額 (IssueAmount 為元 -> 轉為億 E)
+        try:
+            amt = float(r.get("IssueAmount", 0)) / 100_000_000
+            amt_str = f"{int(amt)}E" if amt == int(amt) else f"{amt:.1f}E"
+        except Exception:
+            amt_str = ""
+
+        # 年期
+        years = f"{r.get('TenorYear', '')}y" if r.get('TenorYear') else ""
+
+        # 轉換價
+        cp = r.get("Conversion/ExchangePriceAtIssuance", "")
+        try:
+            conv_price = str(int(float(cp))) if float(cp) == int(float(cp)) else str(round(float(cp), 2))
+        except Exception:
+            conv_price = str(cp)
+
+        # 掛牌日：YYYYMMDD -> 民國/MM/DD
+        ld = str(r.get("ListingDate", "")).strip()
+        if len(ld) == 8:
+            listing = f"{int(ld[:4]) - 1911}/{ld[4:6]}/{ld[6:]}"
+        else:
+            listing = ld
+
+        guar = "有擔保" if str(r.get("Guaranteed", "")).strip() == "1" else "無擔保"
+        remarks = r.get("GuaranteeDescription", "") or ""
+
+        rows.append({
+            "cb_code":    str(r.get("BondCode", "")).strip(),
+            "name":       str(r.get("ShortName", "")).strip(),
+            "tcri":       guar,
+            "amount":     amt_str,
+            "years":      years,
+            "conv_price": conv_price,
+            "listing":    listing,
+            "remarks":    str(remarks).strip(),
+        })
+
+    td = date.today()
+    roc_date = f"{td.year - 1911}.{td.month}.{td.day}"
+    return {"items": rows, "total": len(rows), "data_date": roc_date, "source": "tpex"}
 
 @app.get("/api/cb-listed")
 def get_cb_listed(force: bool = False):
-    """Return recent listed CBs from cbas pscnet Excel. Cached per calendar day."""
+    """Return recent listed CBs from cbas pscnet Excel with TPEX fallback and persistent cache."""
     global _cb_listed_cache
     import io, pandas as pd
     from datetime import date
@@ -2772,9 +2995,19 @@ def get_cb_listed(force: bool = False):
     if not force and _cb_listed_cache["data"] is not None and _cb_listed_cache["date"] == today:
         return _cb_listed_cache["data"]
 
+    # 1. 嘗試從統一證券 CBAS Excel 下載
     try:
-        resp = http_requests.get(CB_LISTED_URL, verify=_TW_VERIFY, timeout=15)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Referer": "https://cbas16889.pscnet.com.tw/"
+        }
+        resp = http_requests.get(CB_LISTED_URL, verify=_TW_VERIFY, timeout=12, headers=headers)
         resp.raise_for_status()
+
+        # 檢查是否為 HTML 維護頁面
+        if b"<html" in resp.content[:200].lower():
+            raise ValueError("Upstream returned HTML maintenance page instead of Excel")
+
         df = pd.read_excel(io.BytesIO(resp.content))
 
         rows = []
@@ -2821,12 +3054,44 @@ def get_cb_listed(force: bool = False):
 
         td = date.today()
         roc_date = f"{td.year - 1911}.{td.month}.{td.day}"
-        result = {"items": rows, "total": len(rows), "data_date": roc_date}
+        result = {"items": rows, "total": len(rows), "data_date": roc_date, "source": "pscnet"}
         _cb_listed_cache = {"date": today, "data": result}
+        try:
+            with open(CB_LISTED_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
         return result
     except Exception as e:
-        logger.error(f"[cb-listed] {e}")
-        return {"items": [], "total": 0, "error": str(e)}
+        logger.warning(f"[cb-listed] pscnet fetch failed: {e}. Trying fallback...")
+
+    # 2. 統一證券失敗或維護時，備援 1：櫃買中心 (TPEX) OpenAPI
+    try:
+        tpex_result = _fetch_cb_listed_tpex()
+        if tpex_result and tpex_result.get("items"):
+            logger.info(f"[cb-listed] successfully fetched {len(tpex_result['items'])} items from TPEX")
+            _cb_listed_cache = {"date": today, "data": tpex_result}
+            try:
+                with open(CB_LISTED_CACHE_FILE, "w", encoding="utf-8") as f:
+                    json.dump(tpex_result, f, ensure_ascii=False)
+            except Exception:
+                pass
+            return tpex_result
+    except Exception as te:
+        logger.warning(f"[cb-listed] TPEX fallback failed: {te}")
+
+    # 3. 備援 2：本地持久化快取
+    if CB_LISTED_CACHE_FILE.exists():
+        try:
+            with open(CB_LISTED_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _cb_listed_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[cb-listed] Failed to read disk cache: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
 
 
 _fsc_cache: dict = {"date": "", "data": None}
@@ -3004,6 +3269,371 @@ def get_fsc_offerings(force: bool = False):
     except Exception as e:
         logger.error(f"[fsc-offerings] {e}")
         return {"items": [], "total": 0, "error": str(e)}
+
+
+# ── 玉山證券 台股行事曆 (近期重要事件/除權息/申報轉讓/董監質設) ────────────────
+_ESUN_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+_ESUN_CODE_PREFIX_RE = re.compile(r"^(ASR|AS|AP|R)")
+_ESUN_STOCK_CODE_RE = re.compile(r"^[1-9]\d{3}$")
+
+def _normalize_tw_stock_code(raw: str):
+    """去除嘉實資訊(MoneyDJ) widget 的市場前綴字母，只保留真正的四碼股票代號
+    (排除 ETF/債券等 00xxx 或五碼以上的代號)。不符合條件回傳 None。"""
+    code = _ESUN_CODE_PREFIX_RE.sub("", str(raw or "").strip())
+    return code if _ESUN_STOCK_CODE_RE.match(code) else None
+
+
+_esun_events_cache: dict = {"date": "", "data": None}
+ESUN_EVENTS_URL = "https://sjis.esunsec.com.tw/b2brwdCommon/jsondata/9c/5b/04/twstockdata.xdjjson"
+ESUN_EVENTS_CACHE_FILE = DATA_DIR / "esun_events_cache.json"
+
+def _fetch_esun_events(days_ahead: int = 30) -> dict:
+    """Fetch 除權息/法說會/股東會/新股掛牌等事件，來源是 esunsec.com.tw 行事曆頁面
+    背後的嘉實資訊(MoneyDJ) widget JSON API，不需要瀏覽器即可直接取得結構化資料。
+    只保留四碼股票代號 (排除 ETF/債券)。"""
+    from datetime import date, timedelta
+
+    start = date.today()
+    end = start + timedelta(days=days_ahead)
+    params = {
+        "x": "afterhours-bulletin0004-3",
+        "a": start.strftime("%Y/%m/%d"),
+        "b": end.strftime("%Y/%m/%d"),
+    }
+    resp = http_requests.get(ESUN_EVENTS_URL, params=params, headers={"User-Agent": _ESUN_UA}, timeout=12, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    rows = (resp.json().get("ResultSet") or {}).get("Result") or []
+
+    items = []
+    for r in rows:
+        code = _normalize_tw_stock_code(r.get("V2", ""))
+        if not code:
+            continue
+        event_type = str(r.get("V4", "")).strip()
+        if "除權" in event_type or "除息" in event_type:
+            continue
+        items.append({
+            "date":       str(r.get("V1", "")).replace("/", "-"),  # YYYY-MM-DD
+            "code":       code,
+            "name":       str(r.get("V3", "")).strip(),
+            "event_type": event_type,
+            "remarks":    str(r.get("V5", "") or "").strip(),
+        })
+    items.sort(key=lambda x: (x["date"], x["code"]))
+    return {
+        "items": items,
+        "total": len(items),
+        "source": "esunsec",
+        "range": {"from": params["a"], "to": params["b"]},
+    }
+
+
+@app.get("/api/esun-events")
+def get_esun_events(force: bool = False, days: int = 30):
+    """近期重要事件 (除權息/法說會/股東會/新股掛牌...)，每日快取一次，失敗時退回磁碟快取。"""
+    global _esun_events_cache
+    from datetime import date
+
+    today = date.today().isoformat()
+    if not force and _esun_events_cache["data"] is not None and _esun_events_cache["date"] == today:
+        return _esun_events_cache["data"]
+
+    try:
+        result = _fetch_esun_events(days_ahead=days)
+        _esun_events_cache = {"date": today, "data": result}
+        try:
+            with open(ESUN_EVENTS_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
+        return result
+    except Exception as e:
+        logger.warning(f"[esun-events] fetch failed: {e}")
+
+    if ESUN_EVENTS_CACHE_FILE.exists():
+        try:
+            with open(ESUN_EVENTS_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _esun_events_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[esun-events] disk cache read failed: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
+
+
+_esun_exdividend_cache: dict = {"date": "", "data": None}
+ESUN_EXDIVIDEND_URL = "https://sjis.esunsec.com.tw/b2brwdCommon/jsondata/63/56/6c/twstockdata.xdjjson"
+ESUN_EXDIVIDEND_CACHE_FILE = DATA_DIR / "esun_exdividend_cache.json"
+
+def _fetch_esun_exdividend() -> dict:
+    """除權除息表 (玉山證券/嘉實資訊)，只保留四碼股票代號。"""
+    resp = http_requests.get(ESUN_EXDIVIDEND_URL, params={"x": "afterhours-bulletin0001"},
+                              headers={"User-Agent": _ESUN_UA}, timeout=12, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    rows = (resp.json().get("ResultSet") or {}).get("Result") or []
+
+    items = []
+    for r in rows:
+        code = _normalize_tw_stock_code(r.get("V11", "") or r.get("V2", ""))
+        if not code:
+            continue
+        ex_date = str(r.get("V9", "")).strip()
+        if not ex_date:
+            continue
+        items.append({
+            "date":            ex_date.replace("/", "-"),
+            "code":            code,
+            "name":            str(r.get("V3", "")).strip(),
+            "cash_dividend":   str(r.get("V4", "") or "").strip(),
+            "stock_dividend":  str(r.get("V6", "") or "").strip(),
+            "pay_date":        str(r.get("V10", "") or "").replace("/", "-"),
+            "yield_pct":       str(r.get("V18", "") or "").strip(),
+        })
+    items.sort(key=lambda x: (x["date"], x["code"]))
+    return {"items": items, "total": len(items), "source": "esunsec"}
+
+
+@app.get("/api/esun-exdividend")
+def get_esun_exdividend(force: bool = False):
+    """除權除息表，每日快取一次，失敗時退回磁碟快取。"""
+    global _esun_exdividend_cache
+    from datetime import date
+
+    today = date.today().isoformat()
+    if not force and _esun_exdividend_cache["data"] is not None and _esun_exdividend_cache["date"] == today:
+        return _esun_exdividend_cache["data"]
+
+    try:
+        result = _fetch_esun_exdividend()
+        _esun_exdividend_cache = {"date": today, "data": result}
+        try:
+            with open(ESUN_EXDIVIDEND_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
+        return result
+    except Exception as e:
+        logger.warning(f"[esun-exdividend] fetch failed: {e}")
+
+    if ESUN_EXDIVIDEND_CACHE_FILE.exists():
+        try:
+            with open(ESUN_EXDIVIDEND_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _esun_exdividend_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[esun-exdividend] disk cache read failed: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
+
+
+_esun_transfer_cache: dict = {"date": "", "data": None}
+ESUN_TRANSFER_URL = "https://sjis.esunsec.com.tw/b2brwdCommon/jsondata/5a/88/e6/twstockdata.xdjjson"
+ESUN_TRANSFER_CACHE_FILE = DATA_DIR / "esun_transfer_cache.json"
+
+def _fetch_esun_transfer(days: int = 30) -> dict:
+    """董監大股東/內部人申報轉讓明細，只保留四碼股票代號。"""
+    resp = http_requests.get(ESUN_TRANSFER_URL, params={"x": "afterhours-Bulletin0003", "days": days},
+                              headers={"User-Agent": _ESUN_UA}, timeout=12, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    rows = (resp.json().get("ResultSet") or {}).get("Result") or []
+
+    items = []
+    for r in rows:
+        raw_code = str(r.get("V1", "")).strip()
+        if not raw_code or raw_code.startswith("@@"):
+            continue
+        code = _normalize_tw_stock_code(raw_code)
+        if not code:
+            continue
+        date_str = str(r.get("V3", "")).strip()
+        if not date_str:
+            continue
+        items.append({
+            "date":   date_str.replace("/", "-"),
+            "code":   code,
+            "name":   str(r.get("V2", "")).strip(),
+            "person": str(r.get("V4", "") or "").strip(),
+            "role":   str(r.get("V5", "") or "").strip(),
+            "shares": str(r.get("V6", "") or "").strip(),
+            "method": str(r.get("V7", "") or "").strip(),
+        })
+    items.sort(key=lambda x: (x["date"], x["code"]), reverse=True)
+    return {"items": items, "total": len(items), "source": "esunsec"}
+
+
+@app.get("/api/esun-transfer")
+def get_esun_transfer(force: bool = False, days: int = 30):
+    """申報轉讓明細，每日快取一次，失敗時退回磁碟快取。"""
+    global _esun_transfer_cache
+    from datetime import date
+
+    today = date.today().isoformat()
+    if not force and _esun_transfer_cache["data"] is not None and _esun_transfer_cache["date"] == today:
+        return _esun_transfer_cache["data"]
+
+    try:
+        result = _fetch_esun_transfer(days=days)
+        _esun_transfer_cache = {"date": today, "data": result}
+        try:
+            with open(ESUN_TRANSFER_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
+        return result
+    except Exception as e:
+        logger.warning(f"[esun-transfer] fetch failed: {e}")
+
+    if ESUN_TRANSFER_CACHE_FILE.exists():
+        try:
+            with open(ESUN_TRANSFER_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _esun_transfer_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[esun-transfer] disk cache read failed: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
+
+
+_esun_boardinfo_cache: dict = {"date": "", "data": None}
+ESUN_BOARDINFO_URL = "https://sjis.esunsec.com.tw/b2brwdCommon/jsondata/c6/80/6e/twstockdata.xdjjson"
+ESUN_BOARDINFO_CACHE_FILE = DATA_DIR / "esun_boardinfo_cache.json"
+
+def _fetch_esun_boardinfo() -> dict:
+    """董監/大股東股票質押設定異動表，只保留四碼股票代號。"""
+    resp = http_requests.get(ESUN_BOARDINFO_URL, params={"x": "afterhours-bulletin0006", "a": 1},
+                              headers={"User-Agent": _ESUN_UA}, timeout=12, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    rows = (resp.json().get("ResultSet") or {}).get("Result") or []
+
+    items = []
+    for r in rows:
+        code = _normalize_tw_stock_code(r.get("V1", ""))
+        if not code:
+            continue
+        date_str = str(r.get("V3", "")).strip()
+        if not date_str:
+            continue
+        items.append({
+            "date":          date_str.replace("/", "-"),
+            "code":          code,
+            "name":          str(r.get("V2", "")).strip(),
+            "role":          str(r.get("V5", "") or "").strip(),
+            "person":        str(r.get("V6", "") or "").strip(),
+            "released":      str(r.get("V7", "") or "").strip(),
+            "pledged":       str(r.get("V8", "") or "").strip(),
+            "total_pledged": str(r.get("V9", "") or "").strip(),
+            "pledgee":       str(r.get("V10", "") or "").strip(),
+            "total_shares":  str(r.get("V11", "") or "").strip(),
+        })
+    items.sort(key=lambda x: (x["date"], x["code"]), reverse=True)
+    return {"items": items, "total": len(items), "source": "esunsec"}
+
+
+@app.get("/api/esun-boardinfo")
+def get_esun_boardinfo(force: bool = False):
+    """董監質設異動表，每日快取一次，失敗時退回磁碟快取。"""
+    global _esun_boardinfo_cache
+    from datetime import date
+
+    today = date.today().isoformat()
+    if not force and _esun_boardinfo_cache["data"] is not None and _esun_boardinfo_cache["date"] == today:
+        return _esun_boardinfo_cache["data"]
+
+    try:
+        result = _fetch_esun_boardinfo()
+        _esun_boardinfo_cache = {"date": today, "data": result}
+        try:
+            with open(ESUN_BOARDINFO_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
+        return result
+    except Exception as e:
+        logger.warning(f"[esun-boardinfo] fetch failed: {e}")
+
+    if ESUN_BOARDINFO_CACHE_FILE.exists():
+        try:
+            with open(ESUN_BOARDINFO_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _esun_boardinfo_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[esun-boardinfo] disk cache read failed: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
+
+
+_esun_disposition_cache: dict = {"date": "", "data": None}
+ESUN_DISPOSITION_URL = "https://sjis.esunsec.com.tw/b2brwdCommon/jsondata/b8/03/a5/twstockdata.xdjjson"
+ESUN_DISPOSITION_CACHE_FILE = DATA_DIR / "esun_disposition_cache.json"
+
+def _fetch_esun_disposition() -> dict:
+    """處置股 (警示股) 清單，只保留四碼普通股代號 (排除同一處置案下的 CB/權證條目)。"""
+    resp = http_requests.get(ESUN_DISPOSITION_URL, params={"x": "afterhours-bulletin0008"},
+                              headers={"User-Agent": _ESUN_UA}, timeout=12, verify=_TW_VERIFY)
+    resp.raise_for_status()
+    rows = (resp.json().get("ResultSet") or {}).get("Result") or []
+
+    items = []
+    for r in rows:
+        code = _normalize_tw_stock_code(r.get("V2", ""))
+        if not code:
+            continue
+        start_date = str(r.get("V6", "")).strip()
+        end_date = str(r.get("V7", "")).strip()
+        if not start_date or not end_date:
+            continue
+        items.append({
+            "code":       code,
+            "name":       str(r.get("V3", "")).strip(),
+            "start_date": start_date.replace("/", "-"),
+            "end_date":   end_date.replace("/", "-"),
+            "interval":   str(r.get("V10", "") or "").strip(),
+        })
+    items.sort(key=lambda x: (x["start_date"], x["code"]))
+    return {"items": items, "total": len(items), "source": "esunsec"}
+
+
+@app.get("/api/esun-disposition")
+def get_esun_disposition(force: bool = False):
+    """處置股清單，每日快取一次，失敗時退回磁碟快取。"""
+    global _esun_disposition_cache
+    from datetime import date
+
+    today = date.today().isoformat()
+    if not force and _esun_disposition_cache["data"] is not None and _esun_disposition_cache["date"] == today:
+        return _esun_disposition_cache["data"]
+
+    try:
+        result = _fetch_esun_disposition()
+        _esun_disposition_cache = {"date": today, "data": result}
+        try:
+            with open(ESUN_DISPOSITION_CACHE_FILE, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception:
+            pass
+        return result
+    except Exception as e:
+        logger.warning(f"[esun-disposition] fetch failed: {e}")
+
+    if ESUN_DISPOSITION_CACHE_FILE.exists():
+        try:
+            with open(ESUN_DISPOSITION_CACHE_FILE, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+                if cached_data and cached_data.get("items"):
+                    _esun_disposition_cache = {"date": today, "data": cached_data}
+                    return cached_data
+        except Exception as ce:
+            logger.error(f"[esun-disposition] disk cache read failed: {ce}")
+
+    return {"items": [], "total": 0, "error": "Upstream unavailable"}
 
 
 # ── Advance-Decline Line ─────────────────────────────────────────────────────
@@ -3440,12 +4070,14 @@ def _classify_stock_zones() -> dict:
         if len(valid_all) >= 2 and valid_all[-2]:
             chg_pct = round((valid_all[-1] - valid_all[-2]) / valid_all[-2] * 100, 2)
 
-        # 是否 > 5日均價
+        # 是否 > 5日均價 與 近20日高點
         last5 = valid_all[-5:]
         ma5 = sum(last5) / len(last5) if len(last5) >= 5 else None
+        prev20 = valid_all[-21:-1] if len(valid_all) >= 21 else (valid_all[:-1] if len(valid_all) > 1 else [])
+        high20 = max(prev20) if prev20 else None
 
         candidates[code] = {"code": code, "name": info["name"], "market": info["market"],
-                             "price": price, "ma": ma, "chg_pct": chg_pct, "ma5": ma5}
+                             "price": price, "ma": ma, "chg_pct": chg_pct, "ma5": ma5, "high20": high20}
 
     # 現價/今日漲跌% 盤中改用即時 MIS 報價覆蓋 (跟「持股健檢」同一支 fetch_tw_prices_mis)，
     # stock_ma_history 是每日收盤快取、盤中不會新增資料，只拿來算季線/5日均本身，不能當現價。
@@ -3468,7 +4100,9 @@ def _classify_stock_zones() -> dict:
                   "price": c["price"], "ma": round(c["ma"], 2), "pct": round(pct, 2),
                   "chg_pct": c["chg_pct"],
                   "ma5": round(ma5, 2) if ma5 is not None else None,
-                  "above_ma5": above_ma5}
+                  "above_ma5": above_ma5,
+                  "high20": round(c["high20"], 2) if c.get("high20") is not None else None,
+                  "is_high20": (c["price"] >= c["high20"]) if c.get("high20") is not None else False}
         if pct > 5:
             zones["strong"].append(entry)
         elif pct >= -5:
@@ -3587,6 +4221,52 @@ def _get_ma_status(codes: list[str]) -> dict[str, dict | None]:
         )
         out[code] = entry
     return out
+
+
+@app.get("/api/stock-ma-asof")
+def get_stock_ma_asof(symbol: str, date: str):
+    """指定股票在某日期 (或最近的前一個交易日) 的收盤價/漲跌%/MA5/10/20/60 站上站下狀態。
+    用於個股研究筆記記錄「撰寫當下」的股價快照，存進筆記後就不會隨資料更新而改變。
+    只能查到 stock_ma_history 保留的近 ~70 個交易日範圍內，超過範圍回傳 404。"""
+    from fastapi import HTTPException
+
+    data = _load_stock_ma_history()
+    if not data.get("dates"):
+        data = _build_stock_ma_history()
+    dates: list[str] = data.get("dates", [])
+    info = data.get("stocks", {}).get(symbol)
+    target = date.replace("-", "")
+
+    idx = None
+    for i in range(len(dates) - 1, -1, -1):
+        if dates[i] <= target:
+            idx = i
+            break
+    if not info or idx is None:
+        raise HTTPException(404, f"no stock-ma data for {symbol} around {date}")
+
+    closes = info.get("closes", [])
+    price = closes[idx] if idx < len(closes) else None
+    if price is None:
+        raise HTTPException(404, f"no close price for {symbol} on {dates[idx]}")
+
+    prev = next((closes[j] for j in range(idx - 1, -1, -1) if closes[j] is not None), None)
+    chg_pct = round((price - prev) / prev * 100, 2) if prev else None
+
+    entry: dict = {
+        "code": symbol, "name": info.get("name"), "date": dates[idx],
+        "price": price, "chg_pct": chg_pct,
+    }
+    for w in _MA_WINDOWS:
+        window = [c for c in closes[max(0, idx - w + 1): idx + 1] if c is not None]
+        if len(window) >= w:
+            ma = round(sum(window) / w, 2)
+            entry[f"ma{w}"] = ma
+            entry[f"above_ma{w}"] = price > ma
+        else:
+            entry[f"ma{w}"] = None
+            entry[f"above_ma{w}"] = None
+    return entry
 
 
 def _fetch_twse_t86(date_str: str) -> dict[str, dict]:

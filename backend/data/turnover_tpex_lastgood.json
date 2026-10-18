@@ -1,205 +1,205 @@
 {
   "tpex": [
     {
-      "code": "1815",
-      "name": "富喬",
-      "turnover": 15615623594,
-      "close": 135.0,
-      "chg": 5.0,
-      "chg_pct": 3.85
-    },
-    {
-      "code": "3081",
-      "name": "聯亞",
-      "turnover": 12117756030,
-      "close": 2865.0,
-      "chg": -205.0,
-      "chg_pct": -6.68
-    },
-    {
-      "code": "6223",
-      "name": "旺矽",
-      "turnover": 10840847215,
-      "close": 5795.0,
-      "chg": 305.0,
-      "chg_pct": 5.56
-    },
-    {
-      "code": "6147",
-      "name": "頎邦",
-      "turnover": 9574486026,
-      "close": 186.5,
-      "chg": -4.5,
-      "chg_pct": -2.36
+      "code": "6274",
+      "name": "台燿",
+      "turnover": 16546464010,
+      "close": 1655.0,
+      "chg": -80.0,
+      "chg_pct": -4.61
     },
     {
       "code": "6488",
       "name": "環球晶",
-      "turnover": 9324501243,
-      "close": 955.0,
-      "chg": -16.0,
-      "chg_pct": -1.65
-    },
-    {
-      "code": "5274",
-      "name": "信驊",
-      "turnover": 8921504335,
-      "close": 19220.0,
-      "chg": 5.0,
-      "chg_pct": 0.03
-    },
-    {
-      "code": "4979",
-      "name": "華星光",
-      "turnover": 7852002759,
-      "close": 605.0,
-      "chg": 15.0,
-      "chg_pct": 2.54
+      "turnover": 16315821465,
+      "close": 1015.0,
+      "chg": -100.0,
+      "chg_pct": -8.97
     },
     {
       "code": "3105",
       "name": "穩懋",
-      "turnover": 7751372196,
-      "close": 441.5,
-      "chg": -9.0,
-      "chg_pct": -2.0
+      "turnover": 13956957465,
+      "close": 556.0,
+      "chg": -24.0,
+      "chg_pct": -4.14
     },
     {
-      "code": "6274",
-      "name": "台燿",
-      "turnover": 6891585680,
-      "close": 1345.0,
-      "chg": -25.0,
-      "chg_pct": -1.82
-    },
-    {
-      "code": "6182",
-      "name": "合晶",
-      "turnover": 6646539093,
-      "close": 109.0,
-      "chg": -2.5,
-      "chg_pct": -2.24
-    },
-    {
-      "code": "3529",
-      "name": "力旺",
-      "turnover": 6204930410,
-      "close": 2825.0,
-      "chg": 255.0,
-      "chg_pct": 9.92
+      "code": "3081",
+      "name": "聯亞",
+      "turnover": 12877741075,
+      "close": 2725.0,
+      "chg": -300.0,
+      "chg_pct": -9.92
     },
     {
       "code": "8299",
       "name": "群聯",
-      "turnover": 5810062900,
-      "close": 2085.0,
-      "chg": -10.0,
-      "chg_pct": -0.48
-    },
-    {
-      "code": "3260",
-      "name": "威剛",
-      "turnover": 5567725822,
-      "close": 414.0,
-      "chg": 2.0,
-      "chg_pct": 0.49
-    },
-    {
-      "code": "6510",
-      "name": "精測",
-      "turnover": 5173461515,
-      "close": 3620.0,
-      "chg": 150.0,
-      "chg_pct": 4.32
+      "turnover": 10614558730,
+      "close": 1965.0,
+      "chg": -90.0,
+      "chg_pct": -4.38
     },
     {
       "code": "6187",
       "name": "萬潤",
-      "turnover": 5145941495,
-      "close": 1385.0,
-      "chg": 15.0,
-      "chg_pct": 1.09
+      "turnover": 9937711190,
+      "close": 1600.0,
+      "chg": -75.0,
+      "chg_pct": -4.48
     },
     {
-      "code": "6173",
-      "name": "信昌電",
-      "turnover": 4746970536,
-      "close": 273.5,
-      "chg": -13.0,
-      "chg_pct": -4.54
+      "code": "6223",
+      "name": "旺矽",
+      "turnover": 8994133565,
+      "close": 5940.0,
+      "chg": -190.0,
+      "chg_pct": -3.1
     },
     {
-      "code": "5351",
-      "name": "鈺創",
-      "turnover": 3643697217,
-      "close": 117.0,
-      "chg": -1.5,
-      "chg_pct": -1.27
+      "code": "1815",
+      "name": "富喬",
+      "turnover": 7639668548,
+      "close": 130.0,
+      "chg": -3.0,
+      "chg_pct": -2.26
     },
     {
-      "code": "3363",
-      "name": "上詮",
-      "turnover": 3106612041,
-      "close": 711.0,
-      "chg": -12.0,
-      "chg_pct": -1.66
+      "code": "3264",
+      "name": "欣銓",
+      "turnover": 6103095798,
+      "close": 268.5,
+      "chg": -4.0,
+      "chg_pct": -1.47
+    },
+    {
+      "code": "6147",
+      "name": "頎邦",
+      "turnover": 5882086672,
+      "close": 221.0,
+      "chg": -8.0,
+      "chg_pct": -3.49
+    },
+    {
+      "code": "6182",
+      "name": "合晶",
+      "turnover": 5439844765,
+      "close": 116.0,
+      "chg": -8.0,
+      "chg_pct": -6.45
+    },
+    {
+      "code": "3265",
+      "name": "台星科",
+      "turnover": 5025458080,
+      "close": 266.0,
+      "chg": 4.0,
+      "chg_pct": 1.53
+    },
+    {
+      "code": "3374",
+      "name": "精材",
+      "turnover": 4842523244,
+      "close": 465.5,
+      "chg": -16.0,
+      "chg_pct": -3.32
+    },
+    {
+      "code": "3624",
+      "name": "光頡",
+      "turnover": 4696693782,
+      "close": 166.5,
+      "chg": 0.0,
+      "chg_pct": 0.0
+    },
+    {
+      "code": "8042",
+      "name": "金山電",
+      "turnover": 4655199538,
+      "close": 144.0,
+      "chg": 0.0,
+      "chg_pct": 0.0
+    },
+    {
+      "code": "4979",
+      "name": "華星光",
+      "turnover": 4302920277,
+      "close": 535.0,
+      "chg": -47.0,
+      "chg_pct": -8.08
+    },
+    {
+      "code": "5274",
+      "name": "信驊",
+      "turnover": 4098475609,
+      "close": 17350.0,
+      "chg": -345.0,
+      "chg_pct": -1.95
     },
     {
       "code": "3324",
       "name": "雙鴻",
-      "turnover": 3085069590,
-      "close": 1340.0,
-      "chg": -100.0,
-      "chg_pct": -6.94
+      "turnover": 3862305155,
+      "close": 1475.0,
+      "chg": -65.0,
+      "chg_pct": -4.22
+    },
+    {
+      "code": "5483",
+      "name": "中美晶",
+      "turnover": 3151095207,
+      "close": 207.0,
+      "chg": -6.5,
+      "chg_pct": -3.04
+    },
+    {
+      "code": "5347",
+      "name": "世界",
+      "turnover": 3109084095,
+      "close": 175.0,
+      "chg": -6.0,
+      "chg_pct": -3.31
+    },
+    {
+      "code": "3363",
+      "name": "上詮",
+      "turnover": 2937161303,
+      "close": 547.0,
+      "chg": -55.0,
+      "chg_pct": -9.14
+    },
+    {
+      "code": "6217",
+      "name": "中探針",
+      "turnover": 2858955069,
+      "close": 197.0,
+      "chg": 17.5,
+      "chg_pct": 9.75
+    },
+    {
+      "code": "3529",
+      "name": "力旺",
+      "turnover": 2391476340,
+      "close": 2810.0,
+      "chg": -40.0,
+      "chg_pct": -1.4
     },
     {
       "code": "5289",
       "name": "宜鼎",
-      "turnover": 2887169740,
-      "close": 1370.0,
-      "chg": -35.0,
-      "chg_pct": -2.49
+      "turnover": 2358578855,
+      "close": 1190.0,
+      "chg": -70.0,
+      "chg_pct": -5.56
     },
     {
-      "code": "3693",
-      "name": "營邦",
-      "turnover": 2535179350,
-      "close": 669.0,
-      "chg": -13.0,
-      "chg_pct": -1.91
-    },
-    {
-      "code": "3131",
-      "name": "弘塑",
-      "turnover": 2414527045,
-      "close": 2635.0,
-      "chg": 80.0,
-      "chg_pct": 3.13
-    },
-    {
-      "code": "3491",
-      "name": "昇達科",
-      "turnover": 2349915535,
-      "close": 1490.0,
-      "chg": -20.0,
-      "chg_pct": -1.32
-    },
-    {
-      "code": "6207",
-      "name": "雷科",
-      "turnover": 2180128113,
-      "close": 116.5,
-      "chg": 4.0,
-      "chg_pct": 3.56
-    },
-    {
-      "code": "8358",
-      "name": "金居",
-      "turnover": 2072555772,
-      "close": 520.0,
-      "chg": 5.0,
-      "chg_pct": 0.97
+      "code": "8086",
+      "name": "宏捷科",
+      "turnover": 2328348101,
+      "close": 140.0,
+      "chg": -8.5,
+      "chg_pct": -5.72
     }
   ],
-  "_last_modified": "2026-09-09T01:22:21Z"
+  "_last_modified": "2026-10-13T18:38:01Z"
 }

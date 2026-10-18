@@ -1,0 +1,1290 @@
+
+[notice] A new release of pip is available: 26.1.2 -> 26.2.1
+[notice] To update, run: C:\Users\wesle\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip
+INFO:     Will watch for changes in these directories: ['E:\\claude_money']
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     Started reloader process [16056] using WatchFiles
+INFO:hc_finance:[tw-table] loaded 52354 symbols (updated: 2026-08-23 15:00:04)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [41432]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+INFO:     127.0.0.1:65049 - "GET / HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+WARNING:  WatchFiles detected changes in 'backend\main.py'. Reloading...
+ INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [41432]
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:hc_finance:[tw-table] loaded 52354 symbols (updated: 2026-08-23 15:00:04)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [30104]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+INFO:     127.0.0.1:59272 - "GET / HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     127.0.0.1:59361 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] warmup done
+Error computing TPEX margin ratio (all 3 attempts failed): ("Connection broken: ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None)", ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None))
+INFO:     127.0.0.1:59524 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:hc_finance:[relay] saved + pushed last-good institutional_flow_lastgood.json
+INFO:hc_finance:[relay] saved + pushed last-good institutional_flow_lastgood.json
+INFO:hc_finance:[relay] saved + pushed last-good institutional_flow_lastgood.json
+INFO:hc_finance:[relay] saved + pushed last-good institutional_flow_lastgood.json
+INFO:hc_finance:[relay] saved + pushed last-good institutional_flow_lastgood.json
+INFO:hc_finance:[Gist] push_file OK: institutional_flow_lastgood.json
+INFO:     127.0.0.1:63515 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,4760,6683,8155,8467 HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] push_file OK: institutional_flow_lastgood.json
+INFO:hc_finance:[Gist] push_file OK: institutional_flow_lastgood.json
+ERROR:hc_finance:[Gist] push_file error institutional_flow_lastgood.json: 409
+INFO:hc_finance:[Gist] push_file OK: institutional_flow_lastgood.json
+WARNING:  WatchFiles detected changes in 'backend\main.py'. Reloading...
+ INFO:     127.0.0.1:58217 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58218 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [30104]
+INFO:hc_finance:[tw-table] loaded 52354 symbols (updated: 2026-08-23 15:00:04)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [42220]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+INFO:     127.0.0.1:58245 - "GET / HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     127.0.0.1:60244 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52637 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52637 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60244 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62757 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52637 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55346 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62743 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62743 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52637 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62757 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14664 suspended 2026-08-19~2026-09-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 24423 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 24424 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 27431 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 33121 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 45491 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 61635 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 65331 suspended 2026-08-19~2026-09-13
+INFO:hc_finance:[cb-suspension] 66034 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84732 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] 99332 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] total 26 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:     127.0.0.1:55346 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:hc_finance:[fsc] fetching https://www.fsc.gov.tw/userfiles/file/1150911%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx (date: 115.9.11)
+INFO:     127.0.0.1:55346 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:hc_finance:[tdcc-remain] loaded 54707 registrations
+INFO:     127.0.0.1:60244 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62793 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62793 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61058 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:hc_finance:[punish] 2 active dispositions
+INFO:     127.0.0.1:61058 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62793 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62473 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62414 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62416 - "GET /api/holdings-health?symbols=2330 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52967 - "GET /api/holdings-health?symbols=2330 HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] push_file OK: chip_cache.json
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-12 21:00:00 CST)" (scheduled at 2026-09-12 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-13 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-14 15:00:00 CST)" was missed by 0:00:01.282647
+WARNING:apscheduler.executors.default:Run time of job "_build_tw_stock_table (trigger: cron[day_of_week='sun', hour='15', minute='0'], next run at: 2026-09-20 15:00:00 CST)" was missed by 0:00:01.283597
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-14 21:00:00 CST)" (scheduled at 2026-09-13 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-14 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+WARNING:  WatchFiles detected changes in 'backend\main.py'. Reloading...
+ INFO:     127.0.0.1:57391 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57392 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55726 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55727 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+要終止批次工作嗎 (Y/N)? INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [42220]
+
+[notice] A new release of pip is available: 26.1.2 -> 26.2.1
+[notice] To update, run: C:\Users\wesle\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip
+INFO:     Will watch for changes in these directories: ['E:\\claude_money']
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     Started reloader process [4732] using WatchFiles
+INFO:hc_finance:[tw-table] loaded 55204 symbols (updated: 2026-09-14 17:52:03)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [21088]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+WARNING:  WatchFiles detected changes in 'backend\main.py'. Reloading...
+ INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [21088]
+INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+[TWSE margin] ok (date=2026-09-15, stale=True)
+[TPEX margin] ok (date=2026-09-15, stale=True)
+INFO:hc_finance:[tw-table] loaded 55204 symbols (updated: 2026-09-14 17:52:03)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [26572]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-16 15:00:00 CST)" (scheduled at 2026-09-16 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: 4931.TW"}}}
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: 6186.TW"}}}
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6186.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6186.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] total 14 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 55131 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-16 saved — net_worth=76,510,566
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-17 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-17 15:10:00 CST)" (scheduled at 2026-09-16 15:10:00+08:00)
+INFO:hc_finance:[stock-ma] gap-fill 20260916 (otc): 874 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-17 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-17 21:00:00 CST)" (scheduled at 2026-09-16 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-17 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+INFO:apscheduler.executors.default:Running job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-18 09:01:00 CST)" (scheduled at 2026-09-17 09:01:00+08:00)
+INFO:hc_finance:[scheduler] TW price cache cleared for market open
+INFO:apscheduler.executors.default:Job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-18 09:01:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-18 15:00:00 CST)" (scheduled at 2026-09-17 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6186.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6186.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+WARNING:hc_finance:[cb-suspension] JSON index failed: HTTPSConnectionPool(host='www.tpex.org.tw', port=443): Max retries exceeded with url: /www/zh-tw/bond/cbSuspend?response=json&limit=100&offset=0 (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.tpex.org.tw', port=443) at 0x29534357610>, 'Connection to www.tpex.org.tw timed out. (connect timeout=10)'))
+INFO:hc_finance:[cb-suspension] found via HEAD: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] total 13 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 55376 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-17 saved — net_worth=78,540,044
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-18 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-18 15:10:00 CST)" (scheduled at 2026-09-17 15:10:00+08:00)
+WARNING:hc_finance:[stock-ma] TPEX 20260917: ("Connection broken: ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None)", ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None))
+INFO:hc_finance:[stock-ma] gap-fill 20260917 (otc): 867 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-18 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-18 21:00:00 CST)" (scheduled at 2026-09-17 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-18 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:apscheduler.executors.default:Running job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-21 09:01:00 CST)" (scheduled at 2026-09-18 09:01:00+08:00)
+INFO:hc_finance:[scheduler] TW price cache cleared for market open
+INFO:apscheduler.executors.default:Job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-21 09:01:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-19 15:00:00 CST)" (scheduled at 2026-09-18 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260917-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 12 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260917-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 55650 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-18 saved — net_worth=80,574,539
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-19 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-21 15:10:00 CST)" (scheduled at 2026-09-18 15:10:00+08:00)
+INFO:hc_finance:[stock-ma] gap-fill 20260918 (otc): 868 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-21 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-19 21:00:00 CST)" (scheduled at 2026-09-18 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-19 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-20 15:00:00 CST)" was missed by 0:00:01.960886
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-20 21:00:00 CST)" (scheduled at 2026-09-19 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-20 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-21 15:00:00 CST)" was missed by 0:00:01.194660
+WARNING:apscheduler.executors.default:Run time of job "_build_tw_stock_table (trigger: cron[day_of_week='sun', hour='15', minute='0'], next run at: 2026-09-20 15:00:00 CST)" was missed by 0:00:01.195530
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-21 21:00:00 CST)" (scheduled at 2026-09-20 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-21 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-22 09:01:00 CST)" was missed by 0:00:01.240749
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-22 15:00:00 CST)" (scheduled at 2026-09-21 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$3081.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260918-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260918-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 55870 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-21 saved — net_worth=80,716,959
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-22 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-22 15:10:00 CST)" (scheduled at 2026-09-21 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-22 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-22 21:00:00 CST)" (scheduled at 2026-09-21 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-22 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+要終止批次工作嗎 (Y/N)? INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+[TWSE margin] ok (date=2026-09-15, stale=True)
+[TPEX margin] ok (date=2026-09-15, stale=True)
+INFO:     127.0.0.1:62576 - "GET /api/portfolio HTTP/1.1" 200 OK
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-23 09:01:00 CST)" was missed by 0:00:01.192118
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-23 15:00:00 CST)" (scheduled at 2026-09-22 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260921-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260921-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 55996 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-22 saved — net_worth=80,468,457
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-23 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-23 15:10:00 CST)" (scheduled at 2026-09-22 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-23 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-23 21:00:00 CST)" (scheduled at 2026-09-22 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-23 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-24 09:01:00 CST)" was missed by 0:00:01.175784
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-24 15:00:00 CST)" (scheduled at 2026-09-23 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260922-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 10 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260922-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56116 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-23 saved — net_worth=80,856,023
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-24 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-24 15:10:00 CST)" (scheduled at 2026-09-23 15:10:00+08:00)
+WARNING:hc_finance:[stock-ma] TPEX 20260923: ("Connection broken: ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None)", ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None))
+INFO:hc_finance:[stock-ma] gap-fill 20260923 (otc): 868 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-24 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-24 21:00:00 CST)" (scheduled at 2026-09-23 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-24 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-25 09:01:00 CST)" was missed by 0:00:01.219585
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-25 15:00:00 CST)" (scheduled at 2026-09-24 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260923-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 9 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260923-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56376 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-24 saved — net_worth=81,333,269
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-25 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-25 15:10:00 CST)" (scheduled at 2026-09-24 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-25 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-25 21:00:00 CST)" (scheduled at 2026-09-24 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-25 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-28 09:01:00 CST)" was missed by 0:00:01.227109
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-26 15:00:00 CST)" (scheduled at 2026-09-25 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 9 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56662 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-25 saved — net_worth=81,331,175
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-26 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-28 15:10:00 CST)" (scheduled at 2026-09-25 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-28 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-26 21:00:00 CST)" (scheduled at 2026-09-25 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-26 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-27 15:00:00 CST)" was missed by 0:00:01.096772
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-27 21:00:00 CST)" (scheduled at 2026-09-26 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-27 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-28 15:00:00 CST)" was missed by 0:00:01.327670
+WARNING:apscheduler.executors.default:Run time of job "_build_tw_stock_table (trigger: cron[day_of_week='sun', hour='15', minute='0'], next run at: 2026-10-04 15:00:00 CST)" was missed by 0:00:01.331547
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-28 21:00:00 CST)" (scheduled at 2026-09-27 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-28 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-29 09:01:00 CST)" was missed by 0:00:01.187731
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-29 15:00:00 CST)" (scheduled at 2026-09-28 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 12 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56662 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-28 saved — net_worth=81,416,843
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-29 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-29 15:10:00 CST)" (scheduled at 2026-09-28 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-29 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-29 21:00:00 CST)" (scheduled at 2026-09-28 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-29 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-09-30 09:01:00 CST)" was missed by 0:00:01.311170
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-30 15:00:00 CST)" (scheduled at 2026-09-29 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260924-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56662 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-29 saved — net_worth=80,211,618
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-30 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-30 15:10:00 CST)" (scheduled at 2026-09-29 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-09-30 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-30 21:00:00 CST)" (scheduled at 2026-09-29 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-30 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-01 09:01:00 CST)" was missed by 0:00:01.184222
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-01 15:00:00 CST)" (scheduled at 2026-09-30 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4772.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4772.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260929-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260929-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56969 registrations
+INFO:hc_finance:[auto-snapshot] 2026-09-30 saved — net_worth=82,151,628
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-01 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-01 15:10:00 CST)" (scheduled at 2026-09-30 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-01 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-01 21:00:00 CST)" (scheduled at 2026-09-30 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-01 21:00:00 CST)" executed successfully
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-02 09:01:00 CST)" was missed by 0:00:01.142252
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-02 15:00:00 CST)" (scheduled at 2026-10-01 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] found via HEAD: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260930-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260930-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56785 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-01 saved — net_worth=82,536,478
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-02 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-02 15:10:00 CST)" (scheduled at 2026-10-01 15:10:00+08:00)
+WARNING:hc_finance:[stock-ma] TPEX 20261001: ("Connection broken: ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None)", ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None))
+INFO:hc_finance:[stock-ma] gap-fill 20261001 (otc): 864 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-02 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-02 21:00:00 CST)" (scheduled at 2026-10-01 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-02 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-05 09:01:00 CST)" was missed by 0:00:01.260227
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-03 15:00:00 CST)" (scheduled at 2026-10-02 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261001-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 10 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261001-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 56849 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-02 saved — net_worth=84,557,522
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-03 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-05 15:10:00 CST)" (scheduled at 2026-10-02 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-05 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-03 21:00:00 CST)" (scheduled at 2026-10-02 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-03 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-04 15:00:00 CST)" was missed by 0:00:01.239932
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-04 21:00:00 CST)" (scheduled at 2026-10-03 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-04 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-05 15:00:00 CST)" was missed by 0:00:01.190961
+WARNING:apscheduler.executors.default:Run time of job "_build_tw_stock_table (trigger: cron[day_of_week='sun', hour='15', minute='0'], next run at: 2026-10-11 15:00:00 CST)" was missed by 0:00:01.200657
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-05 21:00:00 CST)" (scheduled at 2026-10-04 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-05 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-06 09:01:00 CST)" was missed by 0:00:01.244630
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-06 15:00:00 CST)" (scheduled at 2026-10-05 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261002-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 9 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261002-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 57071 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-05 saved — net_worth=86,563,099
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-06 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-06 15:10:00 CST)" (scheduled at 2026-10-05 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-06 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-06 21:00:00 CST)" (scheduled at 2026-10-05 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-06 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-07 09:01:00 CST)" was missed by 0:00:01.266867
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-07 15:00:00 CST)" (scheduled at 2026-10-06 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6182.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261005-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] total 9 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261005-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 57430 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-06 saved — net_worth=86,528,385
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-07 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-07 15:10:00 CST)" (scheduled at 2026-10-06 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-07 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-07 21:00:00 CST)" (scheduled at 2026-10-06 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-07 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00991a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-08 09:01:00 CST)" was missed by 0:00:01.193266
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-08 15:00:00 CST)" (scheduled at 2026-10-07 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261006-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84672 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] 84673 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261006-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 57639 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-07 saved — net_worth=86,781,579
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-08 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-08 15:10:00 CST)" (scheduled at 2026-10-07 15:10:00+08:00)
+WARNING:hc_finance:[stock-ma] TPEX 20261007: Response ended prematurely
+INFO:hc_finance:[stock-ma] gap-fill 20261007 (otc): 873 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-08 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-08 21:00:00 CST)" (scheduled at 2026-10-07 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+INFO:hc_finance:[etf] 00403A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-08 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-09 09:01:00 CST)" was missed by 0:00:01.239561
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-09 15:00:00 CST)" (scheduled at 2026-10-08 15:00:00+08:00)
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261007-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84672 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] 84673 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] total 11 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261007-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 57964 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-08 saved — net_worth=87,271,765
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-09 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-09 15:10:00 CST)" (scheduled at 2026-10-08 15:10:00+08:00)
+WARNING:hc_finance:[stock-ma] TPEX 20261008: Response ended prematurely
+INFO:hc_finance:[stock-ma] gap-fill 20261008 (otc): 867 rows
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-09 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-09 21:00:00 CST)" (scheduled at 2026-10-08 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[etf] 00991A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+INFO:hc_finance:[etf] 00992A: loaded today's data from history JSON, prices refreshed
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-09 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+WARNING:apscheduler.executors.default:Run time of job "_clear_tw_price_cache_for_open (trigger: cron[day_of_week='mon-fri', hour='9', minute='1'], next run at: 2026-10-12 09:01:00 CST)" was missed by 0:00:01.216615
+INFO:apscheduler.executors.default:Running job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-10 15:00:00 CST)" (scheduled at 2026-10-09 15:00:00+08:00)
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6223.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$4931.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=1y) (Yahoo error = "No data found, symbol may be delisted")
+ERROR:yfinance:$6488.TW: possibly delisted; no price data found  (period=5d) (Yahoo error = "No data found, symbol may be delisted")
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261008-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 30401 suspended 2026-10-08~2026-11-06
+INFO:hc_finance:[cb-suspension] 36913 suspended 2026-10-06~2026-11-02
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-10-07~2026-11-05
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84672 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] 84673 suspended 2026-10-15~2026-11-10
+INFO:hc_finance:[cb-suspension] total 10 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202610/RSdrs002.20261008-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 58272 registrations
+INFO:hc_finance:[auto-snapshot] 2026-10-09 saved — net_worth=97,067,371
+INFO:apscheduler.executors.default:Job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-10 15:00:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-12 15:10:00 CST)" (scheduled at 2026-10-09 15:10:00+08:00)
+INFO:apscheduler.executors.default:Job "_run_daily_stock_ma_update (trigger: cron[day_of_week='mon-fri', hour='15', minute='10'], next run at: 2026-10-12 15:10:00 CST)" executed successfully
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-10 21:00:00 CST)" (scheduled at 2026-10-09 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-10 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-10-11 15:00:00 CST)" was missed by 0:00:01.264481
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-11 21:00:00 CST)" (scheduled at 2026-10-10 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-10-11 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+INFO:     127.0.0.1:54170 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54171 - "GET /api/esun-events HTTP/1.1" 404 Not Found

@@ -1,0 +1,672 @@
+INFO: [Gist] Local ¡X bidirectional sync enabled. Gist ID: 95fad***
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     127.0.0.1:61774 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60690 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55593 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60690 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51224 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61774 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54491 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50145 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54449 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50145 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54449 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57820 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54694 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56595 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65481 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52294 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     45.79.181.179:51692 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58307 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51526 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60445 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     45.79.207.110:33660 - "GET / HTTP/1.1" 200 OK
+INFO:     66.228.53.157:26586 - "GET / HTTP/1.1" 200 OK
+INFO:     198.235.24.76:57854 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+INFO:     94.183.174.95:49332 - "GET / HTTP/1.1" 200 OK
+INFO:     45.33.12.122:40486 - "GET / HTTP/1.1" 200 OK
+INFO:     172.104.11.34:6814 - "GET / HTTP/1.1" 200 OK
+INFO:     185.12.59.118:57964 - "GET /v404/exec?jwt=29075 HTTP/1.1" 404 Not Found
+INFO:     66.132.195.78:48060 - "GET / HTTP/1.1" 200 OK
+INFO:     66.132.195.78:11614 - "GET /sellers.json HTTP/1.1" 404 Not Found
+INFO:     198.235.24.68:49422 - "GET / HTTP/1.0" 200 OK
+INFO:     205.210.31.169:65050 - "GET / HTTP/1.1" 200 OK
+INFO:     94.183.174.95:35626 - "GET / HTTP/1.1" 200 OK
+INFO:     205.210.31.35:58224 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     49.216.131.11:42184 - "GET / HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42114 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42115 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42114 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42115 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41692 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42259 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42114 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42115 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41692 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41768 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41838 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41768 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41838 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41693 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41692 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41692 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41486 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41692 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42124 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42120 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42197 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42120 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41845 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41845 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42060 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42060 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42060 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42334 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42334 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41422 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42334 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41422 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42020 - "GET / HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41879 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41879 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42020 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41879 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42020 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42096 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41739 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41951 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42095 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42020 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42096 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41879 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41739 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41951 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41958 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41746 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41746 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41958 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41955 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41951 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41743 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41676 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41893 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41607 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42174 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41892 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42174 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42174 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42174 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41681 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41681 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41681 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42241 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42241 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42179 - "GET /api/market-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42182 - "GET /api/market-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     5.226.140.22:14208 - "GET / HTTP/1.1" 200 OK
+INFO:     194.50.235.131:12306 - "GET /api/mcp HTTP/1.1" 404 Not Found
+INFO:     37.10.113.211:4978 - "GET /mcp HTTP/1.1" 404 Not Found
+INFO:     49.216.131.11:41675 - "GET / HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42244 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42244 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41675 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42244 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41675 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41822 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41821 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42104 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41819 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42244 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41675 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41822 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41821 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42104 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42182 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41897 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42182 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41897 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41894 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42182 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41894 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42104 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41894 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41897 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41895 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42182 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41895 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42112 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42112 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41971 - "GET /static/js/growth.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41405 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41688 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41405 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41688 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41405 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41688 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41405 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42038 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41619 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42117 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET / HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42046 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42046 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42046 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41764 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41908 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41834 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41552 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42046 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41477 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41764 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41908 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41834 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42197 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41841 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42197 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41841 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41980 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42197 - "GET /static/js/assets.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41834 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41484 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41559 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42195 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41702 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41846 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41846 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42200 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41442 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41798 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41442 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41941 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41798 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41442 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42226 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41802 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41946 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42227 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41661 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41661 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41805 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42232 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42232 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42020 - "GET /static/js/growth.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42021 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     195.96.139.89:48115 - "GET / HTTP/1.1" 200 OK
+INFO:     64.62.156.10:41978 - "GET / HTTP/1.1" 200 OK
+INFO:     64.62.156.14:8233 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET / HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /.env.bak HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /.env.production.local HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /.env.production HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /.env.local HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /config.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /config.js HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /env.js HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /runtime-config.js HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /config.yaml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /config.php.bak HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /config.yml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /config.php HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /phpinfo.php HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /.git-credentials HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /.git/config HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /.pypirc HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /.npmrc HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /.docker/config.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /appsettings.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /appsettings.Production.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /application.properties HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /application.yml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /application.yaml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /config/secrets.yml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /server.key HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /conf/tomcat-users.xml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /actuator/configprops HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /actuator/env HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /.kube/config HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /robots.txt HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /sitemap.xml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /sitemap_index.xml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/ HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /openapi.yaml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /openapi.yml HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /swagger/v1/swagger.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /v3/api-docs HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /api-docs HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26230 - "GET /v2/api-docs HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /api/openapi.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /package.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /swagger.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:8502 - "GET /debug HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /_profiler HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /telescope HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26238 - "GET /docs HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26230 - "GET /composer.json HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26234 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /width%3Ddevice-width%2C%20initial-scale%3D1.0 HTTP/1.1" 404 Not Found
+INFO:     161.118.254.127:26244 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/chip-data HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/chip-data/batch HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/tw-prices HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/prices HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/cb-prices HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/stock-lookup HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/cb-lookup HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/snapshot HTTP/1.1" 405 Method Not Allowed
+INFO:     161.118.254.127:8502 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/backups HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/history/push-gist HTTP/1.1" 405 Method Not Allowed
+INFO:     161.118.254.127:8502 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/market-history HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/auto-snapshot/status HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/cb-suspension/reload HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/stock-table/status HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/stock-table/rebuild HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/stock-table/lookup HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/etf-list HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/etf-tracking HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/cb-listed HTTP/1.1" 200 OK
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     161.118.254.127:26238 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/advance-decline HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/stock-zones HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/institutional-flow HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/holdings-health HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/auto-snapshot/run HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/turnover-ranking HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/turnover-ranking/seed-history HTTP/1.1" 405 Method Not Allowed
+INFO:     161.118.254.127:26234 - "GET /api/important-info HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/cb-bookentry HTTP/1.1" 422 Unprocessable Content
+INFO:     161.118.254.127:8502 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26234 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     161.118.254.127:8502 - "GET /api/industry-map/config HTTP/1.1" 405 Method Not Allowed
+INFO:     161.118.254.127:26234 - "GET /docs/oauth2-redirect HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     161.118.254.127:26238 - "GET /docs/oauth2.redirectUrl%3B HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50410 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54465 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62259 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58836 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54336 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54336 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53450 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61147 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53450 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61147 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61147 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53450 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63841 - "GET /api/chip-data/batch?symbols=3324,3526,3587,3680,3717,4722,4760,6510,6683,8155,8467 HTTP/1.1" 200 OK
+INFO:     160.119.71.117:45850 - "GET / HTTP/1.1" 200 OK
+INFO:     87.236.176.91:48169 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56766 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50632 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62075 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57349 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57927 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57927 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61952 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58004 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57927 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58861 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58861 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61988 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61988 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61988 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61988 - "GET /static/js/assets.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61988 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52203 - "GET /static/js/growth.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50606 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62897 - "GET /api/stock-lookup?symbol=6186&market=tw HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "GET /api/chip-data/batch?symbols=6186 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60328 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65140 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53570 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62964 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62964 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63577 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53858 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53858 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57352 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57352 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54911 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52830 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62868 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62868 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "GET /api/chip-data/batch?symbols=3324,3526,3587,3680,3717,4722,4760,6510,6683,8155,8467 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51063 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,6186,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53509 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61070 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61157 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59066 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49827 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49828 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50855 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59877 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57353 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57353 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57353 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57353 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63280 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58584 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58584 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58584 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58584 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57434 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57353 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63280 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56679 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56679 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62261 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56963 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50686 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54043 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63154 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60418 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55599 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52288 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65279 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63731 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63399 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52535 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54828 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54828 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60538 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42017 - "GET / HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41450 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41450 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42017 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41450 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42017 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42161 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42304 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41383 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41737 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41450 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42161 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42017 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42304 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41383 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42188 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42188 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42188 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42327 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42188 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42184 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41383 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42047 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42047 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:42045 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41410 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41410 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41410 - "GET /api/etf-list HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41689 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     49.216.131.11:41906 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55421 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55421 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55421 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59717 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53775 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50753 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51492 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51492 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51492 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/assets.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6186,6223,8996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58348 - "GET /static/js/growth.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62036 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62036 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54228 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49303 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49303 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49821 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49821 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49821 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49821 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49821 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50303 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59790 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59063 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49303 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49303 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62964 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50460 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57171 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58628 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61408 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61633 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65476 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51031 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60257 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59937 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     3.129.187.38:37444 - "GET / HTTP/1.1" 200 OK
+INFO:     3.129.187.38:53062 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /static/style.css?v=64 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56800 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62502 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50860 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56800 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63349 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59320 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60639 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54816 - "GET /api/global-heatmap?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /static/style.css?v=65 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55788 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55788 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61748 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61748 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61748 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61748 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61748 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50957 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55317 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52766 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55788 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55788 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51722 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     66.132.186.180:63984 - "GET / HTTP/1.1" 200 OK
+INFO:     66.132.186.180:41646 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     66.132.186.180:45532 - "GET /sitemap.xml HTTP/1.1" 404 Not Found
+INFO:     40.119.45.136:53886 - "GET /v2/ HTTP/1.1" 404 Not Found
+INFO:     205.210.31.232:63184 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /static/style.css?v=65 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61983 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49983 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53723 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53723 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53723 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61983 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65082 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49744 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60193 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60193 - "GET /api/sync-from-gist HTTP/1.1" 200 OK

@@ -1,0 +1,1476 @@
+{
+  "items": [
+    {
+      "code": "5475",
+      "name": "德宏工業",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.2E",
+      "price": "91.6",
+      "eff_date": "115/10/22",
+      "eff_raw": "1151022"
+    },
+    {
+      "code": "2414",
+      "name": "精技電腦",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2E",
+      "price": "45",
+      "eff_date": "115/10/20",
+      "eff_raw": "1151020"
+    },
+    {
+      "code": "4562",
+      "name": "穎漢科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.3E",
+      "price": "23",
+      "eff_date": "115/10/19",
+      "eff_raw": "1151019"
+    },
+    {
+      "code": "5381",
+      "name": "光譜電工",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/10/19",
+      "eff_raw": "1151019"
+    },
+    {
+      "code": "2367",
+      "name": "燿華電子",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15E",
+      "price": "",
+      "eff_date": "115/10/16",
+      "eff_raw": "1151016"
+    },
+    {
+      "code": "3339",
+      "name": "泰谷光電科技",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/10/14",
+      "eff_raw": "1151014"
+    },
+    {
+      "code": "3339",
+      "name": "泰谷光電科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "32",
+      "eff_date": "115/10/14",
+      "eff_raw": "1151014"
+    },
+    {
+      "code": "6534",
+      "name": "正瀚生技-創",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "7E",
+      "price": "",
+      "eff_date": "115/10/14",
+      "eff_raw": "1151014"
+    },
+    {
+      "code": "1569",
+      "name": "濱川企業",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "36",
+      "eff_date": "115/10/13",
+      "eff_raw": "1151013"
+    },
+    {
+      "code": "1569",
+      "name": "濱川企業",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "4E",
+      "price": "",
+      "eff_date": "115/10/13",
+      "eff_raw": "1151013"
+    },
+    {
+      "code": "4542",
+      "name": "科嶠工業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/10/12",
+      "eff_raw": "1151012"
+    },
+    {
+      "code": "6658",
+      "name": "聯策",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "2.5E",
+      "price": "",
+      "eff_date": "115/10/12",
+      "eff_raw": "1151012"
+    },
+    {
+      "code": "3601",
+      "name": "前源科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "3E",
+      "price": "10",
+      "eff_date": "115/10/12",
+      "eff_raw": "1151012"
+    },
+    {
+      "code": "4542",
+      "name": "科嶠工業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/10/12",
+      "eff_raw": "1151012"
+    },
+    {
+      "code": "7758",
+      "name": "睿騰能源",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "32",
+      "eff_date": "115/10/08",
+      "eff_raw": "1151008"
+    },
+    {
+      "code": "3702",
+      "name": "大聯大",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "150E",
+      "price": "",
+      "eff_date": "115/10/08",
+      "eff_raw": "1151008"
+    },
+    {
+      "code": "6274",
+      "name": "台燿科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "100E",
+      "price": "",
+      "eff_date": "115/10/06",
+      "eff_raw": "1151006"
+    },
+    {
+      "code": "2492",
+      "name": "華新科",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "45E",
+      "price": "",
+      "eff_date": "115/10/06",
+      "eff_raw": "1151006"
+    },
+    {
+      "code": "3033",
+      "name": "威健實業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "40E",
+      "price": "",
+      "eff_date": "115/10/05",
+      "eff_raw": "1151005"
+    },
+    {
+      "code": "2025",
+      "name": "千興不銹鋼",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "4E",
+      "price": "10",
+      "eff_date": "115/10/02",
+      "eff_raw": "1151002"
+    },
+    {
+      "code": "2303",
+      "name": "聯電",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "18E USD",
+      "price": "",
+      "eff_date": "115/10/02",
+      "eff_raw": "1151002"
+    },
+    {
+      "code": "3455",
+      "name": "由田新技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "7E",
+      "price": "",
+      "eff_date": "115/10/02",
+      "eff_raw": "1151002"
+    },
+    {
+      "code": "3455",
+      "name": "由田新技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "3E",
+      "price": "",
+      "eff_date": "115/10/02",
+      "eff_raw": "1151002"
+    },
+    {
+      "code": "1711",
+      "name": "永光化學",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "5E",
+      "price": "33",
+      "eff_date": "115/10/01",
+      "eff_raw": "1151001"
+    },
+    {
+      "code": "5827",
+      "name": "華泰銀行",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "10E",
+      "price": "10",
+      "eff_date": "115/10/01",
+      "eff_raw": "1151001"
+    },
+    {
+      "code": "6750",
+      "name": "泰創工程",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.03E",
+      "price": "50",
+      "eff_date": "115/09/30",
+      "eff_raw": "1150930"
+    },
+    {
+      "code": "4132",
+      "name": "國鼎生物科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2E",
+      "price": "10",
+      "eff_date": "115/09/30",
+      "eff_raw": "1150930"
+    },
+    {
+      "code": "4906",
+      "name": "正文科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "8E",
+      "price": "",
+      "eff_date": "115/09/23",
+      "eff_raw": "1150923"
+    },
+    {
+      "code": "3691",
+      "name": "碩禾電子材料",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "100",
+      "eff_date": "115/09/23",
+      "eff_raw": "1150923"
+    },
+    {
+      "code": "4566",
+      "name": "時碩工業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "10E",
+      "price": "",
+      "eff_date": "115/09/23",
+      "eff_raw": "1150923"
+    },
+    {
+      "code": "4906",
+      "name": "正文科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "12E",
+      "price": "",
+      "eff_date": "115/09/23",
+      "eff_raw": "1150923"
+    },
+    {
+      "code": "6990",
+      "name": "華鉬",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.25E",
+      "price": "120",
+      "eff_date": "115/09/23",
+      "eff_raw": "1150923"
+    },
+    {
+      "code": "6944",
+      "name": "兆聯實業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "13E",
+      "price": "",
+      "eff_date": "115/09/22",
+      "eff_raw": "1150922"
+    },
+    {
+      "code": "6944",
+      "name": "兆聯實業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "12E",
+      "price": "",
+      "eff_date": "115/09/22",
+      "eff_raw": "1150922"
+    },
+    {
+      "code": "6438",
+      "name": "迅得機械",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/09/22",
+      "eff_raw": "1150922"
+    },
+    {
+      "code": "5271",
+      "name": "紘通企業",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "10",
+      "eff_date": "115/09/22",
+      "eff_raw": "1150922"
+    },
+    {
+      "code": "8996",
+      "name": "高力熱處理",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "25E",
+      "price": "",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "6285",
+      "name": "啟碁科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "60E",
+      "price": "",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "6734",
+      "name": "安盛生",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "5",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "2316",
+      "name": "楠梓電子",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "35E",
+      "price": "",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "6285",
+      "name": "啟碁科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "20E",
+      "price": "",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "8996",
+      "name": "高力熱處理",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15E",
+      "price": "",
+      "eff_date": "115/09/21",
+      "eff_raw": "1150921"
+    },
+    {
+      "code": "6129",
+      "name": "普誠科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2E",
+      "price": "15",
+      "eff_date": "115/09/17",
+      "eff_raw": "1150917"
+    },
+    {
+      "code": "1727",
+      "name": "中華化工",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.38E",
+      "price": "72",
+      "eff_date": "115/09/17",
+      "eff_raw": "1150917"
+    },
+    {
+      "code": "7876",
+      "name": "鼎晉生技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.5E",
+      "price": "32",
+      "eff_date": "115/09/17",
+      "eff_raw": "1150917"
+    },
+    {
+      "code": "1727",
+      "name": "中華化工",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "10E",
+      "price": "",
+      "eff_date": "115/09/17",
+      "eff_raw": "1150917"
+    },
+    {
+      "code": "5246",
+      "name": "勵威電子",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.75E",
+      "price": "70",
+      "eff_date": "115/09/16",
+      "eff_raw": "1150916"
+    },
+    {
+      "code": "4938",
+      "name": "和碩聯合",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "5E USD",
+      "price": "",
+      "eff_date": "115/09/15",
+      "eff_raw": "1150915"
+    },
+    {
+      "code": "4958",
+      "name": "F-臻鼎",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "8E USD",
+      "price": "",
+      "eff_date": "115/09/14",
+      "eff_raw": "1150914"
+    },
+    {
+      "code": "6475",
+      "name": "智賦科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.12E",
+      "price": "50",
+      "eff_date": "115/09/11",
+      "eff_raw": "1150911"
+    },
+    {
+      "code": "6834",
+      "name": "天二科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "80",
+      "eff_date": "115/09/10",
+      "eff_raw": "1150910"
+    },
+    {
+      "code": "8422",
+      "name": "可寧衛",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "25E",
+      "price": "",
+      "eff_date": "115/09/10",
+      "eff_raw": "1150910"
+    },
+    {
+      "code": "6174",
+      "name": "安碁科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "3E",
+      "price": "",
+      "eff_date": "115/09/09",
+      "eff_raw": "1150909"
+    },
+    {
+      "code": "3289",
+      "name": "宜特科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "12E",
+      "price": "",
+      "eff_date": "115/09/09",
+      "eff_raw": "1150909"
+    },
+    {
+      "code": "2756",
+      "name": "聯發國際",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "4E",
+      "price": "",
+      "eff_date": "115/09/07",
+      "eff_raw": "1150907"
+    },
+    {
+      "code": "8038",
+      "name": "長園科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.8E",
+      "price": "30",
+      "eff_date": "115/09/07",
+      "eff_raw": "1150907"
+    },
+    {
+      "code": "2357",
+      "name": "華碩電腦",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "15E USD",
+      "price": "",
+      "eff_date": "115/09/07",
+      "eff_raw": "1150907"
+    },
+    {
+      "code": "8021",
+      "name": "尖點科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "4.8E",
+      "price": "",
+      "eff_date": "115/09/04",
+      "eff_raw": "1150904"
+    },
+    {
+      "code": "8021",
+      "name": "尖點科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.4E",
+      "price": "300",
+      "eff_date": "115/09/04",
+      "eff_raw": "1150904"
+    },
+    {
+      "code": "3260",
+      "name": "威剛科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "30E",
+      "price": "",
+      "eff_date": "115/09/03",
+      "eff_raw": "1150903"
+    },
+    {
+      "code": "3260",
+      "name": "威剛科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2E",
+      "price": "300",
+      "eff_date": "115/09/03",
+      "eff_raw": "1150903"
+    },
+    {
+      "code": "4198",
+      "name": "欣大健康",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "3E",
+      "price": "",
+      "eff_date": "115/09/03",
+      "eff_raw": "1150903"
+    },
+    {
+      "code": "7776",
+      "name": "奧孟亞",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.4E",
+      "price": "33",
+      "eff_date": "115/08/31",
+      "eff_raw": "1150831"
+    },
+    {
+      "code": "2890",
+      "name": "永豐金控",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "64E",
+      "price": "31.25",
+      "eff_date": "115/08/28",
+      "eff_raw": "1150828"
+    },
+    {
+      "code": "7419",
+      "name": "達勝科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "50",
+      "eff_date": "115/08/26",
+      "eff_raw": "1150826"
+    },
+    {
+      "code": "2221",
+      "name": "大甲永和機械",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/08/26",
+      "eff_raw": "1150826"
+    },
+    {
+      "code": "4541",
+      "name": "晟田科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "2E",
+      "price": "",
+      "eff_date": "115/08/25",
+      "eff_raw": "1150825"
+    },
+    {
+      "code": "4541",
+      "name": "晟田科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "50",
+      "eff_date": "115/08/25",
+      "eff_raw": "1150825"
+    },
+    {
+      "code": "4541",
+      "name": "晟田科技",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "3E",
+      "price": "",
+      "eff_date": "115/08/25",
+      "eff_raw": "1150825"
+    },
+    {
+      "code": "2454",
+      "name": "聯發科技",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "40E USD",
+      "price": "",
+      "eff_date": "115/08/25",
+      "eff_raw": "1150825"
+    },
+    {
+      "code": "4194",
+      "name": "禾伸堂生技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2.5E",
+      "price": "10",
+      "eff_date": "115/08/24",
+      "eff_raw": "1150824"
+    },
+    {
+      "code": "7743",
+      "name": "金利食安",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "2E",
+      "price": "",
+      "eff_date": "115/08/21",
+      "eff_raw": "1150821"
+    },
+    {
+      "code": "6160",
+      "name": "欣技資訊",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.1E",
+      "price": "13",
+      "eff_date": "115/08/20",
+      "eff_raw": "1150820"
+    },
+    {
+      "code": "6830",
+      "name": "汎銓",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.6E",
+      "price": "300",
+      "eff_date": "115/08/19",
+      "eff_raw": "1150819"
+    },
+    {
+      "code": "8042",
+      "name": "台灣金山電子",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.9E",
+      "price": "90",
+      "eff_date": "115/08/19",
+      "eff_raw": "1150819"
+    },
+    {
+      "code": "2646",
+      "name": "星宇航空",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/08/18",
+      "eff_raw": "1150818"
+    },
+    {
+      "code": "2646",
+      "name": "星宇航空",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "30E",
+      "price": "16.5",
+      "eff_date": "115/08/18",
+      "eff_raw": "1150818"
+    },
+    {
+      "code": "2646",
+      "name": "星宇航空",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15E",
+      "price": "",
+      "eff_date": "115/08/18",
+      "eff_raw": "1150818"
+    },
+    {
+      "code": "2317",
+      "name": "鴻海精密",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "15E USD",
+      "price": "",
+      "eff_date": "115/08/17",
+      "eff_raw": "1150817"
+    },
+    {
+      "code": "6917",
+      "name": "竟天生物",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.6E",
+      "price": "32",
+      "eff_date": "115/08/17",
+      "eff_raw": "1150817"
+    },
+    {
+      "code": "2464",
+      "name": "盟立",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.85E",
+      "price": "120",
+      "eff_date": "115/08/17",
+      "eff_raw": "1150817"
+    },
+    {
+      "code": "4977",
+      "name": "F-眾達",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.83E",
+      "price": "100",
+      "eff_date": "115/08/17",
+      "eff_raw": "1150817"
+    },
+    {
+      "code": "2464",
+      "name": "盟立",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "10E",
+      "price": "",
+      "eff_date": "115/08/17",
+      "eff_raw": "1150817"
+    },
+    {
+      "code": "6954",
+      "name": "全盈支付",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "20",
+      "eff_date": "115/08/14",
+      "eff_raw": "1150814"
+    },
+    {
+      "code": "4925",
+      "name": "智微科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.6E",
+      "price": "58",
+      "eff_date": "115/08/14",
+      "eff_raw": "1150814"
+    },
+    {
+      "code": "2614",
+      "name": "東森國際",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "12.5E",
+      "price": "16",
+      "eff_date": "115/08/13",
+      "eff_raw": "1150813"
+    },
+    {
+      "code": "6597",
+      "name": "立誠光電",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "4.5E",
+      "price": "",
+      "eff_date": "115/08/12",
+      "eff_raw": "1150812"
+    },
+    {
+      "code": "1560",
+      "name": "中國砂輪",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "10E",
+      "price": "",
+      "eff_date": "115/08/11",
+      "eff_raw": "1150811"
+    },
+    {
+      "code": "8084",
+      "name": "巨虹電子",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "10.52E",
+      "price": "45",
+      "eff_date": "115/08/11",
+      "eff_raw": "1150811"
+    },
+    {
+      "code": "6533",
+      "name": "晶心科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.68E",
+      "price": "169",
+      "eff_date": "115/08/10",
+      "eff_raw": "1150810"
+    },
+    {
+      "code": "7631",
+      "name": "聚賢研發-創",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "4E",
+      "price": "",
+      "eff_date": "115/08/10",
+      "eff_raw": "1150810"
+    },
+    {
+      "code": "7777",
+      "name": "能率亞洲",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.6E",
+      "price": "36",
+      "eff_date": "115/08/07",
+      "eff_raw": "1150807"
+    },
+    {
+      "code": "6667",
+      "name": "信紘科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.42E",
+      "price": "195",
+      "eff_date": "115/08/06",
+      "eff_raw": "1150806"
+    },
+    {
+      "code": "7738",
+      "name": "東聯互動",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/08/05",
+      "eff_raw": "1150805"
+    },
+    {
+      "code": "4973",
+      "name": "廣穎電通",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/08/04",
+      "eff_raw": "1150804"
+    },
+    {
+      "code": "6787",
+      "name": "晶瑞光",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.65E",
+      "price": "30",
+      "eff_date": "115/08/04",
+      "eff_raw": "1150804"
+    },
+    {
+      "code": "1795",
+      "name": "美時化學製藥",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "3E USD",
+      "price": "",
+      "eff_date": "115/08/04",
+      "eff_raw": "1150804"
+    },
+    {
+      "code": "6639",
+      "name": "源大環能",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "7",
+      "eff_date": "115/08/03",
+      "eff_raw": "1150803"
+    },
+    {
+      "code": "2761",
+      "name": "橘焱胡同",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.4E",
+      "price": "12",
+      "eff_date": "115/08/03",
+      "eff_raw": "1150803"
+    },
+    {
+      "code": "3016",
+      "name": "嘉晶電子",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "3.5E",
+      "price": "",
+      "eff_date": "115/07/31",
+      "eff_raw": "1150731"
+    },
+    {
+      "code": "3711",
+      "name": "日月光投控",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "10E USD",
+      "price": "",
+      "eff_date": "115/07/31",
+      "eff_raw": "1150731"
+    },
+    {
+      "code": "3016",
+      "name": "嘉晶電子",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.29E",
+      "price": "90",
+      "eff_date": "115/07/31",
+      "eff_raw": "1150731"
+    },
+    {
+      "code": "3219",
+      "name": "倚強科",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "6E",
+      "price": "",
+      "eff_date": "115/07/31",
+      "eff_raw": "1150731"
+    },
+    {
+      "code": "6935",
+      "name": "王子製藥",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "27",
+      "eff_date": "115/07/30",
+      "eff_raw": "1150730"
+    },
+    {
+      "code": "3665",
+      "name": "F-貿聯",
+      "kind": "轉換公司債",
+      "cb_sub": "海外",
+      "amount": "5E USD",
+      "price": "",
+      "eff_date": "115/07/30",
+      "eff_raw": "1150730"
+    },
+    {
+      "code": "6570",
+      "name": "維田科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "2.5E",
+      "price": "",
+      "eff_date": "115/07/30",
+      "eff_raw": "1150730"
+    },
+    {
+      "code": "6225",
+      "name": "天瀚科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "3.22E",
+      "price": "15",
+      "eff_date": "115/07/30",
+      "eff_raw": "1150730"
+    },
+    {
+      "code": "4967",
+      "name": "十銓科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "30E",
+      "price": "",
+      "eff_date": "115/07/29",
+      "eff_raw": "1150729"
+    },
+    {
+      "code": "6698",
+      "name": "旭暉應用",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "40",
+      "eff_date": "115/07/29",
+      "eff_raw": "1150729"
+    },
+    {
+      "code": "1819",
+      "name": "豐鼎光波",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.5E",
+      "price": "10",
+      "eff_date": "115/07/29",
+      "eff_raw": "1150729"
+    },
+    {
+      "code": "6847",
+      "name": "普瑞博",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.3E",
+      "price": "75",
+      "eff_date": "115/07/28",
+      "eff_raw": "1150728"
+    },
+    {
+      "code": "6793",
+      "name": "天力離岸",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "3E",
+      "price": "10.5",
+      "eff_date": "115/07/27",
+      "eff_raw": "1150727"
+    },
+    {
+      "code": "7731",
+      "name": "火星生技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.05E",
+      "price": "5",
+      "eff_date": "115/07/27",
+      "eff_raw": "1150727"
+    },
+    {
+      "code": "7899",
+      "name": "景美科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.35E",
+      "price": "263",
+      "eff_date": "115/07/24",
+      "eff_raw": "1150724"
+    },
+    {
+      "code": "3141",
+      "name": "晶宏半導體",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/07/23",
+      "eff_raw": "1150723"
+    },
+    {
+      "code": "3141",
+      "name": "晶宏半導體",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/07/23",
+      "eff_raw": "1150723"
+    },
+    {
+      "code": "8421",
+      "name": "旭源包裝",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.9E",
+      "price": "11",
+      "eff_date": "115/07/23",
+      "eff_raw": "1150723"
+    },
+    {
+      "code": "2644",
+      "name": "中信造船",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.83E",
+      "price": "72",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "3081",
+      "name": "聯亞光電",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "12E",
+      "price": "",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "8936",
+      "name": "國統國際",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "6E",
+      "price": "",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "3081",
+      "name": "聯亞光電",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "18E",
+      "price": "",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "8936",
+      "name": "國統國際",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "6E",
+      "price": "",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "5206",
+      "name": "坤悅開發",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2.1E",
+      "price": "20",
+      "eff_date": "115/07/22",
+      "eff_raw": "1150722"
+    },
+    {
+      "code": "7897",
+      "name": "禾迅綠電",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.62E",
+      "price": "27",
+      "eff_date": "115/07/21",
+      "eff_raw": "1150721"
+    },
+    {
+      "code": "3512",
+      "name": "皇龍開發",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "6E",
+      "price": "",
+      "eff_date": "115/07/20",
+      "eff_raw": "1150720"
+    },
+    {
+      "code": "2303",
+      "name": "聯電",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "40E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "8155",
+      "name": "博智電子",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "20E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "8155",
+      "name": "博智電子",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "30E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "5536",
+      "name": "聖暉工程",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "5536",
+      "name": "聖暉工程",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "2303",
+      "name": "聯電",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "120E",
+      "price": "",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "6998",
+      "name": "友上科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1E",
+      "price": "20",
+      "eff_date": "115/07/17",
+      "eff_raw": "1150717"
+    },
+    {
+      "code": "6851",
+      "name": "立視科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.23E",
+      "price": "55",
+      "eff_date": "115/07/16",
+      "eff_raw": "1150716"
+    },
+    {
+      "code": "3234",
+      "name": "光環科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.5E",
+      "price": "100",
+      "eff_date": "115/07/16",
+      "eff_raw": "1150716"
+    },
+    {
+      "code": "6980",
+      "name": "鐳洋科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.3E",
+      "price": "100",
+      "eff_date": "115/07/15",
+      "eff_raw": "1150715"
+    },
+    {
+      "code": "6564",
+      "name": "安特羅",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "1.1E",
+      "price": "18",
+      "eff_date": "115/07/14",
+      "eff_raw": "1150714"
+    },
+    {
+      "code": "7911",
+      "name": "阿波羅電力",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "2E",
+      "price": "70",
+      "eff_date": "115/07/14",
+      "eff_raw": "1150714"
+    },
+    {
+      "code": "6715",
+      "name": "嘉基科技",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.6E",
+      "price": "350",
+      "eff_date": "115/07/13",
+      "eff_raw": "1150713"
+    },
+    {
+      "code": "2895",
+      "name": "陽信銀行",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "15E",
+      "price": "10",
+      "eff_date": "115/07/09",
+      "eff_raw": "1150709"
+    },
+    {
+      "code": "8438",
+      "name": "昶昕實業",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "3E",
+      "price": "",
+      "eff_date": "115/07/09",
+      "eff_raw": "1150709"
+    },
+    {
+      "code": "6903",
+      "name": "巨漢",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "10E",
+      "price": "",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "4764",
+      "name": "雙鍵化工",
+      "kind": "轉換公司債",
+      "cb_sub": "有擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "6903",
+      "name": "巨漢",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "5E",
+      "price": "",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "4764",
+      "name": "雙鍵化工",
+      "kind": "現金增資",
+      "cb_sub": "",
+      "amount": "0.6E",
+      "price": "240",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "6683",
+      "name": "雍智科技",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "15.3E",
+      "price": "",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "2486",
+      "name": "一詮精密",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "20E",
+      "price": "",
+      "eff_date": "115/07/08",
+      "eff_raw": "1150708"
+    },
+    {
+      "code": "2451",
+      "name": "創見資訊",
+      "kind": "轉換公司債",
+      "cb_sub": "無擔保",
+      "amount": "30E",
+      "price": "",
+      "eff_date": "115/07/07",
+      "eff_raw": "1150707"
+    }
+  ],
+  "total": 147,
+  "excel_date": "115.10.02"
+}

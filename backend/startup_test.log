@@ -1,0 +1,109 @@
+INFO:hc_finance:[tw-table] loaded 52354 symbols (updated: 2026-08-23 15:00:04)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [47020]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO: [Gist] Local — bidirectional sync enabled. Gist ID: 95fad***
+INFO:     127.0.0.1:59740 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[relay] saved + pushed last-good market_heatmap_tse_lastgood.json
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     127.0.0.1:59760 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[Gist] push_file OK: market_heatmap_tse_lastgood.json
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+Error computing TPEX margin ratio (all 3 attempts failed): ("Connection broken: ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None)", ConnectionResetError(10054, '遠端主機已強制關閉一個現存的連線。', None, 10054, None))
+INFO:     127.0.0.1:50221 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50221 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50221 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50221 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51022 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65024 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65024 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51022 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65024 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65024 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65024 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50221 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51022 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59098 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63088 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62453 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:     127.0.0.1:62453 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:hc_finance:[fsc] fetching https://www.fsc.gov.tw/userfiles/file/1150911%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx (date: 115.9.11)
+INFO:     127.0.0.1:51022 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 24423 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 24424 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 27431 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 33121 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 45491 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 61635 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 66034 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84732 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] 99332 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] total 24 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:     127.0.0.1:59098 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62453 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:hc_finance:[tdcc-remain] loaded 54707 registrations
+INFO:     127.0.0.1:65024 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50264 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50264 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50264 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50221 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54023 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54023 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54023 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54023 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58533 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51892 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55693 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55693 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55693 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50888 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57648 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK

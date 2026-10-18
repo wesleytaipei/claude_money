@@ -1,0 +1,379 @@
+INFO:hc_finance:[tw-table] loaded 52354 symbols (updated: 2026-08-23 15:00:04)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [40888]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO: [Gist] Local ¡X bidirectional sync enabled. Gist ID: 95fad***
+INFO:     127.0.0.1:49928 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49930 - "GET /api/holdings-health?symbols=2330 HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+[TWSE margin] ok (date=2026-09-11, stale=True)
+[TPEX margin] ok (date=2026-09-11, stale=True)
+INFO:     127.0.0.1:63801 - "GET / HTTP/1.1" 200 OK
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:     127.0.0.1:63782 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63782 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63922 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63922 - "GET /static/js/holdings-health.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/investments.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63922 - "GET /static/js/etf.js HTTP/1.1" 200 OK
+INFO:hc_finance:[punish] 2 active dispositions
+INFO:     127.0.0.1:63922 - "GET /api/punish/status HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:     127.0.0.1:63782 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14664 suspended 2026-08-19~2026-09-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 24423 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 24424 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 27431 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 33121 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 45491 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 61635 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 65331 suspended 2026-08-19~2026-09-13
+INFO:hc_finance:[cb-suspension] 66034 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84732 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] 99332 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] total 26 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:     127.0.0.1:50704 - "GET /api/chip-data/batch?symbols=0063,0068,1303,3026,4931,6223,8996 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50704 - "GET /api/holdings-health?symbols=4931,6223,1303,8996,3026,3526,3587,3680,3717,4722,8467,4760,8155,6683,3324,6510 HTTP/1.1" 200 OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:     127.0.0.1:56403 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:hc_finance:[fsc] fetching https://www.fsc.gov.tw/userfiles/file/1150911%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx (date: 115.9.11)
+INFO:     127.0.0.1:56403 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:hc_finance:[tdcc-remain] loaded 54707 registrations
+INFO:     127.0.0.1:62642 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60315 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60315 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59699 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52535 - "GET /api/chip-data/batch?symbols=3324,3526,3587,3680,3717,4722,4760,6510,6683,8155,8467 HTTP/1.1" 200 OK
+INFO:     198.235.24.221:58930 - "GET / HTTP/1.1" 200 OK
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-12 21:00:00 CST)" (scheduled at 2026-09-12 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+ERROR:hc_finance:[Gist] push_file error etf_00981a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+ERROR:hc_finance:[Gist] push_file error etf_00988a_history.json: 409
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-13 21:00:00 CST)" executed successfully
+ERROR:hc_finance:[Gist] push_file error etf_00403a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+ERROR:hc_finance:[Gist] push_file error etf_00992a_history.json: 409
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     185.98.171.54:4273 - "GET /photo/webapi/entry.cgi/SYNO.FotoTeam.Browse.Folder?api=SYNO.FotoTeam.Browse.Folder&method=list&version=2&id=1&offset=0&limit=5000&sort_by=%22filename%22&sort_direction=%22asc%22&additional=%5B%22sharing_info%22%2C%22access_permission%22%2C%22thumbnail%22%2C%22password_verified%22%5D HTTP/1.1" 404 Not Found
+INFO:     185.98.171.54:22377 - "GET /photo/webapi/entry.cgi?api=SYNO.FotoTeam.Browse.Folder&method=list&version=2&id=1&offset=0&limit=5000&sort_by=%22filename%22&sort_direction=%22asc%22&additional=%5B%22sharing_info%22%2C%22access_permission%22%2C%22thumbnail%22%2C%22password_verified%22%5D HTTP/1.1" 404 Not Found
+INFO:     185.98.171.54:4273 - "POST /photo/webapi/auth.php?api=SYNO.PhotoStation.Auth&method=checkauth&version=1&ps_username= HTTP/1.1" 404 Not Found
+INFO:     160.119.71.117:55396 - "GET / HTTP/1.1" 200 OK
+INFO:     198.235.24.110:64378 - "GET / HTTP/1.1" 200 OK
+INFO:     198.235.24.27:65034 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     18.218.118.203:37372 - "GET / HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.224.79:4634 - "GET / HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.224.79:2644 - "GET / HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.224.79:33638 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     66.132.224.79:33656 - "GET /wiki HTTP/1.1" 404 Not Found
+INFO:     185.12.59.118:43614 - "GET /v404/exec?jwt=29075 HTTP/1.1" 404 Not Found
+INFO:     87.236.176.149:34223 - "GET / HTTP/1.1" 200 OK
+INFO:     198.235.24.70:62756 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     205.210.31.221:65262 - "GET / HTTP/1.1" 200 OK
+INFO:     89.37.172.135:12732 - "GET / HTTP/1.1" 200 OK
+INFO:     188.240.59.24:12046 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     31.14.254.6:12462 - "GET /mcp/ HTTP/1.1" 404 Not Found
+INFO:     213.166.84.38:3118 - "GET / HTTP/1.1" 200 OK
+INFO:     194.50.235.132:12078 - "GET /mcp HTTP/1.1" 404 Not Found
+INFO:     5.226.140.50:14672 - "GET /api/mcp HTTP/1.1" 404 Not Found
+INFO:     31.14.254.8:4100 - "GET /sse HTTP/1.1" 404 Not Found
+INFO:     134.209.116.128:44938 - "GET / HTTP/1.1" 200 OK
+INFO:     134.209.116.128:44952 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     195.154.59.230:56082 - "GET / HTTP/1.1" 200 OK
+INFO:     195.154.59.230:56082 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     195.154.59.230:56160 - "GET / HTTP/1.1" 200 OK
+INFO:     195.154.59.230:56216 - "GET / HTTP/1.1" 200 OK
+INFO:     195.154.59.230:56254 - "GET / HTTP/1.1" 200 OK
+INFO:     195.154.59.230:56282 - "GET /HNAP1 HTTP/1.1" 404 Not Found
+INFO:     195.154.59.230:56324 - "POST /onvif/device_service HTTP/1.1" 404 Not Found
+INFO:     195.154.59.230:56366 - "GET /PSIA/index HTTP/1.1" 404 Not Found
+INFO:     205.210.31.163:53777 - "GET / HTTP/1.0" 200 OK
+INFO:     64.62.156.52:14098 - "GET / HTTP/1.1" 200 OK
+INFO:     64.62.156.65:25899 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     205.210.31.166:61866 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     147.185.132.30:57760 - "GET / HTTP/1.1" 200 OK
+WARNING:apscheduler.executors.default:Run time of job "_run_daily_snapshot (trigger: cron[hour='15', minute='0'], next run at: 2026-09-14 15:00:00 CST)" was missed by 0:00:01.280645
+WARNING:apscheduler.executors.default:Run time of job "_build_tw_stock_table (trigger: cron[day_of_week='sun', hour='15', minute='0'], next run at: 2026-09-13 15:00:00 CST)" was missed by 0:00:01.281071
+INFO:     198.235.24.246:61674 - "GET /metrics HTTP/1.1" 404 Not Found
+INFO:     147.185.132.210:63050 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+INFO:     198.235.24.119:63176 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+INFO:     176.65.149.236:52379 - "GET / HTTP/1.1" 200 OK
+INFO:     142.93.224.178:47446 - "GET / HTTP/1.1" 200 OK
+INFO:     85.217.149.1:57382 - "GET / HTTP/1.1" 200 OK
+INFO:     85.217.149.1:57382 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     85.217.149.67:46438 - "GET / HTTP/1.1" 200 OK
+INFO:     85.217.149.67:46438 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:apscheduler.executors.default:Running job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-14 21:00:00 CST)" (scheduled at 2026-09-13 21:00:00+08:00)
+INFO:hc_finance:[scheduler] ETF daily fetch start
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00981A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[Gist] push_file OK: etf_00981a_history.json
+INFO:hc_finance:[scheduler] ETF 00988A fetched OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:hc_finance:[scheduler] ETF 00403A fetched OK
+INFO:hc_finance:[scheduler] ETF 00991A fetched OK
+INFO:hc_finance:[scheduler] ETF 00992A fetched OK
+INFO:hc_finance:[scheduler] ETF daily fetch done
+INFO:apscheduler.executors.default:Job "_run_daily_etf_fetch (trigger: cron[hour='21', minute='0'], next run at: 2026-09-14 21:00:00 CST)" executed successfully
+INFO:hc_finance:[Gist] push_file OK: etf_00988a_history.json
+INFO:hc_finance:[Gist] push_file OK: etf_00403a_history.json
+ERROR:hc_finance:[Gist] push_file error etf_00991a_history.json: 409
+INFO:hc_finance:[Gist] push_file OK: etf_00992a_history.json
+INFO:     160.119.71.117:48458 - "GET / HTTP/1.1" 200 OK
+INFO:     198.235.24.202:63292 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+INFO:     94.183.174.95:45018 - "GET /currentsetting.htm HTTP/1.1" 404 Not Found
+INFO:     198.235.24.219:61312 - "GET /.well-known/security.txt HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:57899 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57899 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53853 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50717 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61139 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:     127.0.0.1:61139 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:hc_finance:[fsc] fetching https://www.fsc.gov.tw/userfiles/file/1150911%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8.xlsx (date: 115.9.11)
+INFO:     127.0.0.1:61139 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51395 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53853 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 14381 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 24423 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 24424 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 27431 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 33121 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 45491 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 61635 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 66034 suspended 2026-08-21~2026-09-15
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 84732 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] 99332 suspended 2026-08-20~2026-09-14
+INFO:hc_finance:[cb-suspension] total 24 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260911-C.csv
+INFO:hc_finance:[tdcc-remain] loaded 54707 registrations
+INFO:     127.0.0.1:57899 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64213 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64213 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58407 - "GET /static/js/history.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58407 - "GET /static/js/stock-zones.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58407 - "GET /api/stock-zones HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59555 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52338 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54705 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59555 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58829 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58829 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:hc_finance:[backup] local snapshot saved ¡÷ E:\claude_money\backend\data\backups\2026-09-14
+INFO:     127.0.0.1:58829 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58829 - "GET /api/history HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] portfolio push OK ts=2026-09-13T16:55:27Z
+INFO:hc_finance:[Gist] confirmed push OK (Local) ts=2026-09-13T16:55:28Z
+INFO:     127.0.0.1:49237 - "GET /static/js/industry.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49237 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:     127.0.0.1:52330 - "GET /api/industry-map?force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63888 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56492 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64908 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58790 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55571 - "GET /api/industry-map HTTP/1.1" 200 OK
+WARNING:  Invalid HTTP request received.
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:51125 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63708 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60257 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51457 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51817 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55799 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57964 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56988 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51991 - "GET /api/industry-map HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57650 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63365 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51463 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57650 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59395 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59395 - "GET /static/js/stock-zones.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59395 - "GET /api/stock-zones HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59395 - "GET /static/js/market-heatmap.js HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59395 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58414 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58414 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64645 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60885 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57600 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:60678 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54253 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49776 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58044 - "GET /api/market-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54253 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49736 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60678 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56404 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/style.css?v=63 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64941 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/global-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57537 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57537 - "GET /api/market-heatmap HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64077 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58903 - "GET /api/sync-from-gist HTTP/1.1" 200 OK

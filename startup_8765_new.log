@@ -1,0 +1,25 @@
+INFO:     Will watch for changes in these directories: ['E:\\claude_money']
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     Started reloader process [8648] using WatchFiles
+INFO:hc_finance:[tw-table] loaded 55204 symbols (updated: 2026-09-14 17:52:03)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [39404]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+WARNING:  WatchFiles detected changes in 'backend\main.py'. Reloading...
+ 

@@ -498,8 +498,9 @@ def fetch_taiex_margin_ratio():
             params={"response": "json", "selectType": "MS"},
             headers=ua, timeout=15, verify=False
         )
+        r_sum_json = r_sum.json()
         total_debt_kt = 0.0
-        for table in r_sum.json().get("tables", []):
+        for table in r_sum_json.get("tables", []):
             for row in table.get("data", []):
                 if "融資金額" in str(row[0]):
                     # fields: 項目|買進|賣出|現金(券)償還|前日餘額|今日餘額
@@ -508,6 +509,14 @@ def fetch_taiex_margin_ratio():
 
         if total_debt_kt <= 0:
             raise ValueError("Could not read total margin debt from TWSE")
+
+        # TWSE 只在收盤結算後才把「今日餘額」換成新的一天 — 開盤前/結算前這支
+        # API 的 date 欄位還停在上一個交易日。fetch_twse_margin() (融資餘額卡)
+        # 已經會檢查這個並標記 stale，這裡如果不比照辦理，就會把「其實是昨天」
+        # 的資料當成「今天」存進 ratio 歷史，跟餘額卡的漲跌基準對不齊，
+        # 出現「餘額減少、維持率卻增加」這種比較基準不一致的假象。
+        resp_raw = r_sum_json.get("date", "")
+        resp_date = f"{resp_raw[:4]}-{resp_raw[4:6]}-{resp_raw[6:8]}" if len(resp_raw) == 8 else ""
 
         # ── 4. Compute collateral value (仟元) ────────────────────────────────
         # 融資今日餘額 unit = 千股 (lots); price unit = NTD/share
@@ -529,15 +538,22 @@ def fetch_taiex_margin_ratio():
         ratio = collateral_kt / total_debt_kt * 100.0
         from datetime import datetime, timezone, timedelta as _td
         tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
-        tw_yesterday = (tw_today - _td(days=1)).isoformat()
+        tw_today_str = tw_today.isoformat()
+        is_stale = (resp_date != tw_today_str) if resp_date else False
+        # Key the value under the trading day it actually represents (resp_date
+        # when stale), not blindly under "today" — keeps the history's date
+        # labels honest so tomorrow's "prev" lookup isn't itself a stale dupe.
+        value_date = resp_date if (is_stale and resp_date) else tw_today_str
+        tw_yesterday = (datetime.fromisoformat(value_date).date() - _td(days=1)).isoformat()
         hist = _load_ratio_history()
         prev_val = hist.get(tw_yesterday, {}).get("tse")
         result = {"current": round(ratio, 2), "prev": prev_val}
-        # Persist today's value
-        today_key = tw_today.isoformat()
-        entry = hist.get(today_key, {})
+        if is_stale:
+            result["stale"] = True
+        # Persist under the value's real trading date
+        entry = hist.get(value_date, {})
         entry["tse"] = result["current"]
-        hist[today_key] = entry
+        hist[value_date] = entry
         _save_ratio_history(hist)
         _margin_ratio_cache = {"ts": now, "data": result}
         return result
@@ -620,6 +636,11 @@ def fetch_tpex_margin_ratio():
             if total_debt_kt <= 0:
                 raise ValueError("TPEX total margin debt is 0 or missing")
 
+            # 同一支 API fetch_tpex_margin() (融資餘額卡) 已經在檢查這個 date 欄位
+            # 判斷 stale — 這裡比照辦理，避免把還沒結算的舊資料當「今天」存進歷史。
+            resp_raw = margin_data.get("date", "")
+            resp_date = f"{resp_raw[:4]}-{resp_raw[4:6]}-{resp_raw[6:8]}" if len(resp_raw) == 8 else ""
+
             # ── 2. TPEX closing prices ─────────────────────────────────────────
             r_prices = requests.get(
                 "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes",
@@ -659,21 +680,27 @@ def fetch_tpex_margin_ratio():
             ratio = collateral_kt / total_debt_kt * 100.0
             from datetime import datetime, timezone, timedelta as _td
             tw_today = datetime.now(tz=timezone(_td(hours=8))).date()
+            tw_today_str = tw_today.isoformat()
+            is_stale = (resp_date != tw_today_str) if resp_date else False
+            # Key under the trading day this data actually represents, not
+            # blindly "today", so tomorrow's lookup doesn't hit a stale dupe.
+            value_date = resp_date if (is_stale and resp_date) else tw_today_str
             hist = _load_ratio_history()
             # Most recent prior day that actually has a value (skips weekends/holidays
             # where nothing was fetched, instead of hard-coding "yesterday").
             prev_val = None
-            for d in sorted((k for k in hist if k < tw_today.isoformat()), reverse=True):
+            for d in sorted((k for k in hist if k < value_date), reverse=True):
                 v = hist[d].get("tpex")
                 if v is not None:
                     prev_val = v
                     break
             result = {"current": round(ratio, 2), "prev": prev_val}
-            # Persist today's value
-            today_key = tw_today.isoformat()
-            entry = hist.get(today_key, {})
+            if is_stale:
+                result["stale"] = True
+            # Persist under the value's real trading date
+            entry = hist.get(value_date, {})
             entry["tpex"] = result["current"]
-            hist[today_key] = entry
+            hist[value_date] = entry
             _save_ratio_history(hist)
             _tpex_margin_ratio_cache = {"ts": now, "data": result, "fail_ts": 0.0}
             return result

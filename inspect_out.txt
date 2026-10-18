@@ -1,0 +1,28 @@
+ASSET GROUPS:
+  group='現金' n_items=14
+    '台北富邦 - 台幣' currency=TWD amount=1528558
+    '台北富邦 - 美元' currency=USD amount=270.8
+    '台北富邦 - 日幣' currency=JPY amount=166
+    '國泰世華 - 台幣' currency=TWD amount=1193857
+    '台新銀行 - 台幣' currency=TWD amount=105210
+    '中國信託 - 台幣' currency=TWD amount=1616373
+  group='不動產' n_items=2
+    '小資宅' currency=TWD amount=18750000
+    '華固慕川' currency=TWD amount=4610000
+  group='其他' n_items=1
+    '汽車' currency=TWD amount=1500000
+
+INVESTMENT GROUPS:
+  group='股票' n_items=13 margin_items=9 brokers=['中信', '群益']
+  group='可轉債' n_items=19 margin_items=0 brokers=['統一']
+  group='美國股市' n_items=5 margin_items=0 brokers=[]
+
+LIABILITY GROUPS:
+  group='中長期貸款' n_items=5
+    '台灣銀行 - 助學貸款' amount=109355 auto_margin=None
+    '富邦銀行 - 理財房貸' amount=2132505 auto_margin=None
+    '富邦銀行 - 理財房貸' amount=11173772 auto_margin=None
+    '永豐銀行 - 一般房貸' amount=14875000 auto_margin=None
+    '富邦銀行 - 信用貸款' amount=3090032 auto_margin=None
+  group='短期貸款' n_items=1
+    '股票融資' amount=25571000 auto_margin=True

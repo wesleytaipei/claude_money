@@ -1,0 +1,982 @@
+INFO:hc_finance:[tw-table] loaded 55204 symbols (updated: 2026-09-14 17:52:03)
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO:apscheduler.scheduler:Added job "_run_daily_snapshot" to job store "default"
+INFO:apscheduler.scheduler:Added job "_build_tw_stock_table" to job store "default"
+INFO:apscheduler.scheduler:Added job "_run_daily_etf_fetch" to job store "default"
+INFO:apscheduler.scheduler:Added job "_clear_tw_price_cache_for_open" to job store "default"
+INFO:apscheduler.scheduler:Scheduler started
+INFO:hc_finance:[scheduler] daily auto-snapshot @ 15:00 | TW table rebuild @ Sun 15:00 | ETF fetch @ 21:00 | TW cache clear @ 09:01
+INFO:apscheduler.scheduler:Added job "_run_daily_stock_ma_update" to job store "default"
+INFO:hc_finance:[scheduler] stock-ma zone update @ 15:10
+INFO:     Started server process [39336]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5000 (Press CTRL+C to quit)
+INFO:hc_finance:[relay] saved + pushed last-good margin_ratio_tse_lastgood.json
+INFO: [Gist] Local ¡X bidirectional sync enabled. Gist ID: 95fad***
+[TWSE margin] ok (date=2026-09-15, stale=True)
+[TPEX margin] ok (date=2026-09-15, stale=True)
+INFO:     127.0.0.1:62865 - "GET /api/important-info?force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[startup] synced from Gist: nothing newer
+INFO:hc_finance:[startup] warming indices & important-info caches...
+ERROR:hc_finance:[Gist] push_file error margin_ratio_history.json: 409
+INFO:hc_finance:[startup] warmup done
+INFO:hc_finance:[Gist] push_file OK: margin_ratio_tse_lastgood.json
+INFO:hc_finance:[industry-map] cache refreshed (89 stocks)
+INFO:     127.0.0.1:51793 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51793 - "GET /static/js/state.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53972 - "GET /static/js/utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53972 - "GET /static/js/api.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:51793 - "GET /static/js/charts.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:51793 - "GET /static/js/routing.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53972 - "GET /static/js/dashboard.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53972 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53972 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51793 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51793 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53972 - "GET /api/history HTTP/1.1" 200 OK
+C:\Users\wesle\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\openpyxl\styles\stylesheet.py:237: UserWarning: Workbook contains no default style, apply openpyxl's default
+  warn("Workbook contains no default style, apply openpyxl's default")
+INFO:     127.0.0.1:59933 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51793 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:hc_finance:[fsc] fetching https://www.fsc.gov.tw/userfiles/file/1150915%E7%94%B3%E5%A0%B1%E6%A1%88%E4%BB%B6%E5%BD%99%E7%B8%BD%E8%A1%A8v2.xlsx (date: 115.9.15)
+INFO:     127.0.0.1:59933 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53972 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:     127.0.0.1:53972 - "GET /static/js/adl.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53972 - "GET /api/important-info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51793 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53972 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] total 14 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:     127.0.0.1:59933 - "GET /api/advance-decline HTTP/1.1" 200 OK
+INFO:hc_finance:[tdcc-remain] loaded 55157 registrations
+INFO:     127.0.0.1:54815 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59160 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59160 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     3.238.56.206:14472 - "GET / HTTP/1.1" 200 OK
+INFO:     3.238.56.206:24770 - "GET / HTTP/1.1" 200 OK
+INFO:     3.238.56.206:24770 - "GET /static../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /media../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/proc/self/environ?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/home/ec2-user/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/../.env?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /static../.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /media../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /static../.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/proc/1/environ?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/proc/self/environ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/root/.config/gcloud/application_default_credentials.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /static../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/root/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /files../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /app/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /assets../../../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/etc/passwd?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40fs/etc/passwd?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /proc/self/environ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /actuator/env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /api/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /config.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /?file=../../../../etc/passwd HTTP/1.1" 200 OK
+INFO:     3.238.56.206:24770 - "GET /.git/HEAD HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /%40vite/env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /read?url=file:///proc/self/environ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.git-credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /download?file=../../../../etc/passwd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET / HTTP/1.1" 200 OK
+INFO:     3.238.56.206:24770 - "GET /.env.staging HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.development HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /accessKeys.csv HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.aws HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /aws-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /server/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET / HTTP/1.1" 200 OK
+INFO:     3.238.56.206:24770 - "GET /backend/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /api/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /config/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /src/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.prod HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.docker HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.gcp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.docker.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:24770 - "GET /.env.azure HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /.aws_credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /proxy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /api/fetch HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /api/preview HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /gradio_api/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /actuator HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /admin/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?uri=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /v1/graphql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /graphql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?uri=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?uri=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /fetch HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /api/graphql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /graphql/console HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /core/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /fetch HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /fetch HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /fetch HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /management HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "POST /proxy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?path=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?path=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?path=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?dest=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:60578 - "GET /fetch?dest=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:40816 - "GET /fetch?dest=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:40816 - "GET /public/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:40816 - "GET /.aws/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:40824 - "GET /app/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /apps/api/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49668 - "GET /_next/../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49668 - "GET /home/node/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /web/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /root/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /home/ubuntu/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /back/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /home/ec2-user/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /backend/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_next/static/../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_next/../.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_nuxt/../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/proc/self/cwd/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /assets../../../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/proc/self/cwd/.env?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /files../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /static../proc/self/environ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?target=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?target=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?file=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?target=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?file=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?file=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?src=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?src=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?src=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Finfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/root/.aws/credentials?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/home/ec2-user/.aws/credentials?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/home/ubuntu/.config/gcloud/application_default_credentials.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.config/gcloud/application_default_credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/home/node/.config/gcloud/application_default_credentials.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/home/node/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/root/.aws/config?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /home/ubuntu/.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/app/.config/gcloud/application_default_credentials.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.azure/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/root/.azure/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/proc/self/cwd/.config/gcloud/application_default_credentials.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/home/ubuntu/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/app/.aws/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.azure/accessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/root/.config/gcloud/application_default_credentials.json?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /home/azureuser/.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/root/.azure/accessTokens.json?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/home/ubuntu/.azure/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/home/azureuser/.azure/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /static../.azure/accessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/proc/self/cwd/.azure/credentials?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /azure.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /_next/../.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /redirect?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /redirect?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/proxy?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/proxy?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/v1/fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v1/fetch?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /azure-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/proc/self/environ?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.gitlab-ci.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.vercel/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.git/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.github/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /%40fs/app/.env?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/root/.env?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.github/workflows/ci.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/.env?raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /%40fs/proc/1/environ?import&raw?? HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /assets/env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.cursor/mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /claude_desktop_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /runtime-config.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.git/index HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /__env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws-exports.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.vite/manifest.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /firebase-config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /google-services.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /debug/pprof/cmdline HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/webhook?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/webhook?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/download?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/download?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /webhook?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /webhook?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /preview?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /preview?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /debug/default/view?panel=config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /screenshot?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /actuator/logfile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /download?file=../../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /storage/logs/laravel.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /download?file=../../.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/file?path=../../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /read?file=../../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /_profiler/phpinfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /read?url=file:///proc/1/environ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /?file=../../.env HTTP/1.1" 200 OK
+INFO:     3.238.56.206:49678 - "GET /screenshot?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /image?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /image?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/preview?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/image?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/preview?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/image?url=http%3A%2F%2F169.254.169.254%2Flatest%2Fmeta-data%2Fiam%2Fsecurity-credentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?url=http%3A%2F%2Fmetadata.google.internal%2FcomputeMetadata%2Fv1%2Finstance%2Fservice-accounts%2Fdefault%2Ftoken HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=http%3A%2F%2Fmetadata.google.internal%2FcomputeMetadata%2Fv1%2Finstance%2Fservice-accounts%2Fdefault%2Ftoken HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /home/gitlab-runner/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /home/runner/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /home/circleci/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.github/workflows/build.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.github/workflows/deploy.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /jenkins/config.xml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /azure-pipelines.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /jenkins/credentials.xml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /Jenkinsfile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /jenkins/config.xml.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.ci HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.circleci/config.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /jenkins/Jenkinsfile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.drone.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.jenkins/config.xml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.travis.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /bitbucket-pipelines.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /cloudbuild.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.github/workflows/main.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.github/workflows/release.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.github/workflows/test.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.github/workflows/docker.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.github/workflows/publish.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=http%3A%2F%2F169.254.169.254%2Fmetadata%2Fidentity%2Foauth2%2Ftoken%3Fapi-version%3D2018-02-01%26resource%3Dhttps%3A%2F%2Fmanagement.azure.com%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.github/secrets.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=http%3A%2F%2F169.254.169.254%2Fmetadata%2Fidentity%2Foauth2%2Ftoken%3Fapi-version%3D2018-02-01%26resource%3Dhttps%3A%2F%2Fcognitiveservices.azure.com%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=http%3A%2F%2F169.254.169.254%2Fmetadata%2Fidentity%2Foauth2%2Ftoken%3Fapi-version%3D2018-02-01%26resource%3Dhttps%3A%2F%2Fcognitiveservices.azure.com%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=http%3A%2F%2F169.254.169.254%2Fmetadata%2Fidentity%2Foauth2%2Ftoken%3Fapi-version%3D2018-02-01%26resource%3Dhttps%3A%2F%2Fmanagement.azure.com%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=file%3A%2F%2F%2Fproc%2Fself%2Fenviron HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=file%3A%2F%2F%2Fproc%2Fself%2Fenviron HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=file%3A%2F%2F%2Froot%2F.aws%2Fcredentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/jenkins.xml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?url=file%3A%2F%2F%2Froot%2F.azure%2Fcredentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=file%3A%2F%2F%2Froot%2F.aws%2Fcredentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/jenkins.conf HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.azure/azureProfile.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/azure.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.azure/msal_token_cache.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.example HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.production.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.development.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.production.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.prod.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /var/www/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=file%3A%2F%2F%2Froot%2F.azure%2Fcredentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.openai HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.anthropic HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /public/env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/env.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /jenkins/secrets/master.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /home/ubuntu/.azure/accessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /environment.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /client/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?url=file%3A%2F%2F%2Froot%2F.azure%2FaccessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=file%3A%2F%2F%2Froot%2F.azure%2FaccessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=file%3A%2F%2F%2Fhome%2Fubuntu%2F.azure%2FaccessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?url=file%3A%2F%2F%2Fhome%2Fubuntu%2F.azure%2FaccessTokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=file%3A%2F%2F%2Fapp%2F.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /fetch?url=file%3A%2F%2F%2Fapp%2F.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=file%3A%2F%2F%2Froot%2F.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.azure/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=file%3A%2F%2F%2Froot%2F.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /debug.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/v1/env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /wp-content/debug.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /env.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.sample HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.supabase/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.terraform/terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfvars.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfvars HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env/. HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /frontend/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /internal/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /production/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /proxy?url=http%3A%2F%2F169.254.170.2%2Fv2%2Fcredentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /development/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=http%3A%2F%2F169.254.170.2%2Fv2%2Fmetadata HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /proxy?url=http%3A%2F%2F169.254.170.2%2Fv2%2Fmetadata HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /fetch?url=http%3A%2F%2F169.254.170.2%2Fv2%2Fcredentials%2F HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /staging/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /prod/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /services/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /private/.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /internal/.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /app/.env.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/.env.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /laravel/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app/.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /html/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /phpinfo.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /v1/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app/api/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /old/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /dev/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /crm/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /apps/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /backend/.env.local HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /backup/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /backend/.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /v2/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /sendgrid/.env.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.docker/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /twilio/.env.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.hermes/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app_dev.php/_profiler/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /management/env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.php.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/.env.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app_dev.php/_profiler/phpinfo HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.azure/service_principal HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET ////../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /../../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_profiler/phpinfo.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.test HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /static///../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /production.tfvars HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.openclaw/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /static/js/../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.vault HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /infra/terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.dev HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env/index.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform/terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /static/../.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /infrastructure/terraform.tfstate HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /cdk.context.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /samconfig.toml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /cdk.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets.tfvars HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /public/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets.auto.tfvars HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /aws_creds.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /vendor/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws_creds.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /tmp/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /internal-api/aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /s3/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /vendor/aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/ecs-task-credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /s3-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws/ecs-task-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws_credentials.txt HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /internal-api/iam/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws/iam/temporary-credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /aws-config.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws/s3/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /admin/config?cmd=cat+/root/.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.well-known/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.gcp/service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/aws.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.gcloud/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gcp-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /aws-access-keys.csv HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /aws/.env.production HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.gcloud/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /rootkey.csv HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /service-account-key.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /aws/.env HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serviceAccount.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /backend/aws.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.gcp/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v1/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serviceAccountKey.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /k8s/eks/credentials HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets/aws.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /google-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /google-service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /google-cloud-key.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /keyfile.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /gcp-service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gcloud-service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application_default_credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /secrets.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /firebase-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /keys/service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /firebase-service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /keys/gcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /firebase.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /tokens.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /google.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.secrets.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/gcp-credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /keys.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /auth.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /firebase-adminsdk.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets/gcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api_keys.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.auth.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.config/anthropic/credentials/default.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.claude/settings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/anthropic.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.cursor/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.codex/config.toml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.codeium/windsurf/mcp_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.claude/mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.cursor/settings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/openai.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.codeium/settings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.windsurf/mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.vscode/mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /ai_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.claude.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /anthropic.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /openai.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.anthropic/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.claude/.credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.openai/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.continue/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /llm.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /ai.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /llm_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /mcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/aws.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /env-config.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /credentials.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app-config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /runtime.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /dist/.vite/manifest.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /push_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /actuator HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /settings.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /Dockerfile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /dist/manifest.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /configuration.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /mcp_config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /pi.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /build/manifest.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_profiler/open HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /admin HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /app_dev.php/_profiler HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /app_dev.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_profiler/latest HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /login HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /__debug__/ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.ssh/id_ecdsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.ssh/known_hosts HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.ssh/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /id_dsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /host.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.ssh/id_dsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /test.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.svn/entries HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.bash_profile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /localhost.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.zshrc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /id_rsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /id_ed25519 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /ssl/server.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /id_ecdsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /nginx_status HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /key.pem HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /server.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /private-key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /privatekey.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /ssl/localhost.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.profile HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.bashrc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/account HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/v2/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /manifest.webmanifest HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.vscode/launch.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /wp-json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gc-service.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/openapi.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.s3cfg HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /rclone.conf HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     3.238.56.206:49656 - "GET /gcp-service.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /bootstrap.properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /values.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.vscode/sftp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.boto HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v2/settings HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /key.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /service_account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gcp-key.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /__/firebase/init.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /sa.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/settings HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.kube/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v1/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /appsettings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/application.properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/application.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application-prod.properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v1/settings HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /wp-config.php.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /web.config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /actuator/heapdump HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /settings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.php.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /wp-config.php~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /settings.py HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /wp-config.php.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /actuator/configprops HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /settings.local.py HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application-prod.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.netrc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /access_keys.csv HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /wp-config.php.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /amplifyconfiguration.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /root/.config/gcloud/application_default_credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/gcp.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /deploy/service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /backend/service-account.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.docker/config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /firebase-admin.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.prod.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /backup.sql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /_debugbar/open HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /telescope/requests HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /log-viewer HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /rails/info/properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /dump.sql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /home/ubuntu/.config/gcloud/application_default_credentials.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /local.settings.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /appsettings.Production.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /horizon/dashboard HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /database.sql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /db.sql HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/database.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /k8s/secrets.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /database.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /kubernetes.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config/master.key HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.hermes/auth.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.ssh/id_rsa HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config/credentials.yml.enc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /info.php HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /trace.axd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.pypirc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /vault.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.bash_history HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.ssh/id_ed25519 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /actuator/mappings HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aider.conf.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.local/share/opencode/auth.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /error.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /actuator/httptrace HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /error_log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /debug/vars HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /debug/default/view?panel=log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /debug/pprof/ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /elmah.axd HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /elmah HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /debug/default/view?panel=request HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.hermes/config.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /server-info HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /__clockwork HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /logs/error.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /storage/logs/lumen.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /log/production.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /logs/app.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /gradle.properties HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /appsettings.Development.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /compose.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.sentryclirc HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /_ignition/health-check HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /app.log HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /appspec.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /secrets.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /ecosystem.config.js HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /api/v1/status/config HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /appspec.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /compose.yaml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /api/v1/status/flags HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /sftp-config.json HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /buildspec.yml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /ecosystem.config.cjs HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /server-status HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.streamlit/secrets.toml HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws/credentials.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.env.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.env.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws/credentials.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /.aws/credentials.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /.aws/credentials.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.json.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfstate.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfstate.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfstate.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /terraform.tfstate.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /terraform.tfstate.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.json.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.json.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /config.json.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.yml.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /config.json.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application.yml.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.yml.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.yml.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.yml~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application.yml.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application.yml.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml~ HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /application.yml.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /application.yml.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml.old HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /docker-compose.yml.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml.copy HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serverless.yml.backup HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serverless.yml.tmp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml.orig HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serverless.yml.swp HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /serverless.yml.bak HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serverless.yml.save HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49678 - "GET /docker-compose.yml.1 HTTP/1.1" 404 Not Found
+INFO:     3.238.56.206:49656 - "GET /serverless.yml~ HTTP/1.1" 404 Not Found
+WARNING:  Invalid HTTP request received.
+INFO:     127.0.0.1:55451 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55451 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:hc_finance:[relay] saved + pushed last-good market_heatmap_tse_lastgood.json
+INFO:     127.0.0.1:55451 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55451 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] push_file OK: market_heatmap_tse_lastgood.json
+INFO:     127.0.0.1:55451 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63865 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63426 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52290 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65369 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55477 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET /static/style.css?v=68 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET /static/js/state.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61740 - "GET /static/js/utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62349 - "GET /static/js/charts.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61740 - "GET /static/js/api.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61740 - "GET /static/js/dashboard.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62349 - "GET /static/js/routing.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62349 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61740 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61740 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62558 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62558 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62349 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61740 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] total 14 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:     127.0.0.1:64998 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64998 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64998 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64998 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55652 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54078 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51432 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55553 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56972 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56972 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     172.239.64.84:7880 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51839 - "GET /api/market-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /static/style.css?v=68 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /static/js/state.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:49671 - "GET /static/js/utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61754 - "GET /static/js/charts.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:49671 - "GET /static/js/api.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61754 - "GET /static/js/dashboard.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:49671 - "GET /static/js/routing.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:49671 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49671 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49671 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49671 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /static/js/stock-zones.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60514 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /api/stock-zones HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61754 - "GET /static/js/heatmap-utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61754 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55065 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55065 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57811 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52959 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /static/js/state.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /static/js/utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /static/js/charts.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /static/js/api.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /static/js/dashboard.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /static/js/routing.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56404 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55691 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59156 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59156 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55691 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /static/js/stock-zones.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/stock-zones HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /static/js/global-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /static/js/heatmap-utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56787 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /static/js/market-heatmap.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:56787 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56787 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/global-heatmap HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58231 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58231 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51112 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52820 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50085 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62513 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51890 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52732 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64166 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:hc_finance:[backup] local snapshot saved ¡÷ E:\claude_money\backend\data\backups\2026-09-16
+INFO:     127.0.0.1:56404 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56404 - "GET /api/history HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] portfolio push OK ts=2026-09-15T19:55:35Z
+INFO:hc_finance:[Gist] confirmed push OK (Local) ts=2026-09-15T19:55:37Z
+INFO:     127.0.0.1:56404 - "GET /static/js/assets.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58530 - "GET /static/js/adl.js HTTP/1.1" 304 Not Modified
+[TWSE margin] ok (date=2026-09-15, stale=True)
+[TPEX margin] ok (date=2026-09-15, stale=True)
+INFO:     127.0.0.1:60123 - "GET /api/advance-decline HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58530 - "GET /api/important-info HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58530 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60123 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /static/js/state.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57436 - "GET /static/js/utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61033 - "GET /static/js/charts.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57436 - "GET /static/js/api.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61033 - "GET /static/js/dashboard.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57436 - "GET /static/js/routing.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:57436 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57436 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57436 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54398 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57436 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61033 - "GET /static/js/market-heatmap.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61033 - "GET /static/js/heatmap-utils.js HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:61033 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61133 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/style.css?v=68 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/main.js?v=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/state.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/charts.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/api.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/dashboard.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /static/js/routing.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/manual-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65399 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63607 - "GET /static/js/cb-listed.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60169 - "GET /static/js/fsc.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60169 - "GET /api/cb-listed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60169 - "GET /api/fsc-offerings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54085 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65399 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65399 - "GET /static/js/market-heatmap.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65399 - "GET /static/js/heatmap-utils.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65399 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49977 - "GET /api/sync-from-gist HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57063 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62591 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59286 - "GET /api/market-heatmap?mode=themes&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63790 - "GET /api/market-heatmap?mode=themes&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63790 - "GET /api/market-heatmap?mode=themes&force=true HTTP/1.1" 200 OK
+INFO:hc_finance:[cb-suspension] latest CSV from JSON API: https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:hc_finance:[cb-suspension] 11011 suspended 2026-09-14~2026-10-13
+INFO:hc_finance:[cb-suspension] 15952 suspended 2026-09-04~2026-10-02
+INFO:hc_finance:[cb-suspension] 19094 suspended 2026-09-02~2026-10-01
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25303 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-08-26~2026-09-20
+INFO:hc_finance:[cb-suspension] 25304 suspended 2026-09-16~2026-10-15
+INFO:hc_finance:[cb-suspension] 31413 suspended 2026-08-25~2026-09-19
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-10-08
+INFO:hc_finance:[cb-suspension] 35914 suspended 2026-07-31~2026-09-18
+INFO:hc_finance:[cb-suspension] 53064 suspended 2026-08-31~2026-09-23
+INFO:hc_finance:[cb-suspension] 68301 suspended 2026-08-28~2026-09-22
+INFO:hc_finance:[cb-suspension] 80212 suspended 2026-09-15~2026-10-12
+INFO:hc_finance:[cb-suspension] 80426 suspended 2026-09-03~2026-09-28
+INFO:hc_finance:[cb-suspension] 80914 suspended 2026-05-28~2027-06-22
+INFO:hc_finance:[cb-suspension] 98026 suspended 2026-08-24~2026-09-17
+INFO:hc_finance:[cb-suspension] 99063 suspended 2026-08-24~2026-09-16
+INFO:hc_finance:[cb-suspension] total 14 suspended CBs from https://www.tpex.org.tw/storage/bond_zone/tradeinfo/cb/2026/202609/RSdrs002.20260915-C.csv
+INFO:     127.0.0.1:53111 - "GET /api/cb-suspension/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59449 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63313 - "GET /api/prices?tickers=NVDA%2CCOHR%2CGoox%2CAMZN%2CAXTX HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54164 - "GET /api/tw-prices?symbols=4931%2C00631l%2C6223%2C00685l%2C1303%2C8996%2C3026%2C6186&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53198 - "GET /api/indices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "GET /api/cb-prices?symbols=35267%2C35872%2C36804%2C37171%2C47223%2C84672%2C47602%2C36806%2C81552%2C66831%2C33246%2C65101%2C36805 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "POST /api/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53198 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:hc_finance:[backup] local snapshot saved ¡÷ E:\claude_money\backend\data\backups\2026-09-16
+INFO:     127.0.0.1:53198 - "POST /api/snapshot HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53198 - "GET /api/history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53198 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53198 - "GET /static/js/important.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56403 - "GET /static/js/adl.js HTTP/1.1" 200 OK
+[TPEX margin] ok (date=2026-09-15, stale=True)
+[TWSE margin] ok (date=2026-09-15, stale=True)
+INFO:     127.0.0.1:53198 - "GET /api/advance-decline HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] portfolio push OK ts=2026-09-15T20:21:04Z
+INFO:     127.0.0.1:56403 - "GET /api/important-info HTTP/1.1" 200 OK
+INFO:hc_finance:[Gist] confirmed push OK (Local) ts=2026-09-15T20:21:04Z
+INFO:     127.0.0.1:63224 - "GET /api/market-heatmap?mode=themes&force=true HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50561 - "GET /api/market-heatmap?mode=themes HTTP/1.1" 200 OK
