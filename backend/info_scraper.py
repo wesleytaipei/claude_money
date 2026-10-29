@@ -10,7 +10,7 @@ from pathlib import Path as _Path
 
 urllib3.disable_warnings()
 
-CACHE_TTL = 300 # 5 minutes cache
+CACHE_TTL = 120 # 2 minutes cache
 _info_cache = {"ts": 0, "data": {}}
 
 FIRECRAWL_API_KEY = "fc-d6d780def05343a5b032c3d22e89e15d"
@@ -294,7 +294,8 @@ def fetch_cnyes_twncon():
         print(f"Error fetching TWNCON: {e}")
     # Cnyes' "GF" (global futures) category has been returning 404/500 site-wide —
     # fall back to the same underlying instrument (SGX FTSE Taiwan Index Futures).
-    return fetch_stwn_robust()
+    # SGX's own API has the T+1 night session; Yahoo's TWN-*.SI is day-session only.
+    return fetch_sgx_twn() or fetch_stwn_robust()
 
 def fetch_taiwan_vix():
     """Fetch 臺指選擇權波動率指數 (TAIWANVIX / 台指VIX) from TAIFEX MIS realtime quote.
@@ -326,6 +327,321 @@ _FUTURES_MONTH_CODES = "FGHJKMNQUVXZ"
 
 def _futures_month_symbol(dt):
     return f"{_FUTURES_MONTH_CODES[dt.month - 1]}{dt.year % 100:02d}"
+
+_SGX_TWN_URL = "https://api.sgx.com/derivatives/v1.0/contract-code/TWN"
+_SGX_TWN_OUTRIGHT = re.compile(r"^TWN[FGHJKMNQUVXZ]\d{2}$")
+
+def _sgt():
+    from datetime import timezone, timedelta
+    return timezone(timedelta(hours=8))
+
+_sgx_twn_cache = {"ts": 0.0, "data": None}   # the SGX payload is ~3.5MB; share it between callers
+
+def _sgx_twn_detail():
+    """SGX FTSE Taiwan Index Futures (富台指) front month from SGX's public derivatives API.
+
+    Each contract comes back as two rows: current-trading-session "0" = T session
+    (08:45-13:45 SGT) and "1" = T+1 night session (14:00-05:15 SGT). Yahoo's TWN-*.SI
+    only carries the T session, so overnight it sits frozen at the 13:50 close.
+    Returns {price, session, asof, base_date, day_settle, prev_settle} or None."""
+    from datetime import datetime
+    c = _sgx_twn_cache
+    if c["data"] and time.time() - c["ts"] < 30:
+        return c["data"]
+    try:
+        r = requests.get(_SGX_TWN_URL, timeout=15, verify=False,
+                         headers={**HEADERS, "Origin": "https://www.sgx.com", "Referer": "https://www.sgx.com/"})
+        by_sym = {}
+        for row in r.json().get("data") or []:
+            sym = row.get("symbol") or ""
+            if _SGX_TWN_OUTRIGHT.match(sym):
+                by_sym.setdefault(sym, {})[str(row.get("current-trading-session"))] = row
+        # front month = the outright with the most T-session volume
+        front_sym = max(by_sym, key=lambda k: (by_sym[k].get("0") or {}).get("total-volume") or 0, default=None)
+        if not front_sym:
+            return None
+        front = by_sym[front_sym]
+        day, night = front.get("0") or {}, front.get("1") or {}
+
+        now = datetime.now(_sgt())
+        hm = now.hour * 60 + now.minute
+        in_day_session = 8 * 60 + 45 <= hm < 14 * 60
+        cur = day if (in_day_session or not night.get("last-traded-price-abs")) else night
+        price = cur.get("last-traded-price-abs")
+        if not price or float(price) <= 100:   # sanity check — trades ~3000-4000 points
+            return None
+
+        asof = None
+        try:
+            asof = datetime.strptime(str(cur.get("last-update-time"))[:19], "%Y-%m-%d %H:%M:%S").replace(tzinfo=_sgt())
+        except Exception:
+            pass
+        detail = {
+            "symbol": front_sym,
+            "price": float(price),
+            "session": "night" if cur is night else "day",
+            "asof": asof,
+            "base_date": str(day.get("base-date") or ""),
+            "day_settle": _safe_float(day.get("daily-settlement-price-abs")),
+            "prev_settle": _safe_float(day.get("preliminary-settlement-price-abs")),
+        }
+        c["ts"], c["data"] = time.time(), detail
+        return detail
+    except Exception as e:
+        print(f"SGX TWN API error: {e}")
+        return None
+
+
+_sgx_settle_cache = {}   # symbol -> (ts, {base_date: settlement})
+
+def _sgx_settle_on(symbol, base_date):
+    """SGX daily settlement of `symbol` on the SGX trading date `base_date` (YYYYMMDD), from the
+    history endpoint. The live rows only carry today's and the previous settlement, which is not
+    enough once SGX has traded two or more days while Taiwan was shut."""
+    ts, hist = _sgx_settle_cache.get(symbol, (0, None))
+    if hist is None or time.time() - ts > 3600:
+        try:
+            r = requests.get(f"https://api.sgx.com/derivatives/v1.0/history/symbol/{symbol}",
+                             params={"days": "1m", "category": "futures"}, timeout=15, verify=False,
+                             headers={**HEADERS, "Origin": "https://www.sgx.com", "Referer": "https://www.sgx.com/"})
+            hist = {str(x.get("base-date")): _safe_float(x.get("daily-settlement-price-abs"))
+                    for x in r.json().get("data") or [] if x.get("base-date")}
+            _sgx_settle_cache[symbol] = (time.time(), hist)
+        except Exception as e:
+            print(f"SGX settle history error: {e}")
+            return None
+    return hist.get(str(base_date))
+
+
+def fetch_sgx_twn():
+    """富台指 card value. Change is vs the prior settlement during the day, and vs the
+    day's settlement at night. Returns None on any failure so the caller can fall back."""
+    d = _sgx_twn_detail()
+    if not d:
+        return None
+    ref = d["day_settle"] if d["session"] == "night" else d["prev_settle"]
+    if not ref:
+        return None
+    change = round(d["price"] - ref, 2)
+    pct = round(change / ref * 100, 2)
+    return {
+        "price": str(round(d["price"], 1)),
+        "change": f"+{change}" if change > 0 else str(change),
+        "change_pct": f"{pct}%",
+    }
+
+
+_TAIFEX_MIS_QUOTE_LIST = "https://mis.taifex.com.tw/futures/api/getQuoteList"
+_TXF_CONTRACT_RE = re.compile(r"^(TXF[A-L]\d)-([FM])$")
+
+def _taifex_txf_rows(market_type):
+    """market_type "0" = 日盤, "1" = 夜盤 (盤後)."""
+    body = {"MarketType": market_type, "SymbolType": "F", "KindID": "1", "CID": "TXF",
+            "ExpireMonth": "", "RowSize": "全部", "PageNo": "", "SortColumn": "", "AscDesc": "A"}
+    r = requests.post(_TAIFEX_MIS_QUOTE_LIST, json=body, timeout=10, verify=False,
+                      headers={"User-Agent": "Mozilla/5.0", "Content-Type": "application/json",
+                               "Origin": "https://mis.taifex.com.tw", "Referer": "https://mis.taifex.com.tw/futures/"})
+    return r.json().get("RtData", {}).get("QuoteList", []) or []
+
+def fetch_txf_quote():
+    """TAIFEX MIS: TAIEX spot (+its trade date) and the latest front-month 台指期 print, whichever
+    of day/night session traded last. Night rows keep the trading-date in CDate, so a CTime before
+    08:00 belongs to the next calendar day. Returns None on failure."""
+    from datetime import datetime, timedelta
+    try:
+        day_rows, night_rows = _taifex_txf_rows("0"), _taifex_txf_rows("1")
+        spot_row = next((q for q in day_rows if q.get("SymbolID") == "TXF-S"), {})
+        spot = _safe_float(spot_row.get("CLastPrice"))
+        if not spot:
+            return None
+
+        front, vol_max = None, -1.0
+        for q in day_rows:
+            m = _TXF_CONTRACT_RE.match(q.get("SymbolID") or "")
+            vol = _safe_float(q.get("CTotalVolume")) or 0.0
+            if m and vol > vol_max:
+                front, vol_max = m.group(1), vol
+
+        cands = []
+        for rows, suffix, is_night in ((day_rows, "F", False), (night_rows, "M", True)):
+            q = next((x for x in rows if x.get("SymbolID") == f"{front}-{suffix}"), None) if front else None
+            if not q:
+                continue
+            last, ref = _safe_float(q.get("CLastPrice")), _safe_float(q.get("CRefPrice"))
+            if not last or not q.get("CDate") or not q.get("CTime"):
+                continue
+            ts = datetime.strptime(q["CDate"] + q["CTime"], "%Y%m%d%H%M%S").replace(tzinfo=_sgt())
+            if is_night and ts.hour < 8:
+                ts += timedelta(days=1)
+            cands.append({"price": last, "ref": ref, "night": is_night, "asof": ts})
+        return {"spot": spot, "spot_date": str(spot_row.get("CDate") or ""),
+                "quote": max(cands, key=lambda c: c["asof"]) if cands else None}
+    except Exception as e:
+        print(f"TAIFEX TXF error: {e}")
+        return None
+
+
+_TXF_FRESH_MIN = 90   # a 台指期 print older than this is not used as the primary estimate
+
+# 推估開盤參數。w_ftse = FTSE Taiwan RIC Capped Index (富台指 underlying) caps any constituent at 20%
+# per quarterly rebalance; w_taiex is recomputed daily from TWSE data, the value here is only a fallback.
+# alpha / beta are consultant-suggested assumptions (ADR pass-through to 2330, NQ sensitivity) — not backtested.
+_EST_W_FTSE = 0.20
+_EST_W_TAIEX_FALLBACK = 0.35
+_EST_ALPHA = 0.80
+_EST_BETA = 1.20
+
+_W_TAIEX_FILE = _Path(__file__).parent / "data" / "taiex_tsmc_weight.json"
+
+def _taiex_tsmc_weight():
+    """2330 share of TAIEX (full market-cap weighted) = 2330 cap / total listed cap, from TWSE open
+    data (issued shares x latest close). Cached per Taipei day; falls back to the last good value."""
+    today = _tw_today()
+    cached = {}
+    try:
+        cached = json.loads(_W_TAIEX_FILE.read_text(encoding="utf-8"))
+        if cached.get("date") == today and cached.get("w"):
+            return cached["w"]
+    except Exception:
+        pass
+    try:
+        hdr = {"User-Agent": "Mozilla/5.0"}
+        px = {r["Code"]: r["ClosingPrice"] for r in requests.get(
+            "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", headers=hdr, timeout=30, verify=False).json()}
+        co = requests.get("https://openapi.twse.com.tw/v1/opendata/t187ap03_L", headers=hdr, timeout=30, verify=False).json()
+        kc = next(k for k in co[0] if "公司代號" in k)
+        ks = next(k for k in co[0] if "已發行普通股" in k)
+        total = tsmc = 0.0
+        for c in co:
+            price, shares = _safe_float(px.get(c[kc])), _safe_float(c[ks])
+            if price and shares:
+                total += price * shares
+                if c[kc] == "2330":
+                    tsmc = price * shares
+        w = tsmc / total if total else 0
+        if 0.2 < w < 0.6:
+            _W_TAIEX_FILE.parent.mkdir(exist_ok=True)
+            _W_TAIEX_FILE.write_text(json.dumps({"date": today, "w": round(w, 4)}), encoding="utf-8")
+            return round(w, 4)
+    except Exception as e:
+        print(f"TAIEX TSMC weight error: {e}")
+    return cached.get("w") or _EST_W_TAIEX_FALLBACK
+
+
+def _fx_change_pct(since):
+    """USD/TWD % change from the bar at/before `since` (aware datetime) to the latest bar.
+    Positive = USD up / TWD weaker. None on failure."""
+    try:
+        h = yf.Ticker("TWD=X").history(period="1mo", interval="15m")["Close"].dropna()
+        if h.empty:
+            return None
+        before = h[h.index <= since]
+        if before.empty:
+            return None
+        return (h.iloc[-1] / before.iloc[-1] - 1) * 100
+    except Exception as e:
+        print(f"USD/TWD error: {e}")
+        return None
+
+
+def _nq_after_close(now):
+    """E-mini Nasdaq-100 move since the last US cash close (16:00 New York) — fills the gap while
+    the TSM ADR is shut. Returns (pct, asof) or (0.0, None) while the US cash session is open
+    (the ADR itself is live then), or None on failure."""
+    from datetime import timedelta
+    from zoneinfo import ZoneInfo
+    try:
+        ny = now.astimezone(ZoneInfo("America/New_York"))
+        if ny.weekday() < 5 and (9, 30) <= (ny.hour, ny.minute) < (16, 0):
+            return 0.0, None
+        close = ny.replace(hour=16, minute=0, second=0, microsecond=0)
+        if ny < close or ny.weekday() >= 5:
+            close -= timedelta(days=1)
+        while close.weekday() >= 5:
+            close -= timedelta(days=1)
+        h = yf.Ticker("NQ=F").history(period="5d", interval="5m", prepost=True)["Close"].dropna()
+        before = h[h.index <= close]
+        if before.empty or h.index[-1] <= close:
+            return None
+        return (h.iloc[-1] / before.iloc[-1] - 1) * 100, h.index[-1].to_pydatetime().astimezone(_sgt())
+    except Exception as e:
+        print(f"NQ after-close error: {e}")
+        return None
+
+
+def estimate_taiex_open(tsm_change_pct=None):
+    """推估加權開盤。Two independent estimates, each stamped with its data time:
+      台指期夜盤逆推 — last night-session print minus the (day settlement - spot) basis. TWD-priced and
+                       the same constituents as TAIEX, so no weight / FX correction is needed.
+      富台指權重修正 — 富台指 move since TAIEX's last close, converted to TWD with USD/TWD, then
+                       re-weighted for TSMC (w_taiex vs w_ftse) using a TSMC proxy:
+                         R_tsmc = alpha*(TSM ADR + FX) + beta*NQ move since the US close.
+                       The SGX reference settlement is the one in force at TAIEX's last close, so it
+                       stays right when Taiwan is shut but SGX trades.
+    Primary = 台指期 while it is fresh (roughly until 05:00 + 90min), otherwise 富台指 — whose data time
+    is advanced by the NQ print, so it stays usable through the 05:00-08:45 gap."""
+    from datetime import datetime
+    txf = fetch_txf_quote()
+    if not txf:
+        return None
+    spot = txf["spot"]
+    now = datetime.now(_sgt())
+    fresh_s = _TXF_FRESH_MIN * 60
+    methods = []
+
+    q = txf["quote"]
+    if q and q["night"] and q["ref"]:
+        methods.append({"name": "台指期夜盤逆推", "value": q["price"] - (q["ref"] - spot), "asof": q["asof"],
+                        "fresh": (now - q["asof"]).total_seconds() <= fresh_s, "detail": "台幣計價、成分一致，免權重與匯率修正"})
+
+    sgx = _sgx_twn_detail()
+    if sgx:
+        # Reference = the SGX settlement of TAIEX's last trading date; the live rows' previous
+        # settlement is only a fallback (right when exactly one SGX day was skipped by Taiwan).
+        ref = _sgx_settle_on(sgx["symbol"], txf["spot_date"])
+        if not ref:
+            ref = sgx["prev_settle"] if sgx["base_date"] > txf["spot_date"] else (sgx["day_settle"] or sgx["prev_settle"])
+        if ref:
+            fpct = (sgx["price"] / ref - 1) * 100
+            cpct = _safe_float(str(tsm_change_pct or "").replace("%", ""))
+            w2, w1 = _taiex_tsmc_weight(), _EST_W_FTSE
+            asof, notes = sgx["asof"], [f"台積電權重 加權{w2*100:.1f}%/富台指{w1*100:.0f}%"]
+
+            fx = None
+            try:
+                fx = _fx_change_pct(datetime.strptime(txf["spot_date"] + "133000", "%Y%m%d%H%M%S").replace(tzinfo=_sgt()))
+            except Exception:
+                pass
+            fxr = (fx or 0) / 100
+            notes.append(f"美元/台幣 {fx:+.2f}%" if fx is not None else "匯率無資料(未修正)")
+            fT = (1 + fpct / 100) * (1 + fxr) - 1
+            dT = fT * 100
+            if cpct is not None:
+                r_ts = _EST_ALPHA * ((1 + cpct / 100) * (1 + fxr) - 1) * 100
+                nq = _nq_after_close(now)
+                if nq and nq[1]:
+                    r_ts += _EST_BETA * nq[0]
+                    notes.append(f"那指盤後 {nq[0]:+.2f}%")
+                    asof = max(asof, nq[1]) if asof else nq[1]
+                notes.append(f"ADR×{_EST_ALPHA}")
+                dT = fT * 100 * (1 - w2) / (1 - w1) + r_ts * (w2 - w1) / (1 - w1)
+            methods.append({"name": "富台指權重修正", "value": spot * (1 + dT / 100), "asof": asof,
+                            "fresh": bool(asof and (now - asof).total_seconds() <= fresh_s), "detail": "・".join(notes)})
+
+    if not methods:
+        return None
+    primary = next((m for m in methods if m["fresh"]), methods[-1])
+
+    def _fmt(m):
+        diff = m["value"] - spot
+        return {"name": m["name"], "value": round(m["value"]), "diff": round(diff),
+                "diff_pct": f"{diff / spot * 100:.2f}", "fresh": m["fresh"], "detail": m.get("detail"),
+                "asof": m["asof"].strftime("%m/%d %H:%M") if m["asof"] else None}
+
+    out = _fmt(primary)
+    out.update({"spot": round(spot), "spot_date": txf["spot_date"], "methods": [_fmt(m) for m in methods]})
+    return out
+
 
 def fetch_stwn_robust():
     """Fetch SGX FTSE Taiwan Index Futures (front month) via Yahoo Finance.
@@ -973,6 +1289,12 @@ def scrape_important_info(force=False):
             "margin_balance_tse": f_margin_tse.result(),
             "margin_balance_otc": f_margin_otc.result(),
         }
+
+    try:
+        data["taiex_open_est"] = estimate_taiex_open((data.get("tsm_adr") or {}).get("change_pct"))
+    except Exception as e:
+        print(f"[taiex_open_est] {e}")
+        data["taiex_open_est"] = None
 
     _info_cache["ts"] = now
     _info_cache["data"] = data

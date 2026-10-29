@@ -1758,3 +1758,229 @@ tr.inv-subrow td { opacity: .72; }
   .pnl-cards-row { grid-template-columns: repeat(3, 1fr); }
   .chart-container { height: 200px !important; }
 }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Taste layer — Geist / zinc neutrals / single brass accent
+   Appended last so it wins over the base rules above; delete this block to
+   fall back to the previous look. Taiwan convention (紅漲綠跌) is untouched.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Cool zinc neutrals instead of warm black — one gray family throughout */
+  --bg:         #09090b;
+  --bg-2:       #0e0e11;
+  --surface:    #121215;
+  --surface-2:  #18181c;
+  --surface-3:  #1f1f24;
+  --border:     rgba(255, 255, 255, 0.07);
+  --border-hi:  rgba(255, 255, 255, 0.15);
+
+  --text:       #ededf0;
+  --text-dim:   #a1a1aa;
+  --muted:      #84848e;
+
+  /* Single accent: brass, desaturated so it sits on zinc without glowing */
+  --primary:    #c9a45c;
+  --primary-2:  #e0c07f;
+  --primary-dark: #9a7a3a;
+  --blue:       #5b8def;
+  --grad-heading: none;
+  --bg-glow-1:  rgba(201, 164, 92, 0.035);
+  --bg-glow-2:  transparent;
+
+  /* Tinted, wide diffusion shadows — no outer glow */
+  --shadow-sm:   0 1px 0 rgba(255,255,255,.035) inset, 0 8px 20px -12px rgba(0,0,0,.7);
+  --shadow-md:   0 1px 0 rgba(255,255,255,.05) inset, 0 18px 36px -18px rgba(0,0,0,.8);
+  --shadow-lg:   0 1px 0 rgba(255,255,255,.06) inset, 0 28px 56px -20px rgba(0,0,0,.85);
+  --shadow-glow: none;
+
+  --radius:      10px;
+  --radius-sm:   7px;
+  --radius-lg:   14px;
+
+  --font: 'Geist', 'IBM Plex Sans TC', 'Microsoft JhengHei', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Geist Mono', 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Spring-like settle instead of the stock material curve */
+  --ease:       cubic-bezier(.16, 1, .3, 1);
+  --ease-out:   cubic-bezier(.16, 1, .3, 1);
+  --transition-fast: .16s var(--ease);
+  --transition:      .28s var(--ease);
+  --transition-slow: .5s var(--ease);
+}
+
+html, body { letter-spacing: -0.003em; }
+body { background: radial-gradient(ellipse 900px 420px at 85% -160px, var(--bg-glow-1), transparent 70%), var(--bg); }
+
+/* Headings: solid text, weight and tracking carry the hierarchy (no gradient fill) */
+.brand-title,
+.page-header h1 {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--text);
+}
+.brand-title { font-weight: 650; letter-spacing: -0.02em; display: inline-flex; align-items: center; gap: 9px; }
+.brand-title::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 2px;
+  background: var(--primary);
+  transform: rotate(45deg);
+}
+.page-header h1 { font-weight: 620; letter-spacing: -0.028em; }
+.panel-head h3 { font-weight: 600; letter-spacing: -0.015em; }
+
+/* Navbar: quieter chrome, active tab marked by an underline rail */
+.top-nav { box-shadow: none; background: rgba(9, 9, 11, 0.78); }
+.nav-item { border-radius: 6px; font-weight: 500; }
+.nav-item:hover { background: rgba(255,255,255,.035); border-color: transparent; }
+.nav-item.active {
+  color: var(--text);
+  background: rgba(255,255,255,.045);
+  border-color: transparent;
+  box-shadow: none;
+}
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px; bottom: -5px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+
+/* Buttons: flat fills, tactile press, no gradients or glows */
+.btn-primary {
+  background: var(--primary);
+  color: #131008;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28);
+}
+.btn-primary:hover {
+  background: var(--primary-2);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 18px -12px rgba(201,164,92,.55);
+}
+.btn-save { background: #3f9d78; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.18); }
+.btn-save:hover { background: #4aae88; box-shadow: 0 10px 18px -12px rgba(63,157,120,.6); }
+.btn-primary:active, .btn-save:active, .btn-ghost:active, .btn-refresh:active, .inv-tab:active, .btn-cancel:active {
+  transform: translateY(0) scale(.98);
+  transition-duration: .06s;
+}
+.btn-ghost, .btn-refresh { background: transparent; }
+.btn-ghost:hover, .btn-refresh:hover { background: var(--surface-2); transform: none; }
+.btn-icon:hover { background: rgba(220,38,38,.08); }
+
+/* Segmented tabs: the active chip is a raised surface, not a colored pill */
+.inv-tabs { border-radius: 10px; background: var(--bg-2); }
+.inv-tab { border-radius: 7px; font-weight: 550; }
+.inv-tab.active {
+  background: var(--surface-3);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px var(--border-hi);
+}
+
+/* KPI strip: one bordered container split by 1px rules instead of five boxed cards.
+   Column counts stay owned by the responsive rules above. */
+.kpi-grid {
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.kpi-card {
+  border: none;
+  border-radius: 0;
+  background: var(--surface);
+  box-shadow: none;
+}
+.kpi-card::before { display: none; }
+.kpi-card::after {
+  width: 2px;
+  height: 14px;
+  top: 22px; bottom: auto;
+  border-radius: 0 2px 2px 0;
+}
+.kpi-card:hover { transform: none; border-color: transparent; box-shadow: none; background: var(--surface-2); }
+.kpi-label { text-transform: none; letter-spacing: 0.01em; font-size: 12px; font-weight: 500; color: var(--muted); }
+.kpi-value { font-weight: 600; letter-spacing: -0.03em; }
+
+/* Panels */
+.panel { box-shadow: var(--shadow-sm); border-color: var(--border); }
+.panel:hover { border-color: rgba(255,255,255,.1); }
+
+/* Tables: sentence-case headers, hairline rows, quiet hover */
+th {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+td { border-bottom-color: rgba(255,255,255,.035); }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+tr.highlighted { background: rgba(201,164,92,.07); }
+.form-group label, .inv-stat-label, .settings-section-title {
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+.badge { text-transform: none; letter-spacing: 0; font-weight: 600; }
+
+/* Status dots: soft breathing ring instead of a static neon glow */
+.status-dot.red    { box-shadow: none; }
+.status-dot.orange { box-shadow: none; }
+.status-dot.green  { box-shadow: none; animation: dotBreath 2.6s ease-in-out infinite; }
+@keyframes dotBreath {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(33,197,93,.45); }
+  50%      { box-shadow: 0 0 0 5px rgba(33,197,93,0); }
+}
+.star-btn.on, .star-btn.auto { text-shadow: none; }
+
+/* Forms & modal */
+.form-group input, .form-group select { border-radius: 7px; }
+.form-group input:focus, .form-group select:focus,
+.mh-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(201,164,92,.14);
+}
+#modal-overlay { background: rgba(5,5,7,.72); backdrop-filter: blur(10px); }
+.modal { border-radius: var(--radius-lg); }
+.toast.success { box-shadow: var(--shadow-md); }
+.toast.error   { box-shadow: var(--shadow-md); }
+
+/* Loading + empty states */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border-radius: 6px;
+  color: transparent !important;
+}
+.skeleton::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.05), transparent);
+  transform: translateX(-100%);
+  animation: skeletonSweep 1.5s var(--ease) infinite;
+}
+@keyframes skeletonSweep { to { transform: translateX(100%); } }
+.empty-state {
+  padding: 56px 24px;
+  border: 1px dashed var(--border-hi);
+  border-radius: var(--radius);
+  background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(255,255,255,.012) 10px 20px);
+}
+
+/* Staggered page entrance: blocks settle in sequence rather than all at once */
+.page.active > * { animation: riseIn .55s var(--ease) both; }
+.page.active > *:nth-child(2) { animation-delay: .05s; }
+.page.active > *:nth-child(3) { animation-delay: .1s; }
+.page.active > *:nth-child(4) { animation-delay: .15s; }
+.page.active > *:nth-child(n+5) { animation-delay: .2s; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); }
+
+/* KPI strip: with 5 cards in 3 or 2 columns the last one spans 2 so no leftover cell so the 1px-gap background never shows as an empty block */
+@media (max-width: 1400px) { .kpi-card:last-child { grid-column: span 2; } }

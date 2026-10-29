@@ -21,3 +21,7 @@ backend/fsc_tmp.xlsx
 backend/*.py.bak
 backend/uvicorn.log
 *portfolio_data.txt
+
+# 手動/暫存備份與原子寫入暫存檔
+backend/data/*.bak_*
+backend/data/*.tmp

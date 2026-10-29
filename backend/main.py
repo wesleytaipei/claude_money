@@ -609,6 +609,10 @@ def fetch_tw_prices_mis(symbols: list[str]) -> dict:
                 "price":      price,
                 "change_pct": change_pct,
                 "high":       _parse_price_cell(item.get("h")),    # 今日盤中最高價 (開盤前為 '-')
+                "low":        _parse_price_cell(item.get("l")),    # 今日盤中最低價
+                "open":       _parse_price_cell(item.get("o")),    # 今日開盤價
+                "vol_lots":    _parse_price_cell(item.get("v")),   # 今日累計成交量（張）
+                "date":       str(item.get("d") or ""),            # 該筆報價的交易日 YYYYMMDD (休市日會是上一個交易日)
                 "name":       item.get("n", ""),
                 "ts":         now,
             }
@@ -667,9 +671,11 @@ def _fetch_tw_indices_mis() -> dict:
     return result
 
 
+INDICES_TTL = 60  # BTC/US indices/FX move continuously; the page polls every 60s
+
 def fetch_indices(force: bool = False) -> dict:
     now = time.time()
-    if not force and _indices_cache["ts"] and (now - _indices_cache["ts"]) < CACHE_TTL:
+    if not force and _indices_cache["ts"] and (now - _indices_cache["ts"]) < INDICES_TTL:
         return _indices_cache["data"]
 
     # US indices + FX via yfinance
@@ -3106,6 +3112,7 @@ def _fetch_fsc_excel_url() -> tuple[str, str]:
     Returns (url, date_str) where date_str is like '115.4.28'.
     Prefers the current ROC-year (N年度申報案件) over previous years."""
     import re as _re
+    from urllib.parse import unquote as _unquote
     from datetime import date as _date
     headers = {**_FSC_UA, "Referer": "https://www.sfb.gov.tw/"}
     try:
@@ -3119,18 +3126,21 @@ def _fetch_fsc_excel_url() -> tuple[str, str]:
         # Each table row typically: <td>date</td>...<td>...<a href="...xlsx">label</a>
         pairs = []
         for m in _re.finditer(
-            r'(\d{3}\.\d{1,2}\.\d{1,2})[^<]*</td>.*?href="([^"]*\.xlsx)"',
+            r'(\d{3}\.\d{1,2}\.\d{1,2})[^<]*</td>.*?href="([^"]*\.xlsx?)"',
             text, _re.IGNORECASE | _re.DOTALL
         ):
             d_str = m.group(1)
             href  = m.group(2)
             if not href.startswith("http"):
                 href = "https://www.sfb.gov.tw" + href
+            # 無償配發 / 停止公開發行 的彙總表沒有現增、轉換債，抓錯會得到空資料
+            if any(k in _unquote(href) for k in ("無償配發", "停止公開發行")):
+                continue
             pairs.append((d_str, href))
 
         if not pairs:
             # Fallback: first xlsx on the page
-            href_m = _re.search(r'href="([^"]*\.xlsx)"', text, _re.IGNORECASE)
+            href_m = _re.search(r'href="([^"]*\.xlsx?)"', text, _re.IGNORECASE)
             date_m = _re.search(r'(\d{3}\.\d{1,2}\.\d{1,2})', text)
             url = href_m.group(1) if href_m else ""
             if url and not url.startswith("http"):
@@ -3839,6 +3849,9 @@ def _fetch_twse_all_day(date_str: str, retries: int = 3) -> dict[str, dict]:
                     continue
                 ci, ni, pi = fields.index("證券代號"), fields.index("證券名稱"), fields.index("收盤價")
                 hi = fields.index("最高價") if "最高價" in fields else None
+                li = fields.index("最低價") if "最低價" in fields else None
+                oi = fields.index("開盤價") if "開盤價" in fields else None
+                vi = fields.index("成交股數") if "成交股數" in fields else None
                 for row in t.get("data") or []:
                     code = str(row[ci]).strip()
                     if not _STOCK_CODE_RE.match(code):
@@ -3849,7 +3862,10 @@ def _fetch_twse_all_day(date_str: str, retries: int = 3) -> dict[str, dict]:
                         continue
                     if close > 0:
                         out[code] = {"name": str(row[ni]).strip(), "close": close,
-                                     "high": _parse_price_cell(row[hi]) if hi is not None else None}
+                                     "high": _parse_price_cell(row[hi]) if hi is not None else None,
+                                     "low": _parse_price_cell(row[li]) if li is not None else None,
+                                     "open": _parse_price_cell(row[oi]) if oi is not None else None,
+                                     "vol": _parse_price_cell(row[vi]) if vi is not None else None}
                 break
             return out
         except Exception as e:
@@ -3885,7 +3901,10 @@ def _fetch_tpex_all_day(date_str: str) -> dict[str, dict]:
                     continue
                 if close > 0:
                     out[code] = {"name": str(row[1]).strip(), "close": close,
-                                 "high": _parse_price_cell(row[5]) if len(row) > 5 else None}
+                                 "high": _parse_price_cell(row[5]) if len(row) > 5 else None,
+                                 "low": _parse_price_cell(row[6]) if len(row) > 6 else None,
+                                 "open": _parse_price_cell(row[4]) if len(row) > 4 else None,
+                                 "vol": _parse_price_cell(row[8]) if len(row) > 8 else None}
     except Exception as e:
         logger.warning(f"[stock-ma] TPEX {date_str}: {e}")
     return out
@@ -3906,9 +3925,14 @@ def _load_stock_ma_history() -> dict:
 
 
 def _save_stock_ma_history(data: dict):
+    """先寫暫存檔再原子替換：寫到一半被終止（重啟/當機）時，原檔不會變成半截的壞檔。"""
     STOCK_MA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(STOCK_MA_FILE, "w", encoding="utf-8") as f:
+    tmp = STOCK_MA_FILE.with_suffix(".json.tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, STOCK_MA_FILE)
 
 
 def _trading_day_candidates(n_trading_days: int) -> list[str]:
@@ -3925,7 +3949,19 @@ def _trading_day_candidates(n_trading_days: int) -> list[str]:
     return out
 
 
+_stock_ma_build_lock = _threading.Lock()
+
+
 def _build_stock_ma_history() -> dict:
+    """同一時間只允許一個全量重建；排隊的請求拿到鎖後，若檔案已被前一個重建好就直接沿用。"""
+    with _stock_ma_build_lock:
+        existing = _load_stock_ma_history()
+        if existing.get("dates"):
+            return existing
+        return _build_stock_ma_history_impl()
+
+
+def _build_stock_ma_history_impl() -> dict:
     """Backfill closing prices for all TW stocks over the last ~70 trading days.
     TWSE throttles even light concurrency (3 workers still triggered empty-body
     responses for a chunk of dates) but is fine with fully sequential requests —
@@ -3944,9 +3980,14 @@ def _build_stock_ma_history() -> dict:
         for code, v in day_data[dt].items():
             if code not in stocks:
                 stocks[code] = {"name": v["name"], "market": v["market"],
-                                "closes": [None] * len(dates), "highs": [None] * len(dates)}
+                                "closes": [None] * len(dates), "highs": [None] * len(dates),
+                                "lows": [None] * len(dates), "opens": [None] * len(dates),
+                                "vols": [None] * len(dates)}
             stocks[code]["closes"][dt_i] = v["close"]
             stocks[code]["highs"][dt_i] = v.get("high")
+            stocks[code]["lows"][dt_i] = v.get("low")
+            stocks[code]["opens"][dt_i] = v.get("open")
+            stocks[code]["vols"][dt_i] = v.get("vol")
 
     result = {"dates": dates, "stocks": stocks, "updated": _now_iso(), "has_highs": True}
     _save_stock_ma_history(result)
@@ -3963,7 +4004,8 @@ def _stock_ma_rebuild_history() -> None:
     最後補抓被節流漏掉的日期。"""
     global _stock_ma_extending
     try:
-        data = _build_stock_ma_history()
+        with _stock_ma_build_lock:
+            data = _build_stock_ma_history_impl()   # 刻意強制全量重抓（舊檔缺欄位）
         _stock_ma_fill_gaps(data, max_dates=60)
         logger.info(f"[stock-ma] rebuild with intraday highs done — {len(data.get('dates', []))} days")
         _stock_zones_cache["ts"] = 0.0               # 讓選股頁下次重新計算
@@ -4014,9 +4056,14 @@ def _stock_ma_fill_gaps(data: dict, sample_size: int = 150, max_dates: int = 25)
         for code, v in rows.items():
             if code not in stocks:
                 stocks[code] = {"name": v["name"], "market": market,
-                                "closes": [None] * len(dates), "highs": [None] * len(dates)}
+                                "closes": [None] * len(dates), "highs": [None] * len(dates),
+                                "lows": [None] * len(dates), "opens": [None] * len(dates),
+                                "vols": [None] * len(dates)}
             stocks[code]["closes"][i] = v["close"]
             stocks[code].setdefault("highs", [None] * len(dates))[i] = v.get("high")
+            stocks[code].setdefault("lows", [None] * len(dates))[i] = v.get("low")
+            stocks[code].setdefault("opens", [None] * len(dates))[i] = v.get("open")
+            stocks[code].setdefault("vols", [None] * len(dates))[i] = v.get("vol")
         patched = True
         logger.info(f"[stock-ma] gap-fill {dt} ({market}): {len(rows)} rows")
         time.sleep(0.4)
@@ -4054,12 +4101,20 @@ def _stock_ma_try_append_today(data: dict) -> dict:
         for code, st in stocks.items():
             st["closes"].append(None)
             st.setdefault("highs", [None] * (len(st["closes"]) - 1)).append(None)
+            st.setdefault("lows", [None] * (len(st["closes"]) - 1)).append(None)
+            st.setdefault("opens", [None] * (len(st["closes"]) - 1)).append(None)
+            st.setdefault("vols", [None] * (len(st["closes"]) - 1)).append(None)
         for code, v in merged.items():
             if code not in stocks:
                 stocks[code] = {"name": v["name"], "market": v["market"],
-                                "closes": [None] * len(dates), "highs": [None] * len(dates)}
+                                "closes": [None] * len(dates), "highs": [None] * len(dates),
+                                "lows": [None] * len(dates), "opens": [None] * len(dates),
+                                "vols": [None] * len(dates)}
             stocks[code]["closes"][-1] = v["close"]
             stocks[code]["highs"][-1] = v.get("high")
+            stocks[code]["lows"][-1] = v.get("low")
+            stocks[code]["opens"][-1] = v.get("open")
+            stocks[code]["vols"][-1] = v.get("vol")
 
     if fetched:
         # Keep a rolling window so the file doesn't grow forever
@@ -4071,6 +4126,12 @@ def _stock_ma_try_append_today(data: dict) -> dict:
                 stocks[code]["closes"] = stocks[code]["closes"][trim:]
                 if stocks[code].get("highs"):
                     stocks[code]["highs"] = stocks[code]["highs"][trim:]
+                if stocks[code].get("lows"):
+                    stocks[code]["lows"] = stocks[code]["lows"][trim:]
+                if stocks[code].get("opens"):
+                    stocks[code]["opens"] = stocks[code]["opens"][trim:]
+                if stocks[code].get("vols"):
+                    stocks[code]["vols"] = stocks[code]["vols"][trim:]
         data["dates"], data["stocks"], data["updated"] = dates, stocks, _now_iso()
         _save_stock_ma_history(data)
     return data
@@ -4205,6 +4266,7 @@ def _classify_stock_zones() -> dict:
                 c["chg_pct"] = live["change_pct"]
 
     cb_map = _get_cb_by_stock()
+    capital = _get_paid_in_capital()
 
     zones = {"strong": [], "season": [], "repair": []}
     for c in candidates.values():
@@ -4219,6 +4281,7 @@ def _classify_stock_zones() -> dict:
                   "above_ma5": above_ma5,
                   "high52": round(c["high52"], 2) if c.get("high52") is not None else None,
                   "day_high": round(c["day_high"], 2) if c.get("day_high") is not None else None,
+                  "cap": round(capital[c["code"]] / 1e8, 2) if c["code"] in capital else None,   # 股本（億元）
                   "is_high52": (c.get("high52") is not None and c.get("day_high") is not None
                                 and c["day_high"] >= c["high52"])}
         if cb_map.get(c["code"]):
@@ -4289,8 +4352,335 @@ def _run_daily_stock_ma_update():
             _stock_ma_fill_gaps(data)   # self-heal any dates a previous run failed to fetch
         global _stock_zones_cache
         _stock_zones_cache = {"ts": 0.0, "data": None}   # force next request to recompute
+        global _crash_cache
+        _crash_cache = {"ts": 0.0, "mode": None, "data": None}
     except Exception as e:
         logger.error(f"[stock-ma] daily update failed: {e}")
+
+
+# ── 個股 K 線 (OHLC) ───────────────────────────────────────────────────────────
+_opens_backfilling = False
+_OPENS_SAVE_EVERY = 25
+
+
+def _opens_missing_dates(data: dict) -> list[str]:
+    """歷史檔裡「全市場完全沒有開盤價或成交量」的交易日（用前 400 檔抽樣判斷）。"""
+    dates, stocks = data.get("dates", []), data.get("stocks", {})
+    sample = list(stocks.values())[:400]
+
+    def has(field: str, i: int) -> bool:
+        return any((a := st.get(field)) and i < len(a) and a[i] is not None for st in sample)
+
+    return [dt for i, dt in enumerate(dates) if not (has("opens", i) and has("vols", i) and has("lows", i))]
+
+
+def _merge_opens(fetched: dict[str, dict]) -> None:
+    """把背景抓到的 {日期: {代號: {"open":..,"vol":..}}} 併回歷史檔。每次都重新讀檔，縮短與其他寫入者的競爭視窗。"""
+    if not fetched:
+        return
+    data = _load_stock_ma_history()
+    dates = data.get("dates", [])
+    idx = {d: i for i, d in enumerate(dates)}
+    for code, st in data.get("stocks", {}).items():
+        for field, key in (("opens", "open"), ("vols", "vol"), ("lows", "low")):
+            arr = st.get(field)
+            if arr is None or len(arr) != len(dates):
+                arr = (arr or [])[:len(dates)] + [None] * (len(dates) - len(arr or []))
+                st[field] = arr
+            for dt, m in fetched.items():
+                i = idx.get(dt)
+                v = (m.get(code) or {}).get(key)
+                if i is not None and v is not None:
+                    arr[i] = v
+    _save_stock_ma_history(data)
+
+
+def _stock_ma_backfill_opens() -> None:
+    global _opens_backfilling
+    try:
+        data = _load_stock_ma_history()
+        missing = _opens_missing_dates(data)
+        if not missing:
+            return
+        logger.info(f"[kline] backfilling open/low/volume for {len(missing)} days")
+        fetched: dict[str, dict] = {}
+        for n, dt in enumerate(missing, 1):
+            merged = _fetch_tw_all_day(dt)
+            if merged:
+                fetched[dt] = {code: {"open": v.get("open"), "vol": v.get("vol"), "low": v.get("low")} for code, v in merged.items()}
+            time.sleep(0.4)
+            if n % _OPENS_SAVE_EVERY == 0:
+                _merge_opens(fetched)
+                fetched = {}
+                logger.info(f"[kline] opens backfill {n}/{len(missing)}")
+        _merge_opens(fetched)
+        logger.info("[kline] opens backfill done")
+    except Exception as e:
+        logger.warning(f"[kline] opens backfill failed: {e}")
+    finally:
+        _opens_backfilling = False
+
+
+def _stock_ma_kick_opens() -> None:
+    """背景回補歷史開盤價（同一時間只跑一個）。"""
+    global _opens_backfilling
+    if _opens_backfilling:
+        return
+    _opens_backfilling = True
+    _threading.Thread(target=_stock_ma_backfill_opens, daemon=True).start()
+
+
+_yahoo_kline_cache: dict = {}
+
+
+def _yahoo_kline(code: str, days: int) -> dict | None:
+    """不在全市場歷史檔裡的標的 (ETF、美股...) 退而用 Yahoo 日 K。快取 30 分鐘。"""
+    hit = _yahoo_kline_cache.get(code)
+    if hit and time.time() - hit[0] < 1800:
+        return hit[1]
+    cands = [f"{code}.TW", f"{code}.TWO"] if code[:1].isdigit() else [code]   # 台股/ETF 代號以數字開頭；其餘視為美股
+    out = None
+    for sym in cands:
+        try:
+            h = yf.Ticker(sym).history(period="2y", interval="1d", auto_adjust=False)
+            h = h.dropna(subset=["Close"])
+            if len(h) >= 5:
+                h = h.tail(days)
+                out = {"dates": [d.strftime("%Y%m%d") for d in h.index],
+                       "o": [round(float(v), 2) for v in h["Open"]], "h": [round(float(v), 2) for v in h["High"]],
+                       "l": [round(float(v), 2) for v in h["Low"]], "c": [round(float(v), 2) for v in h["Close"]],
+                       "v": [round(float(v) / (1000 if code[:1].isdigit() else 1)) for v in h["Volume"].fillna(0)],
+                       "vunit": "張" if code[:1].isdigit() else "股"}
+                break
+        except Exception as e:
+            logger.warning(f"[kline] yahoo {sym}: {e}")
+    _yahoo_kline_cache[code] = (time.time(), out)
+    return out
+
+
+@app.get("/api/kline/{code}")
+def get_kline(code: str, days: int = 248):
+    """個股日 K（開高低收）。全市場個股取自本機歷史檔；盤中補上今日即時 K 棒；
+    其餘標的 (ETF / 美股) 退回 Yahoo。"""
+    from datetime import date as _date
+    from fastapi import HTTPException
+    code = code.strip().upper()
+    days = max(5, min(days, _STOCK_MA_LOOKBACK_DAYS))
+    data = _load_stock_ma_history()
+    if data.get("dates") and not _is_tw_market_open():
+        data = _stock_ma_try_append_today(data)
+    st = (data.get("stocks") or {}).get(code)
+
+    if not st:
+        y = _yahoo_kline(code, days)
+        if not y:
+            raise HTTPException(status_code=404, detail="查無 K 線資料")
+        return {"code": code, "name": code, "market": "other", "source": "yahoo", "opens_pct": 100, **y}
+
+    dates = data["dates"]
+    n = len(dates)
+    sl = slice(max(0, n - days), n)
+    closes, highs, lows = st["closes"], st.get("highs") or [None] * n, st.get("lows") or [None] * n
+    opens = st.get("opens") or [None] * n
+    vols = st.get("vols") or [None] * n
+    out_dates = list(dates[sl])
+    o, h, l, c = list(opens[sl]), list(highs[sl]), list(lows[sl]), list(closes[sl])
+    v = [round(x / 1000) if x is not None else None for x in vols[sl]]          # 股 → 張
+
+    missing = _opens_missing_dates(data)
+    if missing:
+        _stock_ma_kick_opens()
+    have_open = sum(1 for v in o if v is not None)
+    opens_pct = round(have_open / len(o) * 100) if o else 100
+
+    live = False
+    today = _date.today().strftime("%Y%m%d")
+    if _is_tw_market_open() and out_dates and out_dates[-1] != today:
+        q = fetch_tw_prices_mis([code]).get(code) or {}
+        if q.get("price") is not None and q.get("date") in (None, "", today) and q.get("high") and q.get("low"):
+            out_dates.append(today)
+            o.append(q.get("open")); h.append(max(q["high"], q["price"])); l.append(min(q["low"], q["price"])); c.append(q["price"])
+            v.append(round(q["vol_lots"]) if q.get("vol_lots") is not None else None)
+            live = True
+
+    return {"code": code, "name": st["name"], "market": st["market"], "source": "local", "live": live,
+            "opens_pct": opens_pct, "dates": out_dates, "o": o, "h": h, "l": l, "c": c, "v": v, "vunit": "張"}
+
+
+# 啟動後 10 秒在背景檢查並回補歷史開盤價（約 6~10 分鐘，不阻塞服務）
+_threading.Timer(10, _stock_ma_kick_opens).start()
+
+
+# ── 股災選股 (近5日高低點 + 昨日低點) ──────────────────────────────────────────
+_CRASH_DAYS = 5                      # 「近五日」= 今日之前的 5 個交易日
+_crash_cache: dict = {"ts": 0.0, "mode": None, "data": None}
+
+_PAIDIN_FILE = DATA_DIR / "paid_in_capital.json"
+_paidin_cache: dict = {"ts": 0.0, "data": {}}
+
+
+def _get_paid_in_capital() -> dict[str, float]:
+    """股本 = 實收資本額（元）：證交所 t187ap03_L (上市) + 櫃買 mopsfin_t187ap03_O (上櫃)。
+    每天最多重抓一次，結果同時存檔；抓取失敗時沿用記憶體/檔案裡的上一份，不讓股災選股因此失敗。"""
+    now = time.time()
+    if _paidin_cache["data"] and now - _paidin_cache["ts"] < 12 * 3600:
+        return _paidin_cache["data"]
+    if not _paidin_cache["data"]:
+        _paidin_cache["data"] = load_json(_PAIDIN_FILE, {}).get("capital", {})
+        if _paidin_cache["data"] and now - (load_json(_PAIDIN_FILE, {}).get("ts") or 0) < 12 * 3600:
+            _paidin_cache["ts"] = now
+            return _paidin_cache["data"]
+    out: dict[str, float] = {}
+    hdr = {"User-Agent": "Mozilla/5.0"}
+    try:
+        r = http_requests.get("https://openapi.twse.com.tw/v1/opendata/t187ap03_L", headers=hdr, timeout=30, verify=_TW_VERIFY)
+        for it in r.json():
+            code = str(it.get("公司代號", "")).strip()
+            cap = _parse_price_cell(it.get("實收資本額"))
+            if code and cap:
+                out[code] = cap
+    except Exception as e:
+        logger.warning(f"[crash-picks] TWSE paid-in capital fetch failed: {e}")
+    try:
+        r = http_requests.get("https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O", headers=hdr, timeout=30, verify=_TW_VERIFY)
+        for it in r.json():
+            code = str(it.get("SecuritiesCompanyCode", "")).strip()
+            cap = _parse_price_cell(it.get("Paidin.Capital.NTDollars"))
+            if code and cap:
+                out.setdefault(code, cap)
+    except Exception as e:
+        logger.warning(f"[crash-picks] TPEX paid-in capital fetch failed: {e}")
+    if out:
+        _paidin_cache["data"], _paidin_cache["ts"] = out, now
+        try:
+            _PAIDIN_FILE.parent.mkdir(parents=True, exist_ok=True)
+            with open(_PAIDIN_FILE, "w", encoding="utf-8") as f:
+                json.dump({"ts": now, "capital": out}, f, ensure_ascii=False, separators=(",", ":"))
+        except Exception as e:
+            logger.warning(f"[crash-picks] could not save paid-in capital: {e}")
+    return _paidin_cache["data"]
+
+
+def _stock_ma_ensure_lows(data: dict, n: int = _CRASH_DAYS + 3) -> dict:
+    """歷史檔原本只有收盤/最高價。股災選股只需要最近幾天的最低價，所以只回補最後 n 個交易日
+    （循序抓取，約十來秒），不必重抓整年。以全市場是否「完全沒有」該日最低價判斷要不要補。"""
+    dates: list[str] = data.get("dates", [])
+    stocks: dict[str, dict] = data.get("stocks", {})
+    patched = False
+    for i in range(max(0, len(dates) - n), len(dates)):
+        if any((st.get("lows") or [None] * len(dates))[i] is not None for st in stocks.values()):
+            continue
+        merged = _fetch_tw_all_day(dates[i])
+        if not merged:
+            continue
+        for code, v in merged.items():
+            st = stocks.get(code)
+            if st is None:
+                continue
+            st.setdefault("lows", [None] * len(dates))[i] = v.get("low")
+        patched = True
+        logger.info(f"[crash-picks] backfilled lows for {dates[i]}")
+        time.sleep(0.4)
+    if patched:
+        data["updated"] = _now_iso()
+        _save_stock_ma_history(data)
+    return data
+
+
+def _crash_screen() -> dict:
+    """每檔個股對照「今日」與前 5 個交易日 (不含今日) 的高低點，算出五個條件旗標：
+      1 今日最低 >= 昨日最低 (沒跌破昨日低點)
+      2 收盤/現價 <  近5日最低 (收盤創近5日新低)
+      3 今日最低 >= 近5日最低 (沒破5日低點)
+      4 今日最高 >= 近5日最高 (盤中摸到/突破5日高)
+      5 收盤/現價 >  近5日最高 (收上5日高)
+    盤中 (今日還沒進歷史檔) 用 MIS 即時報價當「今日」，盤後用歷史檔最後一天。"""
+    from datetime import date as _date
+    from zoneinfo import ZoneInfo
+    data = _load_stock_ma_history()
+    if not data.get("dates"):
+        data = _build_stock_ma_history()
+    else:
+        data = _stock_ma_try_append_today(data)
+    data = _stock_ma_ensure_lows(data)
+
+    dates: list[str] = data.get("dates", [])
+    stocks: dict[str, dict] = data.get("stocks", {})
+    today_str = _date.today().strftime("%Y%m%d")
+    now_tw = datetime.now(ZoneInfo("Asia/Taipei"))
+
+    live: dict = {}
+    mode = "close"
+    if dates and dates[-1] != today_str and now_tw.weekday() < 5 and now_tw.hour >= 9:
+        probe = fetch_tw_prices_mis(["2330"]).get("2330") or {}
+        # 休市日 MIS 回的是上一個交易日的資料 (d != 今天) → 不當作今日即時
+        if probe.get("price") is not None and probe.get("date") in (None, "", today_str):
+            live = _fetch_live_prices_chunked(list(stocks.keys()))
+            mode = "live"
+
+    capital = _get_paid_in_capital()
+    cb_map = _get_cb_by_stock()
+    n = _CRASH_DAYS
+    items = []
+    for code, info in stocks.items():
+        closes, highs, lows = info.get("closes") or [], info.get("highs") or [], info.get("lows") or []
+        if not (len(closes) == len(highs) == len(lows) and closes):
+            continue
+        if mode == "live":
+            q = live.get(code) or {}
+            price, t_low, t_high = q.get("price"), q.get("low"), q.get("high")
+            chg = q.get("change_pct")
+            hist = slice(len(closes) - n, len(closes))            # 前 5 天 = 歷史檔最後 5 筆
+            prev_idx = len(closes) - 1                            # 昨日 = 歷史檔最後一筆
+        else:
+            price, t_low, t_high = closes[-1], lows[-1], highs[-1]
+            valid = [c for c in closes if c is not None]
+            chg = round((valid[-1] - valid[-2]) / valid[-2] * 100, 2) if len(valid) >= 2 and valid[-2] else None
+            hist = slice(len(closes) - n - 1, len(closes) - 1)
+            prev_idx = len(closes) - 2
+        if prev_idx < 0 or hist.start < 0 or price is None or t_low is None or t_high is None:
+            continue
+        h5 = [h for h in highs[hist] if h is not None]
+        l5 = [l for l in lows[hist] if l is not None]
+        prev_low = lows[prev_idx]
+        if len(h5) < n or len(l5) < n or prev_low is None:
+            continue                                              # 前期資料不足 (新上市 / 停牌) 不判定
+        low5, high5 = min(l5), max(h5)
+        t_low = min(t_low, price)                                 # 防呆：最低價不會高於現價
+        t_high = max(t_high, price)
+        flags = [t_low >= prev_low, price < low5, t_low >= low5, t_high >= high5, price > high5]
+        # 站上 5/10/20/60 日均：均線含今日（盤中用現價取代今日收盤）；資料不足 n 筆者為 None
+        series = [c for c in closes if c is not None] + ([price] if mode == "live" else [])
+        mas = [(1 if price > sum(series[-k:]) / k else 0) if len(series) >= k else None for k in (5, 10, 20, 60)]
+        items.append({"code": code, "name": info["name"], "market": info["market"],
+                      "price": price, "chg_pct": chg, "low": round(t_low, 2), "high": round(t_high, 2),
+                      "prev_low": round(prev_low, 2), "low5": round(low5, 2), "high5": round(high5, 2),
+                      "cap": round(capital[code] / 1e8, 2) if code in capital else None,   # 股本（億元）
+                      "f": [1 if f else 0 for f in flags], "m": mas,
+                      **({"cbs": cb_map[code]} if cb_map.get(code) else {})})
+
+    items.sort(key=lambda x: -(x["chg_pct"] if x["chg_pct"] is not None else -999))
+    return {"items": items, "mode": mode, "as_of": today_str if mode == "live" else (dates[-1] if dates else None),
+            "updated_at": _now_iso()}
+
+
+@app.get("/api/crash-picks")
+def get_crash_picks(force: bool = False):
+    """股災選股：全市場個股的五個高低點條件旗標，前端自行勾選條件做交集/聯集。"""
+    global _crash_cache
+    from fastapi import HTTPException
+    ttl = 90 if _is_tw_market_open() else 1800
+    if not force and _crash_cache["data"] and time.time() - _crash_cache["ts"] < ttl:
+        return _crash_cache["data"]
+    try:
+        result = _crash_screen()
+        _crash_cache = {"ts": time.time(), "mode": result["mode"], "data": result}
+        return result
+    except Exception as e:
+        logger.error(f"[crash-picks] failed: {e}")
+        if _crash_cache["data"]:
+            return {**_crash_cache["data"], "stale": True}
+        raise HTTPException(status_code=500, detail="股災選股計算失敗")
 
 
 # 季線選股資料每日收盤後更新 (15:10，在 daily_snapshot 之後留緩衝)
